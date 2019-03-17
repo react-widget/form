@@ -1,0 +1,65 @@
+.container {
+    display: flex;
+    height: 100%;
+}
+
+#demo .rw-row > div {
+    background: #00a0e9;
+    padding: 16px 0;
+}
+#demo .rw-row > div:nth-child(odd) {
+    background: rgba(0, 160, 233, 0.7);
+    padding: 16px 0;
+}
+
+.slider {
+    width: 200px;
+    border-right: 1px solid #f2f2fe;
+    > div {
+        padding: 10px;
+        border-bottom: 1px solid #f2f2fe;
+        cursor: pointer;
+    }
+
+    .active {
+        background: #3399ff;
+        color: #fff;
+    }
+}
+
+.content {
+    overflow: auto;
+    padding: 10px;
+    border: 1px solid #f2f2f2;
+    flex: 1;
+}
+
+.table-tree {
+    border-collapse: collapse;
+
+    tbody tr:hover {
+        background-color: #efefef;
+    }
+    td {
+        border-bottom: 1px solid #f2f2f2;
+    }
+}
+
+.dialog {
+    width: 150px;
+    height: 150px;
+    border: 1px solid #000;
+    text-align: center;
+    background: #efefef;
+}
+
+.s-item {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    width: 350px;
+}
+
+.is-error {
+    color: red;
+}
