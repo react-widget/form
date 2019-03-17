@@ -6,7 +6,9 @@
     "dependencies": {
         "@babel/runtime": "^7.1.2",
         "@babel/runtime-corejs2": "^7.1.2",
+        "async-validator": "^1.10.1",
         "classnames": "^2.2.6",
+        "lodash": "^4.17.11",
         "object.omit": "^3.0.0",
         "omit.js": "^1.0.0",
         "prop-types": "^15.6.2",
