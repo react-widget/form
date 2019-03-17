@@ -823,8 +823,8 @@ exports.default = Form;
   formDefaultValue: _propTypes.default.object,
   formValue: _propTypes.default.object,
   formError: _propTypes.default.object,
-  checkDelay: _propTypes.default.number,
-  checkTrigger: _propTypes.default.string,
+  validateDelay: _propTypes.default.number,
+  validateTrigger: _propTypes.default.string,
   //change blur none
   component: _propTypes.default.node,
   rules: _propTypes.default.object,
@@ -841,6 +841,7 @@ exports.default = Form;
   style: {},
   path2obj: true,
   component: 'form',
+  validateTrigger: 'none',
   labelPosition: 'right',
   labelSuffix: ''
 });
@@ -911,8 +912,6 @@ var _propTypes = _interopRequireDefault(__webpack_require__(/*! prop-types */ ".
 
 var _classnames2 = _interopRequireDefault(__webpack_require__(/*! classnames */ "./node_modules/classnames/index.js"));
 
-var _asyncValidator = _interopRequireDefault(__webpack_require__(/*! async-validator */ "./node_modules/async-validator/es/index.js"));
-
 var _FormContext = _interopRequireDefault(__webpack_require__(/*! ./FormContext */ "./src/FormContext.js"));
 
 var FormItem =
@@ -967,19 +966,34 @@ function (_React$Component) {
       return isRequired;
     }
   }, {
+    key: "getValidateTrigger",
+    value: function getValidateTrigger() {
+      var form = this.context.form;
+      var validateTrigger = form.props.validateTrigger;
+      var props = this.props;
+      return 'validateTrigger' in props ? props.validateTrigger : validateTrigger;
+    }
+  }, {
+    key: "getValidateDelay",
+    value: function getValidateDelay() {
+      var form = this.context.form;
+      var validateDelay = form.props.validateDelay;
+      var props = this.props;
+      return 'validateDelay' in props ? props.validateDelay : validateDelay;
+    }
+  }, {
     key: "onFieldBlur",
     value: function onFieldBlur() {
       var form = this.context.form;
-      var _form$props = form.props,
-          checkTrigger = _form$props.checkTrigger,
-          checkDelay = _form$props.checkDelay;
+      var validateTrigger = this.getValidateTrigger();
+      var validateDelay = this.getValidateDelay();
       var name = this.props.name;
 
-      if (checkTrigger === 'blur' && checkDelay > 0) {
+      if (validateTrigger === 'blur' && validateDelay > 0) {
         if (this._validateTimer) clearTimeout(this._validateTimer);
         this._validateTimer = setTimeout(function () {
           form.validateField(name);
-        }, checkDelay);
+        }, validateDelay);
       }
     }
   }, {
@@ -993,15 +1007,16 @@ function (_React$Component) {
     key: "onFieldChange",
     value: function onFieldChange(value, e) {
       var form = this.context.form;
-      var checkTrigger = form.props.checkTrigger;
+      var validateTrigger = this.getValidateTrigger();
+      var validateDelay = this.getValidateDelay();
       var name = this.props.name;
       form.setValue(name, value, e);
 
-      if (checkTrigger === 'change' && checkDelay > 0) {
+      if (validateTrigger === 'change' && validateDelay > 0) {
         if (this._validateTimer) clearTimeout(this._validateTimer);
         this._validateTimer = setTimeout(function () {
           form.validateField(name);
-        }, checkDelay);
+        }, validateDelay);
       }
     }
   }, {
@@ -1102,9 +1117,12 @@ exports.default = FormItem;
   label: _propTypes.default.string,
   labelWidth: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
   name: _propTypes.default.string,
-  required: _propTypes.default.bool,
-  rules: _propTypes.default.oneOfType([_propTypes.default.object, _propTypes.default.array]),
-  normalize: _propTypes.default.func
+  //required: PropTypes.bool,
+  //rules: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+  normalize: _propTypes.default.func,
+  validateDelay: _propTypes.default.number,
+  validateTrigger: _propTypes.default.string //change blur none
+
 });
 (0, _defineProperty2.default)(FormItem, "defaultProps", {
   prefixCls: 'rw-form-item'
@@ -1229,4 +1247,4 @@ module.exports = __webpack_require__(/*! D:\wamp\www\github-projects\react-widge
 /***/ })
 
 /******/ });
-//# sourceMappingURL=index.7388e44d.js.map
+//# sourceMappingURL=index.578b5677.js.map
