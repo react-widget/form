@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import AsyncValidator from 'async-validator';
 import FormContext from './FormContext';
 export default class FormItem extends React.Component {
 
@@ -11,9 +10,11 @@ export default class FormItem extends React.Component {
         label: PropTypes.string,
         labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         name: PropTypes.string,
-        required: PropTypes.bool,
-        rules: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+        //required: PropTypes.bool,
+        //rules: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
         normalize: PropTypes.func,
+        validateDelay: PropTypes.number,
+        validateTrigger: PropTypes.string, //change blur none
     }
 
     static defaultProps = {
@@ -59,15 +60,32 @@ export default class FormItem extends React.Component {
 
     _validateTimer = null
 
+    getValidateTrigger() {
+        const { form } = this.context;
+        const { validateTrigger } = form.props;
+        const props = this.props;
+
+        return 'validateTrigger' in props ? props.validateTrigger : validateTrigger;
+    }
+
+    getValidateDelay() {
+        const { form } = this.context;
+        const { validateDelay } = form.props;
+        const props = this.props;
+
+        return 'validateDelay' in props ? props.validateDelay : validateDelay;
+    }
+
     onFieldBlur() {
         const { form } = this.context;
-        const { checkTrigger, checkDelay } = form.props;
+        const validateTrigger = this.getValidateTrigger();
+        const validateDelay = this.getValidateDelay();
         const { name } = this.props;
-        if (checkTrigger === 'blur' && checkDelay > 0) {
+        if (validateTrigger === 'blur' && validateDelay > 0) {
             if (this._validateTimer) clearTimeout(this._validateTimer)
             this._validateTimer = setTimeout(() => {
                 form.validateField(name);
-            }, checkDelay)
+            }, validateDelay)
         }
     }
 
@@ -80,16 +98,17 @@ export default class FormItem extends React.Component {
 
     onFieldChange(value, e) {
         const { form } = this.context;
-        const { checkTrigger } = form.props;
+        const validateTrigger = this.getValidateTrigger();
+        const validateDelay = this.getValidateDelay();
         const { name } = this.props;
 
         form.setValue(name, value, e);
 
-        if (checkTrigger === 'change' && checkDelay > 0) {
+        if (validateTrigger === 'change' && validateDelay > 0) {
             if (this._validateTimer) clearTimeout(this._validateTimer)
             this._validateTimer = setTimeout(() => {
                 form.validateField(name);
-            }, checkDelay)
+            }, validateDelay)
         }
     }
 

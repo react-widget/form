@@ -16,8 +16,8 @@ export default class Form extends React.Component {
         formDefaultValue: PropTypes.object,
         formValue: PropTypes.object,
         formError: PropTypes.object,
-        checkDelay: PropTypes.number,
-        checkTrigger: PropTypes.string, //change blur none
+        validateDelay: PropTypes.number,
+        validateTrigger: PropTypes.string, //change blur none
         component: PropTypes.node,
         rules: PropTypes.object,
         // labelPosition: PropTypes.oneOf(['right']),
@@ -34,6 +34,7 @@ export default class Form extends React.Component {
         style: {},
         path2obj: true,
         component: 'form',
+        validateTrigger: 'none',
         labelPosition: 'right',
         labelSuffix: ''
     }
