@@ -191,15 +191,15 @@ export default class FormItem extends React.Component {
             >
                 {
                     label && (
-                        <label className="nex-form-item-label">
+                        <label className={`${prefixCls}-label`}>
                             {label}
                         </label>
                     )
                 }
-                <div className="nex-form-inner-wrapper" style={this.contentStyle()}>
+                <div className={`${prefixCls}-content`} style={this.contentStyle()}>
                     {InputComponent}
                     {
-                        error && <div className="nex-form-item-error">{error}</div>
+                        error && <div className={`${prefixCls}-error-tip`} >{error}</div>
                     }
                 </div>
             </div>
