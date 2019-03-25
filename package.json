@@ -14,6 +14,7 @@
         "prop-types": "^15.6.2",
         "react": "^16.5.2",
         "react-dom": "^16.5.2",
+        "react-widget-base-css": "^0.1.0",
         "warning": "^4.0.2"
     },
     "devDependencies": {
