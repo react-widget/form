@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Input from 'react-widget-input';
 import {
     Form,
     FormItem,
@@ -77,6 +78,13 @@ export default class DEMO extends Component {
                     {form => {
                         return (
                             <div>
+                                <FormItem name="name" label="姓名">
+                                    <Input
+                                        style={{
+                                            width: 'auto'
+                                        }}
+                                    />
+                                </FormItem>
                                 <FormItem name="name" label="姓名">
                                     <NativeField component="input" />
                                 </FormItem>

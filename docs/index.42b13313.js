@@ -136,7 +136,7 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
+/******/ 	__webpack_require__.p = "./";
 /******/
 /******/ 	var jsonpArray = window["webpackJsonp"] = window["webpackJsonp"] || [];
 /******/ 	var oldJsonpFunction = jsonpArray.push.bind(jsonpArray);
@@ -317,6 +317,8 @@ var _defineProperty2 = _interopRequireDefault(__webpack_require__(/*! @babel/run
 
 var _react = _interopRequireWildcard(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 
+var _reactWidgetInput = _interopRequireDefault(__webpack_require__(/*! react-widget-input */ "./node_modules/react-widget-input/index.js"));
+
 var _index = __webpack_require__(/*! ../../src/index */ "./src/index.js");
 
 var DEMO =
@@ -412,6 +414,13 @@ function (_Component) {
         return _react.default.createElement("div", null, _react.default.createElement(_index.FormItem, {
           name: "name",
           label: "\u59D3\u540D"
+        }, _react.default.createElement(_reactWidgetInput.default, {
+          style: {
+            width: 'auto'
+          }
+        })), _react.default.createElement(_index.FormItem, {
+          name: "name",
+          label: "\u59D3\u540D"
         }, _react.default.createElement(_index.NativeField, {
           component: "input"
         })), _react.default.createElement("div", null, form.isValidatingField('name') ? '数据校验中...' : null), _react.default.createElement(_index.FormItem, {
@@ -486,6 +495,12 @@ var _interopRequireDefault = __webpack_require__(/*! @babel/runtime-corejs2/help
 var _react = _interopRequireDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 
 var _reactDom = _interopRequireDefault(__webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js"));
+
+__webpack_require__(/*! react-widget-base-css/lib/index.css */ "./node_modules/react-widget-base-css/lib/index.css");
+
+__webpack_require__(/*! react-widget-input/lib/style/index.css */ "./node_modules/react-widget-input/lib/style/index.css");
+
+__webpack_require__(/*! react-widget-icon/lib/style/index.css */ "./node_modules/react-widget-icon/lib/style/index.css");
 
 __webpack_require__(/*! ./style/index.scss */ "./examples/style/index.scss");
 
@@ -1099,12 +1114,12 @@ function (_React$Component) {
       return _react.default.createElement("div", {
         className: (0, _classnames2.default)(prefixCls, (_classnames = {}, (0, _defineProperty2.default)(_classnames, "".concat(className), className), (0, _defineProperty2.default)(_classnames, 'is-error', error), (0, _defineProperty2.default)(_classnames, 'is-validating', validating), (0, _defineProperty2.default)(_classnames, 'is-required', this.isRequired() || required), _classnames))
       }, label && _react.default.createElement("label", {
-        className: "nex-form-item-label"
+        className: "".concat(prefixCls, "-label")
       }, label), _react.default.createElement("div", {
-        className: "nex-form-inner-wrapper",
+        className: "".concat(prefixCls, "-content"),
         style: this.contentStyle()
       }, InputComponent, error && _react.default.createElement("div", {
-        className: "nex-form-item-error"
+        className: "".concat(prefixCls, "-error-tip")
       }, error)));
     }
   }]);
@@ -1241,10 +1256,10 @@ exports.default = _default;
 
 __webpack_require__(/*! D:\wamp\www\github-projects\react-widget\form\node_modules\packez\lib\fetchPolyfills.js */"./node_modules/packez/lib/fetchPolyfills.js");
 __webpack_require__(/*! D:\wamp\www\github-projects\react-widget\form\node_modules\packez\lib\polyfills.js */"./node_modules/packez/lib/polyfills.js");
-module.exports = __webpack_require__(/*! D:\wamp\www\github-projects\react-widget\form\examples\index.js */"./examples/index.js");
+module.exports = __webpack_require__(/*! ./examples/index.js */"./examples/index.js");
 
 
 /***/ })
 
 /******/ });
-//# sourceMappingURL=index.578b5677.js.map
+//# sourceMappingURL=index.42b13313.js.map

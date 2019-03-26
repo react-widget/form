@@ -1,4 +1,57 @@
 
-rw-form-item {
-  display: -ms-inline-flexbox;
-  display: inline-flex; }
+.rw-form .rw-form-item-label {
+  text-align: right;
+  vertical-align: middle;
+  float: left;
+  font-size: 12px;
+  color: #515a6e;
+  line-height: 1;
+  padding: 10px 12px 10px 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box; }
+
+.rw-form-label-left .rw-form-item-label {
+  text-align: left; }
+
+.rw-form-label-top .rw-form-item-label {
+  float: none;
+  display: inline-block;
+  padding: 0 0 10px 0; }
+
+.rw-form-inline .rw-form-item {
+  display: inline-block;
+  margin-right: 10px;
+  vertical-align: top; }
+
+.rw-form-item {
+  margin-bottom: 24px;
+  vertical-align: top;
+  zoom: 1; }
+  .rw-form-item:before, .rw-form-item:after {
+    content: "";
+    display: table; }
+  .rw-form-item:after {
+    clear: both; }
+  .rw-form-item-content {
+    position: relative;
+    line-height: 32px;
+    font-size: 12px; }
+  .rw-form-item .rw-form-item {
+    margin-bottom: 0; }
+  .rw-form-item .rw-form-item .rw-form-item-content {
+    margin-left: 0 !important; }
+  .rw-form-item-error-tip {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    line-height: 1;
+    padding-top: 6px;
+    color: #ed4014; }
+  .rw-form-item-required .rw-form-item-label:before {
+    content: "*";
+    display: inline-block;
+    margin-right: 4px;
+    line-height: 1;
+    font-family: SimSun;
+    font-size: 12px;
+    color: #ed4014; }

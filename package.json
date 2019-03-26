@@ -15,6 +15,8 @@
         "react": "^16.5.2",
         "react-dom": "^16.5.2",
         "react-widget-base-css": "^0.1.0",
+        "react-widget-icon": "^0.2.0",
+        "react-widget-input": "^0.1.0",
         "warning": "^4.0.2"
     },
     "devDependencies": {
@@ -83,9 +85,9 @@
         "*.md"
     ],
     "scripts": {
-        "docs": "node build/docs",
-        "start": "transform-es src -d lib -c -w",
-        "demo": "packez examples/index.js -d docs -w -c -m css,sass,babel,jsx",
+        "docs": "node build/pack",
+        "start": "node build/start",
+        "demo": "node build/pack",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
