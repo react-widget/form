@@ -51,15 +51,19 @@ export default class DEMO extends Component {
                 type: "email",
                 message: "emial 错误..."
             },
-            name(rule, value, callback) {
-                setTimeout(() => {
-                    if (value.length < 5) {
-                        callback(('必须多于5个字符'))
-                    } else {
-                        callback()
-                    }
-                }, 2000)
-            }
+            name: {
+                required: true,
+                message: "必填"
+            },
+            // name(rule, value, callback) {
+            //     setTimeout(() => {
+            //         if (value.length < 5) {
+            //             callback(('必须多于5个字符'))
+            //         } else {
+            //             callback()
+            //         }
+            //     }, 20000)
+            // }
         }
     }
 
@@ -74,13 +78,14 @@ export default class DEMO extends Component {
                     onChange={(formValue) => this.setState({ formValue })}
                     onSubmit={this.onSubmit}
                     rules={this.getRules()}
-                    checkTrigger="none"
+                    validateTrigger="blur"
                 >
                     {form => {
                         return (
                             <div>
-                                <FormItem name="name" label="姓名" inline>
+                                <FormItem labelFor="12" name="name" label="姓名" inline>
                                     <Input
+                                        id="12"
                                         allowClear
                                         prepend="http://"
                                         append=".com"
@@ -120,7 +125,10 @@ export default class DEMO extends Component {
                                 <FormItem name="name" label="姓名" inline>
                                     <Input />
                                 </FormItem>
-                                <FormItem name="name" labelPosition="top" label="姓名">
+                                <FormItem name="name" labelPosition="top" label="姓名" >
+                                    <Input />
+                                </FormItem>
+                                <FormItem name="name" labelPosition="top" label="姓名" inline>
                                     <Input />
                                 </FormItem>
                                 <FormItem name="name" label="姓名">

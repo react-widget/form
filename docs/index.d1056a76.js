@@ -319,6 +319,8 @@ var _react = _interopRequireWildcard(__webpack_require__(/*! react */ "./node_mo
 
 var _reactWidgetInput = _interopRequireDefault(__webpack_require__(/*! react-widget-input */ "./node_modules/react-widget-input/index.js"));
 
+var _reactWidgetIcon = _interopRequireDefault(__webpack_require__(/*! react-widget-icon */ "./node_modules/react-widget-icon/index.js"));
+
 var _index = __webpack_require__(/*! ../../src/index */ "./src/index.js");
 
 var DEMO =
@@ -380,15 +382,19 @@ function (_Component) {
           type: "email",
           message: "emial 错误..."
         },
-        name: function name(rule, value, callback) {
-          setTimeout(function () {
-            if (value.length < 5) {
-              callback('必须多于5个字符');
-            } else {
-              callback();
-            }
-          }, 2000);
-        }
+        name: {
+          required: true,
+          message: "必填"
+        } // name(rule, value, callback) {
+        //     setTimeout(() => {
+        //         if (value.length < 5) {
+        //             callback(('必须多于5个字符'))
+        //         } else {
+        //             callback()
+        //         }
+        //     }, 20000)
+        // }
+
       };
     }
   }, {
@@ -409,16 +415,84 @@ function (_Component) {
         },
         onSubmit: this.onSubmit,
         rules: this.getRules(),
-        checkTrigger: "none"
+        validateTrigger: "blur"
       }, function (form) {
         return _react.default.createElement("div", null, _react.default.createElement(_index.FormItem, {
+          labelFor: "12",
+          name: "name",
+          label: "\u59D3\u540D",
+          inline: true
+        }, _react.default.createElement(_reactWidgetInput.default, {
+          id: "12",
+          allowClear: true,
+          prepend: "http://",
+          append: ".com",
+          prefix: _react.default.createElement(_reactWidgetIcon.default, {
+            type: "ios-contact"
+          }),
+          suffix: _react.default.createElement(_reactWidgetIcon.default, {
+            type: "ios-contact"
+          })
+        })), _react.default.createElement(_index.FormItem, {
+          name: "name",
+          label: "\u59D3\u540D",
+          inline: true
+        }, _react.default.createElement(_reactWidgetInput.default, {
+          allowClear: true,
+          disabled: true,
+          prepend: "http://",
+          append: ".com",
+          prefix: _react.default.createElement(_reactWidgetIcon.default, {
+            type: "ios-contact"
+          }),
+          suffix: _react.default.createElement(_reactWidgetIcon.default, {
+            type: "ios-contact"
+          })
+        })), _react.default.createElement(_index.FormItem, {
+          name: "name",
+          label: "\u59D3\u540D",
+          inline: true
+        }, _react.default.createElement(_reactWidgetInput.default, {
+          size: "small",
+          allowClear: true,
+          prepend: "http://",
+          append: ".com",
+          prefix: _react.default.createElement(_reactWidgetIcon.default, {
+            type: "ios-contact"
+          }),
+          suffix: _react.default.createElement(_reactWidgetIcon.default, {
+            type: "ios-contact"
+          })
+        })), _react.default.createElement(_index.FormItem, {
+          name: "name",
+          label: "\u59D3\u540D",
+          inline: true
+        }, _react.default.createElement(_reactWidgetInput.default, {
+          size: "small"
+        })), _react.default.createElement(_index.FormItem, {
+          labelWidth: 100,
           name: "name",
           label: "\u59D3\u540D"
-        }, _react.default.createElement(_reactWidgetInput.default, {
-          style: {
-            width: 'auto'
-          }
-        })), _react.default.createElement(_index.FormItem, {
+        }, _react.default.createElement(_reactWidgetInput.default, null)), _react.default.createElement(_index.FormItem, {
+          name: "name",
+          labelWidth: 100,
+          labelPosition: "right",
+          label: "\u59D3\u540D",
+          inline: true
+        }, _react.default.createElement(_reactWidgetInput.default, null)), _react.default.createElement(_index.FormItem, {
+          name: "name",
+          label: "\u59D3\u540D",
+          inline: true
+        }, _react.default.createElement(_reactWidgetInput.default, null)), _react.default.createElement(_index.FormItem, {
+          name: "name",
+          labelPosition: "top",
+          label: "\u59D3\u540D"
+        }, _react.default.createElement(_reactWidgetInput.default, null)), _react.default.createElement(_index.FormItem, {
+          name: "name",
+          labelPosition: "top",
+          label: "\u59D3\u540D",
+          inline: true
+        }, _react.default.createElement(_reactWidgetInput.default, null)), _react.default.createElement(_index.FormItem, {
           name: "name",
           label: "\u59D3\u540D"
         }, _react.default.createElement(_index.NativeField, {
@@ -464,7 +538,8 @@ function (_Component) {
           value: "\u6FB3\u5927\u5229\u4E9A"
         }, "\u6FB3\u5927\u5229\u4E9A"))), _react.default.createElement(_index.FormItem, {
           name: "info.desc",
-          label: "\u5907\u6CE8"
+          label: "\u5907\u6CE8",
+          alignItems: "top"
         }, _react.default.createElement(_index.NativeField, {
           component: "textarea"
         })), _react.default.createElement("pre", null, (0, _stringify.default)(formValue)), _react.default.createElement("pre", null, (0, _stringify.default)(form.getError())), _react.default.createElement("button", null, "submit"), _react.default.createElement("button", {
@@ -555,9 +630,9 @@ exports.default = void 0;
 
 var _keys = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/core-js/object/keys */ "./node_modules/@babel/runtime-corejs2/core-js/object/keys.js"));
 
-var _objectSpread5 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/helpers/objectSpread */ "./node_modules/@babel/runtime-corejs2/helpers/objectSpread.js"));
-
 var _isArray = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/core-js/array/is-array */ "./node_modules/@babel/runtime-corejs2/core-js/array/is-array.js"));
+
+var _objectSpread5 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/helpers/objectSpread */ "./node_modules/@babel/runtime-corejs2/helpers/objectSpread.js"));
 
 var _classCallCheck2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/helpers/classCallCheck */ "./node_modules/@babel/runtime-corejs2/helpers/classCallCheck.js"));
 
@@ -614,60 +689,6 @@ function (_React$Component) {
   }
 
   (0, _createClass2.default)(Form, [{
-    key: "getRule",
-    value: function getRule(name) {
-      var rules = this.props.rules[name] || null;
-
-      if (rules) {
-        if (typeof rules === 'function') {
-          rules = [{
-            validator: rules
-          }];
-        } else if (!(0, _isArray.default)(rules)) {
-          rules = [rules];
-        }
-      }
-
-      return rules;
-    }
-  }, {
-    key: "validateField",
-    value: function validateField(name, cb) {
-      var _this2 = this;
-
-      var _this$state = this.state,
-          formError = _this$state.formError,
-          validatingFields = _this$state.validatingFields;
-      var rules = this.getRule(name);
-
-      if (!rules || rules.length === 0) {
-        if (cb instanceof Function) {
-          cb(null);
-        }
-
-        return;
-      }
-
-      this.setState({
-        validatingFields: (0, _objectSpread5.default)({}, validatingFields, (0, _defineProperty2.default)({}, name, true))
-      });
-      var descriptor = (0, _defineProperty2.default)({}, name, rules);
-      var validator = new _asyncValidator.default(descriptor);
-      var data = (0, _defineProperty2.default)({}, name, this.getValue(name));
-      validator.validate(data, {
-        firstFields: true
-      }, function (errors) {
-        _this2.setState({
-          formError: (0, _objectSpread5.default)({}, formError, (0, _defineProperty2.default)({}, name, errors ? errors[0].message : null)),
-          validatingFields: (0, _objectSpread5.default)({}, validatingFields, (0, _defineProperty2.default)({}, name, false))
-        }, function () {
-          if (cb instanceof Function) {
-            cb(errors);
-          }
-        });
-      });
-    }
-  }, {
     key: "addField",
     value: function addField(field) {
       this.fields.push(field);
@@ -728,17 +749,71 @@ function (_React$Component) {
       return formError[name];
     }
   }, {
+    key: "cleanErrors",
+    value: function cleanErrors() {
+      this.setState({
+        validatingFields: {},
+        formError: {}
+      });
+    }
+  }, {
+    key: "getFieldRules",
+    value: function getFieldRules(name) {
+      var rules = this.props.rules[name] || null;
+
+      if (rules) {
+        if (typeof rules === 'function') {
+          rules = [{
+            validator: rules
+          }];
+        } else if (!(0, _isArray.default)(rules)) {
+          rules = [rules];
+        }
+      }
+
+      return rules;
+    }
+  }, {
     key: "isValidatingField",
     value: function isValidatingField(name) {
       var validatingFields = this.state.validatingFields;
       return !!validatingFields[name];
     }
   }, {
-    key: "cleanErrors",
-    value: function cleanErrors() {
+    key: "validateField",
+    value: function validateField(name, cb) {
+      var _this2 = this;
+
+      var _this$state = this.state,
+          formError = _this$state.formError,
+          validatingFields = _this$state.validatingFields;
+      var rules = this.getFieldRules(name);
+
+      if (!rules || rules.length === 0) {
+        if (cb instanceof Function) {
+          cb(null);
+        }
+
+        return;
+      }
+
       this.setState({
-        validatingFields: {},
-        formError: {}
+        validatingFields: (0, _objectSpread5.default)({}, validatingFields, (0, _defineProperty2.default)({}, name, true))
+      });
+      var descriptor = (0, _defineProperty2.default)({}, name, rules);
+      var validator = new _asyncValidator.default(descriptor);
+      var data = (0, _defineProperty2.default)({}, name, this.getValue(name));
+      validator.validate(data, {
+        firstFields: true
+      }, function (errors) {
+        _this2.setState({
+          formError: (0, _objectSpread5.default)({}, formError, (0, _defineProperty2.default)({}, name, errors ? errors[0].message : null)),
+          validatingFields: (0, _objectSpread5.default)({}, validatingFields, (0, _defineProperty2.default)({}, name, false))
+        }, function () {
+          if (cb instanceof Function) {
+            cb(errors);
+          }
+        });
       });
     }
   }, {
@@ -837,7 +912,7 @@ exports.default = Form;
   path2obj: _propTypes.default.bool,
   formDefaultValue: _propTypes.default.object,
   formValue: _propTypes.default.object,
-  formError: _propTypes.default.object,
+  //formError: PropTypes.object,
   validateDelay: _propTypes.default.number,
   validateTrigger: _propTypes.default.string,
   //change blur none
@@ -848,7 +923,8 @@ exports.default = Form;
   // labelSuffix: PropTypes.string,
   // inline: PropTypes.bool,
   onSubmit: _propTypes.default.func,
-  onChange: _propTypes.default.func
+  onChange: _propTypes.default.func,
+  validateFieldsAndScroll: _propTypes.default.bool
 });
 (0, _defineProperty2.default)(Form, "defaultProps", {
   prefixCls: 'rw-form',
@@ -856,9 +932,12 @@ exports.default = Form;
   style: {},
   path2obj: true,
   component: 'form',
+  validateDelay: 0,
+  validateFieldsAndScroll: true,
+  // 待实现
   validateTrigger: 'none',
-  labelPosition: 'right',
-  labelSuffix: ''
+  labelPosition: 'right' //  labelSuffix: '',
+
 });
 
 /***/ }),
@@ -905,15 +984,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _parseInt2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/core-js/parse-int */ "./node_modules/@babel/runtime-corejs2/core-js/parse-int.js"));
-
 var _classCallCheck2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/helpers/classCallCheck */ "./node_modules/@babel/runtime-corejs2/helpers/classCallCheck.js"));
 
 var _createClass2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/helpers/createClass */ "./node_modules/@babel/runtime-corejs2/helpers/createClass.js"));
 
 var _possibleConstructorReturn2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime-corejs2/helpers/possibleConstructorReturn.js"));
 
-var _getPrototypeOf2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/helpers/getPrototypeOf */ "./node_modules/@babel/runtime-corejs2/helpers/getPrototypeOf.js"));
+var _getPrototypeOf3 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/helpers/getPrototypeOf */ "./node_modules/@babel/runtime-corejs2/helpers/getPrototypeOf.js"));
 
 var _assertThisInitialized2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/helpers/assertThisInitialized */ "./node_modules/@babel/runtime-corejs2/helpers/assertThisInitialized.js"));
 
@@ -934,17 +1011,19 @@ var FormItem =
 function (_React$Component) {
   (0, _inherits2.default)(FormItem, _React$Component);
 
-  function FormItem(props) {
+  function FormItem() {
+    var _getPrototypeOf2;
+
     var _this;
 
     (0, _classCallCheck2.default)(this, FormItem);
-    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(FormItem).call(this, props));
+
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    _this = (0, _possibleConstructorReturn2.default)(this, (_getPrototypeOf2 = (0, _getPrototypeOf3.default)(FormItem)).call.apply(_getPrototypeOf2, [this].concat(args)));
     (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "_validateTimer", null);
-    _this.state = {
-      error: '',
-      valid: false,
-      validating: false
-    };
     return _this;
   }
 
@@ -969,7 +1048,7 @@ function (_React$Component) {
     value: function isRequired() {
       var form = this.context.form;
       var name = this.props.name;
-      var rules = form.getRule(name);
+      var rules = form.getFieldRules(name);
       var isRequired = false;
 
       if (rules && rules.length) {
@@ -1004,11 +1083,15 @@ function (_React$Component) {
       var validateDelay = this.getValidateDelay();
       var name = this.props.name;
 
-      if (validateTrigger === 'blur' && validateDelay > 0) {
-        if (this._validateTimer) clearTimeout(this._validateTimer);
-        this._validateTimer = setTimeout(function () {
+      if (validateTrigger === 'blur') {
+        if (validateDelay > 0) {
+          if (this._validateTimer) clearTimeout(this._validateTimer);
+          this._validateTimer = setTimeout(function () {
+            form.validateField(name);
+          }, validateDelay);
+        } else {
           form.validateField(name);
-        }, validateDelay);
+        }
       }
     }
   }, {
@@ -1027,49 +1110,16 @@ function (_React$Component) {
       var name = this.props.name;
       form.setValue(name, value, e);
 
-      if (validateTrigger === 'change' && validateDelay > 0) {
-        if (this._validateTimer) clearTimeout(this._validateTimer);
-        this._validateTimer = setTimeout(function () {
+      if (validateTrigger === 'change') {
+        if (validateDelay > 0) {
+          if (this._validateTimer) clearTimeout(this._validateTimer);
+          this._validateTimer = setTimeout(function () {
+            form.validateField(name);
+          }, validateDelay);
+        } else {
           form.validateField(name);
-        }, validateDelay);
+        }
       }
-    }
-  }, {
-    key: "labelStyle",
-    value: function labelStyle() {
-      var ret = {}; // if (this.parent().props.labelPosition === 'top') return ret;
-
-      var labelWidth = this.props.labelWidth; //|| this.parent().props.labelWidth;
-
-      if (labelWidth) {
-        ret.width = (0, _parseInt2.default)(labelWidth);
-      }
-
-      return ret;
-    }
-  }, {
-    key: "contentStyle",
-    value: function contentStyle() {
-      var ret = {}; //    if (this.parent().props.labelPosition === 'top' || this.parent().props.inline) return ret;
-
-      var labelWidth = this.props.labelWidth; // || this.parent().props.labelWidth;
-
-      if (labelWidth) {
-        ret.marginLeft = (0, _parseInt2.default)(labelWidth);
-      }
-
-      return ret;
-    }
-  }, {
-    key: "fieldValue",
-    value: function fieldValue() {
-      var model = this.context.model; //const model = this.parent().props.model;
-
-      if (!model || !this.props.name) {
-        return;
-      }
-
-      return model[this.props.name];
     }
   }, {
     key: "render",
@@ -1077,15 +1127,21 @@ function (_React$Component) {
       var _classnames;
 
       var form = this.context.form;
-      var validating = this.state.validating;
       var _this$props = this.props,
           normalize = _this$props.normalize,
           label = _this$props.label,
           required = _this$props.required,
+          inline = _this$props.inline,
+          labelFor = _this$props.labelFor,
           className = _this$props.className,
+          labelPosition = _this$props.labelPosition,
+          alignItems = _this$props.alignItems,
+          labelWidth = _this$props.labelWidth,
           prefixCls = _this$props.prefixCls,
-          name = _this$props.name;
+          name = _this$props.name,
+          showMessage = _this$props.showMessage;
       var error = form.getError(name);
+      var validating = form.isValidatingField(name);
 
       var children = _react.default.Children.only(this.props.children);
 
@@ -1112,15 +1168,18 @@ function (_React$Component) {
       });
 
       return _react.default.createElement("div", {
-        className: (0, _classnames2.default)(prefixCls, (_classnames = {}, (0, _defineProperty2.default)(_classnames, "".concat(className), className), (0, _defineProperty2.default)(_classnames, 'is-error', error), (0, _defineProperty2.default)(_classnames, 'is-validating', validating), (0, _defineProperty2.default)(_classnames, 'is-required', this.isRequired() || required), _classnames))
+        className: (0, _classnames2.default)(prefixCls, (_classnames = {}, (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-inline"), inline), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-position-").concat(labelPosition), labelPosition), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-align-items-").concat(alignItems), alignItems !== 'center'), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-error"), error), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-validating"), validating), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-required"), this.isRequired() || required), (0, _defineProperty2.default)(_classnames, "".concat(className), className), _classnames))
       }, label && _react.default.createElement("label", {
-        className: "".concat(prefixCls, "-label")
+        htmlFor: labelFor,
+        className: "".concat(prefixCls, "-label"),
+        style: {
+          width: labelWidth
+        }
       }, label), _react.default.createElement("div", {
-        className: "".concat(prefixCls, "-content"),
-        style: this.contentStyle()
-      }, InputComponent, error && _react.default.createElement("div", {
+        className: "".concat(prefixCls, "-content")
+      }, InputComponent, showMessage && error ? _react.default.createElement("div", {
         className: "".concat(prefixCls, "-error-tip")
-      }, error)));
+      }, error) : null));
     }
   }]);
   return FormItem;
@@ -1130,17 +1189,25 @@ exports.default = FormItem;
 (0, _defineProperty2.default)(FormItem, "contextType", _FormContext.default);
 (0, _defineProperty2.default)(FormItem, "propTypes", {
   label: _propTypes.default.string,
+  labelFor: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
   labelWidth: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+  labelPosition: _propTypes.default.oneOf(['top', 'left', 'right']),
+  alignItems: _propTypes.default.oneOf(['top', 'center', 'bottom']),
   name: _propTypes.default.string,
-  //required: PropTypes.bool,
-  //rules: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+  // required: PropTypes.bool,
   normalize: _propTypes.default.func,
   validateDelay: _propTypes.default.number,
-  validateTrigger: _propTypes.default.string //change blur none
-
+  validateTrigger: _propTypes.default.string,
+  //change blur none
+  inline: _propTypes.default.bool,
+  showMessage: _propTypes.default.bool
 });
 (0, _defineProperty2.default)(FormItem, "defaultProps", {
-  prefixCls: 'rw-form-item'
+  prefixCls: 'rw-form-item',
+  labelPosition: 'left',
+  alignItems: "center",
+  inline: false,
+  showMessage: true
 });
 
 /***/ }),
@@ -1262,4 +1329,4 @@ module.exports = __webpack_require__(/*! ./examples/index.js */"./examples/index
 /***/ })
 
 /******/ });
-//# sourceMappingURL=index.42b13313.js.map
+//# sourceMappingURL=index.d1056a76.js.map
