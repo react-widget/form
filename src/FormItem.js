@@ -13,12 +13,12 @@ export default class FormItem extends React.Component {
         labelPosition: PropTypes.oneOf(['top', 'left', 'right']),
         alignItems: PropTypes.oneOf(['top', 'center', 'bottom']),
         name: PropTypes.string,
-        required: PropTypes.bool,
-        //rules: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+        // required: PropTypes.bool,
         normalize: PropTypes.func,
         validateDelay: PropTypes.number,
         validateTrigger: PropTypes.string, //change blur none
         inline: PropTypes.bool,
+        showMessage: PropTypes.bool,
     }
 
     static defaultProps = {
@@ -26,16 +26,7 @@ export default class FormItem extends React.Component {
         labelPosition: 'left',
         alignItems: "center",
         inline: false,
-    }
-
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            error: '',
-            valid: false,
-            validating: false
-        }
+        showMessage: true,
     }
 
     componentDidMount() {
@@ -55,7 +46,7 @@ export default class FormItem extends React.Component {
     isRequired() {
         const { form } = this.context;
         const { name } = this.props;
-        let rules = form.getRule(name);
+        let rules = form.getFieldRules(name);
         let isRequired = false;
 
         if (rules && rules.length) {
@@ -88,11 +79,16 @@ export default class FormItem extends React.Component {
         const validateTrigger = this.getValidateTrigger();
         const validateDelay = this.getValidateDelay();
         const { name } = this.props;
-        if (validateTrigger === 'blur' && validateDelay > 0) {
-            if (this._validateTimer) clearTimeout(this._validateTimer)
-            this._validateTimer = setTimeout(() => {
+
+        if (validateTrigger === 'blur') {
+            if (validateDelay > 0) {
+                if (this._validateTimer) clearTimeout(this._validateTimer)
+                this._validateTimer = setTimeout(() => {
+                    form.validateField(name);
+                }, validateDelay);
+            } else {
                 form.validateField(name);
-            }, validateDelay)
+            }
         }
     }
 
@@ -111,53 +107,36 @@ export default class FormItem extends React.Component {
 
         form.setValue(name, value, e);
 
-        if (validateTrigger === 'change' && validateDelay > 0) {
-            if (this._validateTimer) clearTimeout(this._validateTimer)
-            this._validateTimer = setTimeout(() => {
+        if (validateTrigger === 'change') {
+            if (validateDelay > 0) {
+                if (this._validateTimer) clearTimeout(this._validateTimer)
+                this._validateTimer = setTimeout(() => {
+                    form.validateField(name);
+                }, validateDelay);
+            } else {
                 form.validateField(name);
-            }, validateDelay)
+            }
         }
-    }
-
-    labelStyle() {
-        const ret = {};
-
-        // if (this.parent().props.labelPosition === 'top') return ret;
-
-        const labelWidth = this.props.labelWidth //|| this.parent().props.labelWidth;
-
-        if (labelWidth) {
-            ret.width = parseInt(labelWidth);
-        }
-
-        return ret;
-    }
-
-    fieldValue() {
-        const { model } = this.context;
-        //const model = this.parent().props.model;
-        if (!model || !this.props.name) { return; }
-        return model[this.props.name];
     }
 
     render() {
         const { form } = this.context;
-        //const { validating } = this.state;
         const {
             normalize,
             label,
             required,
             inline,
-            labelForm,
+            labelFor,
             className,
             labelPosition,
             alignItems,
             labelWidth,
             prefixCls,
-            validating,
-            name
+            name,
+            showMessage
         } = this.props;
-        const error = form.getError(name)
+        const error = form.getError(name);
+        const validating = form.isValidatingField(name);
 
         const children = React.Children.only(this.props.children);
 
@@ -201,7 +180,7 @@ export default class FormItem extends React.Component {
                 {
                     label && (
                         <label
-                            htmlFor={labelForm}
+                            htmlFor={labelFor}
                             className={`${prefixCls}-label`}
                             style={{
                                 width: labelWidth
@@ -214,7 +193,9 @@ export default class FormItem extends React.Component {
                 <div className={`${prefixCls}-content`}>
                     {InputComponent}
                     {
-                        error && <div className={`${prefixCls}-error-tip`} >{error}</div>
+                        showMessage && error ? (
+                            <div className={`${prefixCls}-error-tip`} >{error}</div>
+                        ) : null
                     }
                 </div>
             </div>

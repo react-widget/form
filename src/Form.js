@@ -15,7 +15,7 @@ export default class Form extends React.Component {
         path2obj: PropTypes.bool,
         formDefaultValue: PropTypes.object,
         formValue: PropTypes.object,
-        formError: PropTypes.object,
+        //formError: PropTypes.object,
         validateDelay: PropTypes.number,
         validateTrigger: PropTypes.string, //change blur none
         component: PropTypes.node,
@@ -26,6 +26,7 @@ export default class Form extends React.Component {
         // inline: PropTypes.bool,
         onSubmit: PropTypes.func,
         onChange: PropTypes.func,
+        validateFieldsAndScroll: PropTypes.bool,
     }
 
     static defaultProps = {
@@ -34,9 +35,11 @@ export default class Form extends React.Component {
         style: {},
         path2obj: true,
         component: 'form',
+        validateDelay: 0,
+        validateFieldsAndScroll: true,// 待实现
         validateTrigger: 'none',
         labelPosition: 'right',
-        labelSuffix: ''
+        //  labelSuffix: '',
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -51,63 +54,6 @@ export default class Form extends React.Component {
         formError: {},
         validatingFields: {},
         formValue: this.props.formDefaultValue || {},
-    }
-
-    getRule(name) {
-        let rules = this.props.rules[name] || null;
-
-        if (rules) {
-            if (typeof rules === 'function') {
-                rules = [
-                    {
-                        validator: rules
-                    }
-                ]
-            } else if (!Array.isArray(rules)) {
-                rules = [rules];
-            }
-        }
-        return rules;
-    }
-
-    validateField(name, cb) {
-        const { formError, validatingFields } = this.state;
-        const rules = this.getRule(name);
-
-        if (!rules || rules.length === 0) {
-            if (cb instanceof Function) {
-                cb(null);
-            }
-            return;
-        }
-
-        this.setState({
-            validatingFields: {
-                ...validatingFields,
-                [name]: true,
-            }
-        });
-
-        const descriptor = { [name]: rules };
-        const validator = new AsyncValidator(descriptor);
-        const data = { [name]: this.getValue(name) };
-
-        validator.validate(data, { firstFields: true }, errors => {
-            this.setState({
-                formError: {
-                    ...formError,
-                    [name]: errors ? errors[0].message : null
-                },
-                validatingFields: {
-                    ...validatingFields,
-                    [name]: false,
-                },
-            }, () => {
-                if (cb instanceof Function) {
-                    cb(errors);
-                }
-            });
-        });
     }
 
     addField(field) {
@@ -163,15 +109,72 @@ export default class Form extends React.Component {
         return formError[name];
     }
 
+    cleanErrors() {
+        this.setState({
+            validatingFields: {},
+            formError: {}
+        });
+    }
+
+    getFieldRules(name) {
+        let rules = this.props.rules[name] || null;
+
+        if (rules) {
+            if (typeof rules === 'function') {
+                rules = [
+                    {
+                        validator: rules
+                    }
+                ]
+            } else if (!Array.isArray(rules)) {
+                rules = [rules];
+            }
+        }
+        return rules;
+    }
+
     isValidatingField(name) {
         const validatingFields = this.state.validatingFields;
         return !!validatingFields[name];
     }
 
-    cleanErrors() {
+    validateField(name, cb) {
+        const { formError, validatingFields } = this.state;
+        const rules = this.getFieldRules(name);
+
+        if (!rules || rules.length === 0) {
+            if (cb instanceof Function) {
+                cb(null);
+            }
+            return;
+        }
+
         this.setState({
-            validatingFields: {},
-            formError: {}
+            validatingFields: {
+                ...validatingFields,
+                [name]: true,
+            }
+        });
+
+        const descriptor = { [name]: rules };
+        const validator = new AsyncValidator(descriptor);
+        const data = { [name]: this.getValue(name) };
+
+        validator.validate(data, { firstFields: true }, errors => {
+            this.setState({
+                formError: {
+                    ...formError,
+                    [name]: errors ? errors[0].message : null
+                },
+                validatingFields: {
+                    ...validatingFields,
+                    [name]: false,
+                },
+            }, () => {
+                if (cb instanceof Function) {
+                    cb(errors);
+                }
+            });
         });
     }
 
