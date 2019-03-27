@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Input from 'react-widget-input';
+import Icon from 'react-widget-icon'
 import {
     Form,
     FormItem,
@@ -78,12 +79,49 @@ export default class DEMO extends Component {
                     {form => {
                         return (
                             <div>
-                                <FormItem name="name" label="姓名">
+                                <FormItem name="name" label="姓名" inline>
                                     <Input
-                                        style={{
-                                            width: 'auto'
-                                        }}
+                                        allowClear
+                                        prepend="http://"
+                                        append=".com"
+                                        prefix={<Icon type="ios-contact" />}
+                                        suffix={<Icon type="ios-contact" />}
                                     />
+                                </FormItem>
+                                <FormItem name="name" label="姓名" inline>
+                                    <Input
+                                        allowClear
+                                        disabled
+                                        prepend="http://"
+                                        append=".com"
+                                        prefix={<Icon type="ios-contact" />}
+                                        suffix={<Icon type="ios-contact" />}
+                                    />
+                                </FormItem>
+                                <FormItem name="name" label="姓名" inline>
+                                    <Input
+                                        size="small"
+                                        allowClear
+                                        prepend="http://"
+                                        append=".com"
+                                        prefix={<Icon type="ios-contact" />}
+                                        suffix={<Icon type="ios-contact" />}
+                                    />
+                                </FormItem>
+                                <FormItem name="name" label="姓名" inline>
+                                    <Input size="small" />
+                                </FormItem>
+                                <FormItem labelWidth={100} name="name" label="姓名">
+                                    <Input />
+                                </FormItem>
+                                <FormItem name="name" labelWidth={100} labelPosition="right" label="姓名" inline>
+                                    <Input />
+                                </FormItem>
+                                <FormItem name="name" label="姓名" inline>
+                                    <Input />
+                                </FormItem>
+                                <FormItem name="name" labelPosition="top" label="姓名">
+                                    <Input />
                                 </FormItem>
                                 <FormItem name="name" label="姓名">
                                     <NativeField component="input" />
@@ -115,7 +153,7 @@ export default class DEMO extends Component {
                                         <option value="澳大利亚">澳大利亚</option>
                                     </NativeField>
                                 </FormItem>
-                                <FormItem name="info.desc" label="备注">
+                                <FormItem name="info.desc" label="备注" alignItems="top">
                                     <NativeField component="textarea" />
                                 </FormItem>
                                 <pre>
