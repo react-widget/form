@@ -8,17 +8,24 @@ export default class FormItem extends React.Component {
 
     static propTypes = {
         label: PropTypes.string,
+        labelFor: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        labelPosition: PropTypes.oneOf(['top', 'left', 'right']),
+        alignItems: PropTypes.oneOf(['top', 'center', 'bottom']),
         name: PropTypes.string,
-        //required: PropTypes.bool,
+        required: PropTypes.bool,
         //rules: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
         normalize: PropTypes.func,
         validateDelay: PropTypes.number,
         validateTrigger: PropTypes.string, //change blur none
+        inline: PropTypes.bool,
     }
 
     static defaultProps = {
-        prefixCls: 'rw-form-item'
+        prefixCls: 'rw-form-item',
+        labelPosition: 'left',
+        alignItems: "center",
+        inline: false,
     }
 
     constructor(props) {
@@ -126,20 +133,6 @@ export default class FormItem extends React.Component {
         return ret;
     }
 
-    contentStyle() {
-        const ret = {};
-
-        //    if (this.parent().props.labelPosition === 'top' || this.parent().props.inline) return ret;
-
-        const labelWidth = this.props.labelWidth// || this.parent().props.labelWidth;
-
-        if (labelWidth) {
-            ret.marginLeft = parseInt(labelWidth);
-        }
-
-        return ret;
-    }
-
     fieldValue() {
         const { model } = this.context;
         //const model = this.parent().props.model;
@@ -149,8 +142,21 @@ export default class FormItem extends React.Component {
 
     render() {
         const { form } = this.context;
-        const { validating } = this.state;
-        const { normalize, label, required, className, prefixCls, name } = this.props;
+        //const { validating } = this.state;
+        const {
+            normalize,
+            label,
+            required,
+            inline,
+            labelForm,
+            className,
+            labelPosition,
+            alignItems,
+            labelWidth,
+            prefixCls,
+            validating,
+            name
+        } = this.props;
         const error = form.getError(name)
 
         const children = React.Children.only(this.props.children);
@@ -183,20 +189,29 @@ export default class FormItem extends React.Component {
         return (
             <div
                 className={classnames(prefixCls, {
+                    [`${prefixCls}-inline`]: inline,
+                    [`${prefixCls}-position-${labelPosition}`]: labelPosition,
+                    [`${prefixCls}-align-items-${alignItems}`]: alignItems !== 'center',
+                    [`${prefixCls}-error`]: error,
+                    [`${prefixCls}-validating`]: validating,
+                    [`${prefixCls}-required`]: this.isRequired() || required,
                     [`${className}`]: className,
-                    'is-error': error,
-                    'is-validating': validating,
-                    'is-required': this.isRequired() || required
                 })}
             >
                 {
                     label && (
-                        <label className={`${prefixCls}-label`}>
+                        <label
+                            htmlFor={labelForm}
+                            className={`${prefixCls}-label`}
+                            style={{
+                                width: labelWidth
+                            }}
+                        >
                             {label}
                         </label>
                     )
                 }
-                <div className={`${prefixCls}-content`} style={this.contentStyle()}>
+                <div className={`${prefixCls}-content`}>
                     {InputComponent}
                     {
                         error && <div className={`${prefixCls}-error-tip`} >{error}</div>
