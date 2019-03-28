@@ -83,7 +83,7 @@ export default class DEMO extends Component {
                     {form => {
                         return (
                             <div>
-                                <FormItem labelFor="12" name="name" label="姓名" inline>
+                                <FormItem labelFor="12" name="goods" validateTrigger="change" required label="姓名" inline>
                                     <Input
                                         id="12"
                                         allowClear
