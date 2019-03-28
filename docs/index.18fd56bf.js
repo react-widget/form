@@ -419,7 +419,9 @@ function (_Component) {
       }, function (form) {
         return _react.default.createElement("div", null, _react.default.createElement(_index.FormItem, {
           labelFor: "12",
-          name: "name",
+          name: "goods",
+          validateTrigger: "change",
+          required: true,
           label: "\u59D3\u540D",
           inline: true
         }, _react.default.createElement(_reactWidgetInput.default, {
@@ -630,6 +632,8 @@ exports.default = void 0;
 
 var _keys = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/core-js/object/keys */ "./node_modules/@babel/runtime-corejs2/core-js/object/keys.js"));
 
+var _toConsumableArray2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/helpers/toConsumableArray */ "./node_modules/@babel/runtime-corejs2/helpers/toConsumableArray.js"));
+
 var _isArray = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/core-js/array/is-array */ "./node_modules/@babel/runtime-corejs2/core-js/array/is-array.js"));
 
 var _objectSpread5 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/helpers/objectSpread */ "./node_modules/@babel/runtime-corejs2/helpers/objectSpread.js"));
@@ -759,7 +763,30 @@ function (_React$Component) {
   }, {
     key: "getFieldRules",
     value: function getFieldRules(name) {
-      var rules = this.props.rules[name] || null;
+      var fieldRules = [];
+      this.fields.filter(function (field) {
+        return field.props.name === name;
+      }).forEach(function (field) {
+        var fieldProps = field.props;
+        var rules = fieldProps.rules || [];
+
+        if (typeof rules === 'function') {
+          rules = [{
+            validator: rules
+          }];
+        } else if (!(0, _isArray.default)(rules)) {
+          rules = [rules];
+        }
+
+        if (fieldProps.required) {
+          rules.unshift({
+            required: true
+          });
+        }
+
+        fieldRules.push.apply(fieldRules, (0, _toConsumableArray2.default)(rules));
+      });
+      var rules = this.props.rules[name] || [];
 
       if (rules) {
         if (typeof rules === 'function') {
@@ -771,7 +798,7 @@ function (_React$Component) {
         }
       }
 
-      return rules;
+      return rules ? fieldRules.concat(rules) : fieldRules;
     }
   }, {
     key: "isValidatingField",
@@ -803,6 +830,7 @@ function (_React$Component) {
       var descriptor = (0, _defineProperty2.default)({}, name, rules);
       var validator = new _asyncValidator.default(descriptor);
       var data = (0, _defineProperty2.default)({}, name, this.getValue(name));
+      console.log(data);
       validator.validate(data, {
         firstFields: true
       }, function (errors) {
@@ -857,7 +885,7 @@ function (_React$Component) {
           validatingFields: {}
         }, function () {
           if (callback instanceof Function) {
-            callback(errors);
+            callback(errors, formValue);
           }
         });
       });
@@ -917,7 +945,7 @@ exports.default = Form;
   validateTrigger: _propTypes.default.string,
   //change blur none
   component: _propTypes.default.node,
-  rules: _propTypes.default.object,
+  rules: _propTypes.default.oneOfType([_propTypes.default.object, _propTypes.default.array, _propTypes.default.func]),
   // labelPosition: PropTypes.oneOf(['right']),
   // labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   // labelSuffix: PropTypes.string,
@@ -1194,7 +1222,8 @@ exports.default = FormItem;
   labelPosition: _propTypes.default.oneOf(['top', 'left', 'right']),
   alignItems: _propTypes.default.oneOf(['top', 'center', 'bottom']),
   name: _propTypes.default.string,
-  // required: PropTypes.bool,
+  rules: _propTypes.default.oneOfType([_propTypes.default.object, _propTypes.default.array, _propTypes.default.func]),
+  required: _propTypes.default.bool,
   normalize: _propTypes.default.func,
   validateDelay: _propTypes.default.number,
   validateTrigger: _propTypes.default.string,
@@ -1329,4 +1358,4 @@ module.exports = __webpack_require__(/*! ./examples/index.js */"./examples/index
 /***/ })
 
 /******/ });
-//# sourceMappingURL=index.d1056a76.js.map
+//# sourceMappingURL=index.18fd56bf.js.map
