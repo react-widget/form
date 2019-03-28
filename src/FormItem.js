@@ -102,22 +102,25 @@ export default class FormItem extends React.Component {
 
     onFieldChange(value, e) {
         const { form } = this.context;
-        const validateTrigger = this.getValidateTrigger();
-        const validateDelay = this.getValidateDelay();
         const { name } = this.props;
 
-        form.setValue(name, value, e);
+        form.setValue(name, value, e, () => {
+            const validateTrigger = this.getValidateTrigger();
+            const validateDelay = this.getValidateDelay();
 
-        if (validateTrigger === 'change') {
-            if (validateDelay > 0) {
-                if (this._validateTimer) clearTimeout(this._validateTimer)
-                this._validateTimer = setTimeout(() => {
+            if (validateTrigger === 'change') {
+                if (validateDelay > 0) {
+                    if (this._validateTimer) clearTimeout(this._validateTimer)
+                    this._validateTimer = setTimeout(() => {
+                        form.validateField(name);
+                    }, validateDelay);
+                } else {
                     form.validateField(name);
-                }, validateDelay);
-            } else {
-                form.validateField(name);
+                }
             }
-        }
+        });
+
+
     }
 
     render() {

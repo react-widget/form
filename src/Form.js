@@ -49,6 +49,7 @@ export default class Form extends React.Component {
     }
 
     fields = []
+    _valiateCb = []
 
     state = {
         formError: {},
@@ -76,7 +77,7 @@ export default class Form extends React.Component {
         return formValue[name];
     }
 
-    setValue(name, value, event) {
+    setValue(name, value, event, cb) {
         const { path2obj, onChange } = this.props;
         const formValue = this.state.formValue;
 
@@ -100,7 +101,24 @@ export default class Form extends React.Component {
             onChange(nextFormValue, event);
         }
 
+        if (cb) {
+            this._valiateCb.push(cb);
+        }
+
         return this;
+    }
+
+    componentDidUpdate() {
+        const formValue = this.state.formValue;
+        const validateProcess = this._valiateCb;
+        this._valiateCb = [];
+        validateProcess.forEach(cb => {
+            cb(formValue);
+        });
+    }
+
+    componentWillUnmount() {
+        this._valiateCb = [];
     }
 
     getError(name) {
@@ -183,7 +201,7 @@ export default class Form extends React.Component {
         const descriptor = { [name]: rules };
         const validator = new AsyncValidator(descriptor);
         const data = { [name]: this.getValue(name) };
-        console.log(data)
+
         validator.validate(data, { firstFields: true }, errors => {
             this.setState({
                 formError: {
