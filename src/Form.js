@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import AsyncValidator from 'async-validator';
 import set from 'lodash/set';
 import get from 'lodash/get';
+import scrollIntoView from 'bplokjs-dom-utils/scrollIntoView';
 import FormContext from './FormContext';
 
 
@@ -15,7 +16,6 @@ export default class Form extends React.Component {
         path2obj: PropTypes.bool,
         formDefaultValue: PropTypes.object,
         formValue: PropTypes.object,
-        //formError: PropTypes.object,
         validateDelay: PropTypes.number,
         validateTrigger: PropTypes.string, //change blur none
         component: PropTypes.node,
@@ -134,6 +134,14 @@ export default class Form extends React.Component {
         });
     }
 
+    setErrors(errors) {
+        const { formError } = this.state;
+        this.setState({
+            ...formError,
+            ...errors
+        });
+    }
+
     getFieldRules(name) {
         const fieldRules = [];
         this.fields
@@ -182,11 +190,12 @@ export default class Form extends React.Component {
 
     validateField(name, cb) {
         const { formError, validatingFields } = this.state;
+        const value = this.getValue(name);
         const rules = this.getFieldRules(name);
 
         if (!rules || rules.length === 0) {
             if (cb instanceof Function) {
-                cb(null);
+                cb(null, value);
             }
             return;
         }
@@ -200,7 +209,7 @@ export default class Form extends React.Component {
 
         const descriptor = { [name]: rules };
         const validator = new AsyncValidator(descriptor);
-        const data = { [name]: this.getValue(name) };
+        const data = { [name]: value };
 
         validator.validate(data, { firstFields: true }, errors => {
             this.setState({
@@ -214,7 +223,7 @@ export default class Form extends React.Component {
                 },
             }, () => {
                 if (cb instanceof Function) {
-                    cb(errors);
+                    cb(errors, value);
                 }
             });
         });
@@ -223,9 +232,9 @@ export default class Form extends React.Component {
     validate(callback) {
         const { rules, formValue } = this.props;
         const fields = this.fields;
-
+        //rules获取规则需要调整
         if (fields.length === 0 && callback) {
-            callback(null);
+            callback(null, formValue);
             return;
         }
 
@@ -258,6 +267,27 @@ export default class Form extends React.Component {
                 }
             });
 
+        });
+    }
+
+    validateAndScroll(callback) {
+        const { formError } = this.state;
+        const fields = this.fields;
+        this.validate((errors, formValue) => {
+            let field;
+            fields.forEach(f => {
+                const name = f.props.name;
+                if (!name) return;
+                if (!field && (name in formError)) {
+                    field = f;
+                }
+            });
+
+            if (field) {
+                scrollIntoView(field.getDOM());
+            }
+
+            callback(errors, formValue);
         });
     }
 

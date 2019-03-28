@@ -30,6 +30,14 @@ export default class FormItem extends React.Component {
         showMessage: true,
     }
 
+    saveDOM = dom => {
+        this._dom = dom;
+    }
+
+    getDOM() {
+        return this._dom;
+    }
+
     componentDidMount() {
         const { form } = this.context;
         const { name } = this.props;
@@ -171,6 +179,7 @@ export default class FormItem extends React.Component {
 
         return (
             <div
+                ref={this.saveDOM}
                 className={classnames(prefixCls, {
                     [`${prefixCls}-inline`]: inline,
                     [`${prefixCls}-position-${labelPosition}`]: labelPosition,
