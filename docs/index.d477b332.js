@@ -366,7 +366,7 @@ function (_Component) {
       e.preventDefault();
 
       if (_this.form) {
-        _this.form.validate(function (errors) {
+        _this.form.validateAndScroll(function (errors) {
           console.log(errors);
         });
       }
@@ -664,6 +664,8 @@ var _set = _interopRequireDefault(__webpack_require__(/*! lodash/set */ "./node_
 
 var _get = _interopRequireDefault(__webpack_require__(/*! lodash/get */ "./node_modules/lodash/get.js"));
 
+var _scrollIntoView = _interopRequireDefault(__webpack_require__(/*! bplokjs-dom-utils/scrollIntoView */ "./node_modules/bplokjs-dom-utils/scrollIntoView.js"));
+
 var _FormContext = _interopRequireDefault(__webpack_require__(/*! ./FormContext */ "./src/FormContext.js"));
 
 var Form =
@@ -684,6 +686,7 @@ function (_React$Component) {
 
     _this = (0, _possibleConstructorReturn2.default)(this, (_getPrototypeOf2 = (0, _getPrototypeOf3.default)(Form)).call.apply(_getPrototypeOf2, [this].concat(args)));
     (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "fields", []);
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "_valiateCb", []);
     (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "state", {
       formError: {},
       validatingFields: {},
@@ -720,7 +723,7 @@ function (_React$Component) {
     }
   }, {
     key: "setValue",
-    value: function setValue(name, value, event) {
+    value: function setValue(name, value, event, cb) {
       var _this$props = this.props,
           path2obj = _this$props.path2obj,
           onChange = _this$props.onChange;
@@ -743,7 +746,26 @@ function (_React$Component) {
         onChange(nextFormValue, event);
       }
 
+      if (cb) {
+        this._valiateCb.push(cb);
+      }
+
       return this;
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      var formValue = this.state.formValue;
+      var validateProcess = this._valiateCb;
+      this._valiateCb = [];
+      validateProcess.forEach(function (cb) {
+        cb(formValue);
+      });
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      this._valiateCb = [];
     }
   }, {
     key: "getError",
@@ -759,6 +781,12 @@ function (_React$Component) {
         validatingFields: {},
         formError: {}
       });
+    }
+  }, {
+    key: "setErrors",
+    value: function setErrors(errors) {
+      var formError = this.state.formError;
+      this.setState((0, _objectSpread5.default)({}, formError, errors));
     }
   }, {
     key: "getFieldRules",
@@ -814,11 +842,12 @@ function (_React$Component) {
       var _this$state = this.state,
           formError = _this$state.formError,
           validatingFields = _this$state.validatingFields;
+      var value = this.getValue(name);
       var rules = this.getFieldRules(name);
 
       if (!rules || rules.length === 0) {
         if (cb instanceof Function) {
-          cb(null);
+          cb(null, value);
         }
 
         return;
@@ -829,8 +858,7 @@ function (_React$Component) {
       });
       var descriptor = (0, _defineProperty2.default)({}, name, rules);
       var validator = new _asyncValidator.default(descriptor);
-      var data = (0, _defineProperty2.default)({}, name, this.getValue(name));
-      console.log(data);
+      var data = (0, _defineProperty2.default)({}, name, value);
       validator.validate(data, {
         firstFields: true
       }, function (errors) {
@@ -839,7 +867,7 @@ function (_React$Component) {
           validatingFields: (0, _objectSpread5.default)({}, validatingFields, (0, _defineProperty2.default)({}, name, false))
         }, function () {
           if (cb instanceof Function) {
-            cb(errors);
+            cb(errors, value);
           }
         });
       });
@@ -852,10 +880,10 @@ function (_React$Component) {
       var _this$props2 = this.props,
           rules = _this$props2.rules,
           formValue = _this$props2.formValue;
-      var fields = this.fields;
+      var fields = this.fields; //rules获取规则需要调整
 
       if (fields.length === 0 && callback) {
-        callback(null);
+        callback(null, formValue);
         return;
       }
 
@@ -888,6 +916,29 @@ function (_React$Component) {
             callback(errors, formValue);
           }
         });
+      });
+    }
+  }, {
+    key: "validateAndScroll",
+    value: function validateAndScroll(callback) {
+      var formError = this.state.formError;
+      var fields = this.fields;
+      this.validate(function (errors, formValue) {
+        var field;
+        fields.forEach(function (f) {
+          var name = f.props.name;
+          if (!name) return;
+
+          if (!field && name in formError) {
+            field = f;
+          }
+        });
+
+        if (field) {
+          (0, _scrollIntoView.default)(field.getDOM());
+        }
+
+        callback(errors, formValue);
       });
     }
   }, {
@@ -940,7 +991,6 @@ exports.default = Form;
   path2obj: _propTypes.default.bool,
   formDefaultValue: _propTypes.default.object,
   formValue: _propTypes.default.object,
-  //formError: PropTypes.object,
   validateDelay: _propTypes.default.number,
   validateTrigger: _propTypes.default.string,
   //change blur none
@@ -1051,11 +1101,19 @@ function (_React$Component) {
     }
 
     _this = (0, _possibleConstructorReturn2.default)(this, (_getPrototypeOf2 = (0, _getPrototypeOf3.default)(FormItem)).call.apply(_getPrototypeOf2, [this].concat(args)));
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "saveDOM", function (dom) {
+      _this._dom = dom;
+    });
     (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "_validateTimer", null);
     return _this;
   }
 
   (0, _createClass2.default)(FormItem, [{
+    key: "getDOM",
+    value: function getDOM() {
+      return this._dom;
+    }
+  }, {
     key: "componentDidMount",
     value: function componentDidMount() {
       var form = this.context.form;
@@ -1132,22 +1190,26 @@ function (_React$Component) {
   }, {
     key: "onFieldChange",
     value: function onFieldChange(value, e) {
-      var form = this.context.form;
-      var validateTrigger = this.getValidateTrigger();
-      var validateDelay = this.getValidateDelay();
-      var name = this.props.name;
-      form.setValue(name, value, e);
+      var _this2 = this;
 
-      if (validateTrigger === 'change') {
-        if (validateDelay > 0) {
-          if (this._validateTimer) clearTimeout(this._validateTimer);
-          this._validateTimer = setTimeout(function () {
+      var form = this.context.form;
+      var name = this.props.name;
+      form.setValue(name, value, e, function () {
+        var validateTrigger = _this2.getValidateTrigger();
+
+        var validateDelay = _this2.getValidateDelay();
+
+        if (validateTrigger === 'change') {
+          if (validateDelay > 0) {
+            if (_this2._validateTimer) clearTimeout(_this2._validateTimer);
+            _this2._validateTimer = setTimeout(function () {
+              form.validateField(name);
+            }, validateDelay);
+          } else {
             form.validateField(name);
-          }, validateDelay);
-        } else {
-          form.validateField(name);
+          }
         }
-      }
+      });
     }
   }, {
     key: "render",
@@ -1196,6 +1258,7 @@ function (_React$Component) {
       });
 
       return _react.default.createElement("div", {
+        ref: this.saveDOM,
         className: (0, _classnames2.default)(prefixCls, (_classnames = {}, (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-inline"), inline), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-position-").concat(labelPosition), labelPosition), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-align-items-").concat(alignItems), alignItems !== 'center'), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-error"), error), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-validating"), validating), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-required"), this.isRequired() || required), (0, _defineProperty2.default)(_classnames, "".concat(className), className), _classnames))
       }, label && _react.default.createElement("label", {
         htmlFor: labelFor,
@@ -1358,4 +1421,4 @@ module.exports = __webpack_require__(/*! ./examples/index.js */"./examples/index
 /***/ })
 
 /******/ });
-//# sourceMappingURL=index.18fd56bf.js.map
+//# sourceMappingURL=index.d477b332.js.map

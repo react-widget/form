@@ -38,7 +38,7 @@ export default class DEMO extends Component {
         e.preventDefault();
 
         if (this.form) {
-            this.form.validate(errors => {
+            this.form.validateAndScroll(errors => {
                 console.log(errors)
             });
         }
