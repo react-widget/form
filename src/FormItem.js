@@ -13,7 +13,8 @@ export default class FormItem extends React.Component {
         labelPosition: PropTypes.oneOf(['top', 'left', 'right']),
         alignItems: PropTypes.oneOf(['top', 'center', 'bottom']),
         name: PropTypes.string,
-        // required: PropTypes.bool,
+        rules: PropTypes.oneOfType([PropTypes.object, PropTypes.array, PropTypes.func]),
+        required: PropTypes.bool,
         normalize: PropTypes.func,
         validateDelay: PropTypes.number,
         validateTrigger: PropTypes.string, //change blur none

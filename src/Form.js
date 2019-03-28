@@ -19,7 +19,7 @@ export default class Form extends React.Component {
         validateDelay: PropTypes.number,
         validateTrigger: PropTypes.string, //change blur none
         component: PropTypes.node,
-        rules: PropTypes.object,
+        rules: PropTypes.oneOfType([PropTypes.object, PropTypes.array, PropTypes.func]),
         // labelPosition: PropTypes.oneOf(['right']),
         // labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         // labelSuffix: PropTypes.string,
@@ -117,8 +117,31 @@ export default class Form extends React.Component {
     }
 
     getFieldRules(name) {
-        let rules = this.props.rules[name] || null;
+        const fieldRules = [];
+        this.fields
+            .filter(field => field.props.name === name)
+            .forEach(field => {
+                const fieldProps = field.props;
+                let rules = fieldProps.rules || [];
+                if (typeof rules === 'function') {
+                    rules = [
+                        {
+                            validator: rules
+                        }
+                    ]
+                } else if (!Array.isArray(rules)) {
+                    rules = [rules];
+                }
+                if (fieldProps.required) {
+                    rules.unshift({
+                        required: true
+                    });
+                }
 
+                fieldRules.push(...rules);
+            });
+
+        let rules = this.props.rules[name] || [];
         if (rules) {
             if (typeof rules === 'function') {
                 rules = [
@@ -130,7 +153,8 @@ export default class Form extends React.Component {
                 rules = [rules];
             }
         }
-        return rules;
+
+        return rules ? fieldRules.concat(rules) : fieldRules;
     }
 
     isValidatingField(name) {
@@ -159,7 +183,7 @@ export default class Form extends React.Component {
         const descriptor = { [name]: rules };
         const validator = new AsyncValidator(descriptor);
         const data = { [name]: this.getValue(name) };
-
+        console.log(data)
         validator.validate(data, { firstFields: true }, errors => {
             this.setState({
                 formError: {
@@ -189,7 +213,6 @@ export default class Form extends React.Component {
 
         const validatingFields = {};
 
-
         const validator = new AsyncValidator(rules);
         const data = {};
         Object.keys(rules).forEach(key => {
@@ -213,7 +236,7 @@ export default class Form extends React.Component {
                 validatingFields: {},
             }, () => {
                 if (callback instanceof Function) {
-                    callback(errors);
+                    callback(errors, formValue);
                 }
             });
 
