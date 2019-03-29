@@ -1,6 +1,6 @@
 {
     "name": "react-widget-form",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "description": "",
     "main": "index.js",
     "dependencies": {
@@ -17,7 +17,7 @@
         "react-dom": "^16.5.2",
         "react-widget-base-css": "^0.1.0",
         "react-widget-icon": "^0.2.0",
-        "react-widget-input": "^0.1.0",
+        "react-widget-input": "^0.2.0",
         "warning": "^4.0.2"
     },
     "devDependencies": {

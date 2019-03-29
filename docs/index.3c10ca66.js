@@ -342,7 +342,7 @@ function (_Component) {
     _this = (0, _possibleConstructorReturn2.default)(this, (_getPrototypeOf2 = (0, _getPrototypeOf3.default)(DEMO)).call.apply(_getPrototypeOf2, [this].concat(args)));
     (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "state", {
       formValue: {
-        name: 'haha',
+        name: '',
         info: {
           gender: '男'
         }
@@ -415,6 +415,7 @@ function (_Component) {
         },
         onSubmit: this.onSubmit,
         rules: this.getRules(),
+        inline: true,
         validateTrigger: "blur"
       }, function (form) {
         return _react.default.createElement("div", null, _react.default.createElement(_index.FormItem, {
@@ -451,6 +452,7 @@ function (_Component) {
             type: "ios-contact"
           })
         })), _react.default.createElement(_index.FormItem, {
+          help: "\u5FC5\u586B\u9009\u9879",
           name: "name",
           label: "\u59D3\u540D",
           inline: true
@@ -668,6 +670,8 @@ var _scrollIntoView = _interopRequireDefault(__webpack_require__(/*! bplokjs-dom
 
 var _FormContext = _interopRequireDefault(__webpack_require__(/*! ./FormContext */ "./src/FormContext.js"));
 
+_asyncValidator.default.warning = function () {};
+
 var Form =
 /*#__PURE__*/
 function (_React$Component) {
@@ -877,16 +881,25 @@ function (_React$Component) {
     value: function validate(callback) {
       var _this3 = this;
 
-      var _this$props2 = this.props,
-          rules = _this$props2.rules,
-          formValue = _this$props2.formValue;
-      var fields = this.fields; //rules获取规则需要调整
+      var formValue = this.props.formValue;
+      var fields = this.fields;
+      var rules = {};
 
       if (fields.length === 0 && callback) {
         callback(null, formValue);
         return;
       }
 
+      fields.forEach(function (field) {
+        var name = field.props.name;
+        if (!name || name in rules) return;
+
+        var fieldRules = _this3.getFieldRules(name);
+
+        if (fieldRules && fieldRules.length) {
+          rules[name] = fieldRules;
+        }
+      });
       var validatingFields = {};
       var validator = new _asyncValidator.default(rules);
       var data = {};
@@ -921,21 +934,25 @@ function (_React$Component) {
   }, {
     key: "validateAndScroll",
     value: function validateAndScroll(callback) {
-      var formError = this.state.formError;
-      var fields = this.fields;
+      var _this4 = this;
+
       this.validate(function (errors, formValue) {
-        var field;
-        fields.forEach(function (f) {
-          var name = f.props.name;
-          if (!name) return;
+        if (errors) {
+          var field;
+          var formError = _this4.state.formError;
+          var fields = _this4.fields;
+          fields.forEach(function (f) {
+            var name = f.props.name;
+            if (!name) return;
 
-          if (!field && name in formError) {
-            field = f;
+            if (!field && name in formError) {
+              field = f;
+            }
+          });
+
+          if (field) {
+            (0, _scrollIntoView.default)(field.getDOM());
           }
-        });
-
-        if (field) {
-          (0, _scrollIntoView.default)(field.getDOM());
         }
 
         callback(errors, formValue);
@@ -957,13 +974,13 @@ function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this$props3 = this.props,
-          prefixCls = _this$props3.prefixCls,
-          style = _this$props3.style,
-          className = _this$props3.className,
-          onSubmit = _this$props3.onSubmit,
-          Component = _this$props3.component,
-          children = _this$props3.children;
+      var _this$props2 = this.props,
+          prefixCls = _this$props2.prefixCls,
+          style = _this$props2.style,
+          className = _this$props2.className,
+          onSubmit = _this$props2.onSubmit,
+          Component = _this$props2.component,
+          children = _this$props2.children;
       return _react.default.createElement(_FormContext.default.Provider, {
         value: this.getFormContext()
       }, _react.default.createElement(Component, {
@@ -996,13 +1013,14 @@ exports.default = Form;
   //change blur none
   component: _propTypes.default.node,
   rules: _propTypes.default.oneOfType([_propTypes.default.object, _propTypes.default.array, _propTypes.default.func]),
-  // labelPosition: PropTypes.oneOf(['right']),
-  // labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  // labelSuffix: PropTypes.string,
-  // inline: PropTypes.bool,
+  labelWidth: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
+  labelPosition: _propTypes.default.oneOf(['top', 'left', 'right']),
+  alignItems: _propTypes.default.oneOf(['top', 'center', 'bottom']),
+  inline: _propTypes.default.bool,
   onSubmit: _propTypes.default.func,
   onChange: _propTypes.default.func,
-  validateFieldsAndScroll: _propTypes.default.bool
+  validateFieldsAndScroll: _propTypes.default.bool,
+  showMessage: _propTypes.default.bool
 });
 (0, _defineProperty2.default)(Form, "defaultProps", {
   prefixCls: 'rw-form',
@@ -1011,11 +1029,11 @@ exports.default = Form;
   path2obj: true,
   component: 'form',
   validateDelay: 0,
-  validateFieldsAndScroll: true,
-  // 待实现
   validateTrigger: 'none',
-  labelPosition: 'right' //  labelSuffix: '',
-
+  labelPosition: 'left',
+  alignItems: "center",
+  inline: false,
+  showMessage: true
 });
 
 /***/ }),
@@ -1212,6 +1230,20 @@ function (_React$Component) {
       });
     }
   }, {
+    key: "getLabelProps",
+    value: function getLabelProps() {
+      var form = this.context.form;
+      var formProps = form.props;
+      var props = this.props;
+      return {
+        inline: 'inline' in props ? props.inline : formProps.inline,
+        labelPosition: 'labelPosition' in props ? props.labelPosition : formProps.labelPosition,
+        labelWidth: 'labelWidth' in props ? props.labelWidth : formProps.labelWidth,
+        alignItems: 'alignItems' in props ? props.alignItems : formProps.alignItems,
+        showMessage: 'showMessage' in props ? props.showMessage : formProps.showMessage
+      };
+    }
+  }, {
     key: "render",
     value: function render() {
       var _classnames;
@@ -1221,15 +1253,19 @@ function (_React$Component) {
           normalize = _this$props.normalize,
           label = _this$props.label,
           required = _this$props.required,
-          inline = _this$props.inline,
           labelFor = _this$props.labelFor,
           className = _this$props.className,
-          labelPosition = _this$props.labelPosition,
-          alignItems = _this$props.alignItems,
-          labelWidth = _this$props.labelWidth,
           prefixCls = _this$props.prefixCls,
           name = _this$props.name,
-          showMessage = _this$props.showMessage;
+          help = _this$props.help;
+
+      var _this$getLabelProps = this.getLabelProps(),
+          inline = _this$getLabelProps.inline,
+          labelPosition = _this$getLabelProps.labelPosition,
+          labelWidth = _this$getLabelProps.labelWidth,
+          alignItems = _this$getLabelProps.alignItems,
+          showMessage = _this$getLabelProps.showMessage;
+
       var error = form.getError(name);
       var validating = form.isValidatingField(name);
 
@@ -1259,7 +1295,7 @@ function (_React$Component) {
 
       return _react.default.createElement("div", {
         ref: this.saveDOM,
-        className: (0, _classnames2.default)(prefixCls, (_classnames = {}, (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-inline"), inline), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-position-").concat(labelPosition), labelPosition), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-align-items-").concat(alignItems), alignItems !== 'center'), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-error"), error), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-validating"), validating), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-required"), this.isRequired() || required), (0, _defineProperty2.default)(_classnames, "".concat(className), className), _classnames))
+        className: (0, _classnames2.default)(prefixCls, (_classnames = {}, (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-inline"), inline), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-position-").concat(labelPosition), labelPosition), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-align-items-").concat(alignItems), alignItems !== 'center'), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-error"), error), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-validating"), validating), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-required"), this.isRequired() || required), (0, _defineProperty2.default)(_classnames, "".concat(prefixCls, "-with-help"), help), (0, _defineProperty2.default)(_classnames, "".concat(className), className), _classnames))
       }, label && _react.default.createElement("label", {
         htmlFor: labelFor,
         className: "".concat(prefixCls, "-label"),
@@ -1268,9 +1304,11 @@ function (_React$Component) {
         }
       }, label), _react.default.createElement("div", {
         className: "".concat(prefixCls, "-content")
-      }, InputComponent, showMessage && error ? _react.default.createElement("div", {
+      }, InputComponent, !help && showMessage && error ? _react.default.createElement("div", {
         className: "".concat(prefixCls, "-error-tip")
-      }, error) : null));
+      }, error) : null, help ? _react.default.createElement("div", {
+        className: "".concat(prefixCls, "-help")
+      }, help) : null));
     }
   }]);
   return FormItem;
@@ -1292,14 +1330,16 @@ exports.default = FormItem;
   validateTrigger: _propTypes.default.string,
   //change blur none
   inline: _propTypes.default.bool,
-  showMessage: _propTypes.default.bool
+  showMessage: _propTypes.default.bool,
+  help: _propTypes.default.node //extra: PropTypes.node,
+
 });
 (0, _defineProperty2.default)(FormItem, "defaultProps", {
-  prefixCls: 'rw-form-item',
-  labelPosition: 'left',
-  alignItems: "center",
-  inline: false,
-  showMessage: true
+  prefixCls: 'rw-form-item' // labelPosition: 'left',
+  // alignItems: "center",
+  // inline: false,
+  //showMessage: true,
+
 });
 
 /***/ }),
@@ -1421,4 +1461,4 @@ module.exports = __webpack_require__(/*! ./examples/index.js */"./examples/index
 /***/ })
 
 /******/ });
-//# sourceMappingURL=index.d477b332.js.map
+//# sourceMappingURL=index.3c10ca66.js.map

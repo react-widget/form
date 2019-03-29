@@ -8,4 +8,7 @@ export {
     NativeField,
 };
 
+Form.Item = FormItem;
+Form.NativeField = NativeField;
+
 export default Form;

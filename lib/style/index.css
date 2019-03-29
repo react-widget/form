@@ -60,12 +60,13 @@
     margin-bottom: 0; }
   .rw-form-item .rw-form-item .rw-form-item-content {
     margin-left: 0 !important; }
-  .rw-form-item-error-tip {
+  .rw-form-item-help, .rw-form-item-error-tip {
     position: absolute;
     top: 100%;
     left: 0;
     line-height: 1;
-    padding-top: 6px;
+    padding-top: 5px; }
+  .rw-form-item-error-tip {
     color: #ed4014; }
   .rw-form-item-required .rw-form-item-label:before {
     content: "*";
@@ -74,4 +75,6 @@
     line-height: 1;
     font-family: SimSun;
     font-size: 12px;
+    color: #ed4014; }
+  .rw-form-item-error .rw-form-item-help {
     color: #ed4014; }

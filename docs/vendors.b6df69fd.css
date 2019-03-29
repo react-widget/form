@@ -496,9 +496,6 @@ samp {
 .input-group-error-prepend, .input-group-error-append {
   background-color: #fff;
   border: 1px solid #ed4014; }
-  .input-group-error-prepend .rwselect-selection, .input-group-error-append .rwselect-selection {
-    background-color: inherit;
-    border: 1px solid transparent; }
 
 .input-group-error-prepend {
   border-right: 0; }
@@ -519,7 +516,8 @@ samp {
   background-color: #fff;
   background-image: none;
   position: relative;
-  cursor: text; }
+  cursor: text;
+  z-index: 2; }
   .rw-input::-moz-placeholder {
     color: #c5c8ce;
     opacity: 1; }
@@ -572,7 +570,6 @@ samp {
     text-align: center;
     color: #808695;
     position: absolute;
-    z-index: 3;
     top: 50%;
     left: 50%;
     -webkit-transform: translateY(-50%) translateX(-50%);
@@ -585,16 +582,26 @@ samp {
   .rw-input-wrapper-small .rw-input-icon {
     font-size: 14px; }
   .rw-input-prefix, .rw-input-suffix {
-    width: 32px;
-    height: 100%;
+    width: 30px;
     text-align: center;
     position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 1; }
+    left: 1px;
+    top: 1px;
+    bottom: 1px;
+    z-index: 3;
+    border-radius: 4px; }
   .rw-input-suffix {
     left: auto;
-    right: 0; }
+    right: 1px; }
+  .rw-input-wrapper-small .rw-input-prefix,
+  .rw-input-wrapper-small .rw-input-suffix {
+    border-radius: 3px; }
+  .rw-input-wrapper-small .rw-input-prefix, .rw-input-prefix {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0; }
+  .rw-input-wrapper-small .rw-input-suffix, .rw-input-suffix {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0; }
 
 .rw-input-group {
   display: table;
@@ -624,9 +631,11 @@ samp {
   .rw-input-group > .rw-input-affix-wrapper,
   .rw-input-group > .rw-input {
     display: table-cell; }
+  .rw-input-group-with-prepend .rw-input-prefix,
   .rw-input-group-with-prepend .rw-input {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0; }
+  .rw-input-group-with-append .rw-input-suffix,
   .rw-input-group-with-append .rw-input {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0; }
@@ -645,7 +654,6 @@ samp {
     padding: 4px 7px;
     font-size: inherit;
     font-weight: normal;
-    line-height: 1;
     color: #515a6e;
     text-align: center;
     background-color: #f8f8f9;
@@ -666,6 +674,13 @@ samp {
     border-bottom-left-radius: 0;
     border-top-left-radius: 0; }
 
+.rw-form-item-error .rw-input {
+  border: 1px solid #ed4014; }
+  .rw-form-item-error .rw-input:hover {
+    border-color: #ed4014; }
+  .rw-form-item-error .rw-input:active {
+    border-color: #ed4014; }
+
 .rw-input-with-search .rw-input-suffix {
   cursor: pointer;
   color: #999eaa; }
@@ -682,7 +697,7 @@ samp {
   color: #fff;
   border-color: #2d8cf0;
   position: relative;
-  z-index: 2; }
+  z-index: 1; }
   .rw-input-with-search > .rw-input-group-append:hover {
     background: #57a3f3;
     border-color: #57a3f3; }
@@ -3354,4 +3369,4 @@ MIT License: https://github.com/driftyco/ionicons
             transform: rotate(360deg); } }
 
 
-/*# sourceMappingURL=vendors.2f776281.css.map*/
+/*# sourceMappingURL=vendors.b6df69fd.css.map*/

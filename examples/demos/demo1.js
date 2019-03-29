@@ -13,7 +13,7 @@ export default class DEMO extends Component {
 
     state = {
         formValue: {
-            name: 'haha',
+            name: '',
             info: {
                 gender: '男'
             }
@@ -78,6 +78,7 @@ export default class DEMO extends Component {
                     onChange={(formValue) => this.setState({ formValue })}
                     onSubmit={this.onSubmit}
                     rules={this.getRules()}
+                    inline
                     validateTrigger="blur"
                 >
                     {form => {
@@ -103,7 +104,7 @@ export default class DEMO extends Component {
                                         suffix={<Icon type="ios-contact" />}
                                     />
                                 </FormItem>
-                                <FormItem name="name" label="姓名" inline>
+                                <FormItem help="必填选项" name="name" label="姓名" inline>
                                     <Input
                                         size="small"
                                         allowClear
