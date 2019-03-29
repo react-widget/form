@@ -21,13 +21,14 @@ export default class Form extends React.Component {
         validateTrigger: PropTypes.string, //change blur none
         component: PropTypes.node,
         rules: PropTypes.oneOfType([PropTypes.object, PropTypes.array, PropTypes.func]),
-        // labelPosition: PropTypes.oneOf(['right']),
-        // labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        // labelSuffix: PropTypes.string,
-        // inline: PropTypes.bool,
+        labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        labelPosition: PropTypes.oneOf(['top', 'left', 'right']),
+        alignItems: PropTypes.oneOf(['top', 'center', 'bottom']),
+        inline: PropTypes.bool,
         onSubmit: PropTypes.func,
         onChange: PropTypes.func,
         validateFieldsAndScroll: PropTypes.bool,
+        showMessage: PropTypes.bool,
     }
 
     static defaultProps = {
@@ -37,10 +38,11 @@ export default class Form extends React.Component {
         path2obj: true,
         component: 'form',
         validateDelay: 0,
-        validateFieldsAndScroll: true,// 待实现
         validateTrigger: 'none',
-        labelPosition: 'right',
-        //  labelSuffix: '',
+        labelPosition: 'left',
+        alignItems: "center",
+        inline: false,
+        showMessage: true,
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {

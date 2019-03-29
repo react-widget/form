@@ -78,12 +78,16 @@
         margin-left: 0 !important;
     }
 
+    &-help,
     &-error-tip {
         position: absolute;
         top: 100%;
         left: 0;
         line-height: 1;
-        padding-top: 6px;
+        padding-top: 5px;
+    }
+
+    &-error-tip {
         color: $error-color;
     }
 
@@ -98,6 +102,10 @@
             color: $error-color;
         }
     }
+    &-error &-help {
+        color: $error-color;
+    }
+
     &-error {
         // todo
     }

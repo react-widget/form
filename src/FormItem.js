@@ -20,14 +20,16 @@ export default class FormItem extends React.Component {
         validateTrigger: PropTypes.string, //change blur none
         inline: PropTypes.bool,
         showMessage: PropTypes.bool,
+        help: PropTypes.node,
+        //extra: PropTypes.node,
     }
 
     static defaultProps = {
         prefixCls: 'rw-form-item',
-        labelPosition: 'left',
-        alignItems: "center",
-        inline: false,
-        showMessage: true,
+        // labelPosition: 'left',
+        // alignItems: "center",
+        // inline: false,
+        //showMessage: true,
     }
 
     saveDOM = dom => {
@@ -131,22 +133,34 @@ export default class FormItem extends React.Component {
 
     }
 
+    getLabelProps() {
+        const { form } = this.context;
+        const formProps = form.props;
+        const props = this.props;
+
+        return {
+            inline: 'inline' in props ? props.inline : formProps.inline,
+            labelPosition: 'labelPosition' in props ? props.labelPosition : formProps.labelPosition,
+            labelWidth: 'labelWidth' in props ? props.labelWidth : formProps.labelWidth,
+            alignItems: 'alignItems' in props ? props.alignItems : formProps.alignItems,
+            showMessage: 'showMessage' in props ? props.showMessage : formProps.showMessage,
+        }
+    }
+
     render() {
         const { form } = this.context;
         const {
             normalize,
             label,
             required,
-            inline,
             labelFor,
             className,
-            labelPosition,
-            alignItems,
-            labelWidth,
             prefixCls,
             name,
-            showMessage
+            help,
+            //extra,
         } = this.props;
+        const { inline, labelPosition, labelWidth, alignItems, showMessage } = this.getLabelProps();
         const error = form.getError(name);
         const validating = form.isValidatingField(name);
 
@@ -187,6 +201,7 @@ export default class FormItem extends React.Component {
                     [`${prefixCls}-error`]: error,
                     [`${prefixCls}-validating`]: validating,
                     [`${prefixCls}-required`]: this.isRequired() || required,
+                    [`${prefixCls}-with-help`]: help,
                     [`${className}`]: className,
                 })}
             >
@@ -206,8 +221,13 @@ export default class FormItem extends React.Component {
                 <div className={`${prefixCls}-content`}>
                     {InputComponent}
                     {
-                        showMessage && error ? (
+                        !help && showMessage && error ? (
                             <div className={`${prefixCls}-error-tip`} >{error}</div>
+                        ) : null
+                    }
+                    {
+                        help ? (
+                            <div className={`${prefixCls}-help`} >{help}</div>
                         ) : null
                     }
                 </div>
