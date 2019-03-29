@@ -7,6 +7,7 @@ import get from 'lodash/get';
 import scrollIntoView from 'bplokjs-dom-utils/scrollIntoView';
 import FormContext from './FormContext';
 
+AsyncValidator.warning = function () { };
 
 export default class Form extends React.Component {
     static propTypes = {
@@ -230,13 +231,23 @@ export default class Form extends React.Component {
     }
 
     validate(callback) {
-        const { rules, formValue } = this.props;
+        const { formValue } = this.props;
         const fields = this.fields;
-        //rules获取规则需要调整
+        const rules = {};
+
         if (fields.length === 0 && callback) {
             callback(null, formValue);
             return;
         }
+
+        fields.forEach(field => {
+            const name = field.props.name;
+            if (!name || name in rules) return;
+            const fieldRules = this.getFieldRules(name);
+            if (fieldRules && fieldRules.length) {
+                rules[name] = fieldRules;
+            }
+        });
 
         const validatingFields = {};
 
@@ -271,20 +282,22 @@ export default class Form extends React.Component {
     }
 
     validateAndScroll(callback) {
-        const { formError } = this.state;
-        const fields = this.fields;
         this.validate((errors, formValue) => {
-            let field;
-            fields.forEach(f => {
-                const name = f.props.name;
-                if (!name) return;
-                if (!field && (name in formError)) {
-                    field = f;
-                }
-            });
+            if (errors) {
+                let field;
+                const formError = this.state.formError;
+                const fields = this.fields;
+                fields.forEach(f => {
+                    const name = f.props.name;
+                    if (!name) return;
+                    if (!field && (name in formError)) {
+                        field = f;
+                    }
+                });
 
-            if (field) {
-                scrollIntoView(field.getDOM());
+                if (field) {
+                    scrollIntoView(field.getDOM());
+                }
             }
 
             callback(errors, formValue);
