@@ -35,6 +35,7 @@ export default class Form extends React.Component {
         prefixCls: 'rw-form',
         className: '',
         style: {},
+        rules: {},
         path2obj: true,
         component: 'form',
         validateDelay: 0,
