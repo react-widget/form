@@ -32,6 +32,17 @@ export default class FormItem extends React.Component {
         //showMessage: true,
     }
 
+    constructor(...args) {
+        super(...args);
+
+        const { form } = this.context;
+        const { name } = this.props;
+
+        if (name) {
+            form.addField(this);
+        }
+    }
+
     saveDOM = dom => {
         this._dom = dom;
     }
@@ -40,14 +51,14 @@ export default class FormItem extends React.Component {
         return this._dom;
     }
 
-    componentDidMount() {
-        const { form } = this.context;
-        const { name } = this.props;
+    // componentDidMount() {
+    //     const { form } = this.context;
+    //     const { name } = this.props;
 
-        if (name) {
-            form.addField(this);
-        }
-    }
+    //     if (name) {
+    //         form.addField(this);
+    //     }
+    // }
 
     componentWillUnmount() {
         const { form } = this.context;
