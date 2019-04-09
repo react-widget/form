@@ -7,7 +7,7 @@ export default class FormItem extends React.Component {
     static contextType = FormContext;
 
     static propTypes = {
-        label: PropTypes.string,
+        label: PropTypes.node,
         labelFor: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         labelPosition: PropTypes.oneOf(['top', 'left', 'right']),
