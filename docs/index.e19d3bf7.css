@@ -330,8 +330,8 @@
     .rw-form-item-position-left .rw-form-item-label, .rw-form-item-position-right .rw-form-item-label {
       padding: 0 10px 0 0; }
     .rw-form-item-position-left .rw-form-item-content, .rw-form-item-position-right .rw-form-item-content {
-      -ms-flex: auto;
-          flex: auto; }
+      -ms-flex: 1 1;
+          flex: 1 1; }
   .rw-form-item-position-left.rw-form-item-align-items-top, .rw-form-item-position-right.rw-form-item-align-items-top {
     -ms-flex-align: start;
         align-items: flex-start; }
@@ -372,4 +372,4 @@
     color: #ed4014; }
 
 
-/*# sourceMappingURL=index.2116b9ed.css.map*/
+/*# sourceMappingURL=index.e19d3bf7.css.map*/

@@ -1026,6 +1026,7 @@ exports.default = Form;
   prefixCls: 'rw-form',
   className: '',
   style: {},
+  rules: {},
   path2obj: true,
   component: 'form',
   validateDelay: 0,
@@ -1123,6 +1124,13 @@ function (_React$Component) {
       _this._dom = dom;
     });
     (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "_validateTimer", null);
+    var form = _this.context.form;
+    var name = _this.props.name;
+
+    if (name) {
+      form.addField((0, _assertThisInitialized2.default)(_this));
+    }
+
     return _this;
   }
 
@@ -1130,17 +1138,14 @@ function (_React$Component) {
     key: "getDOM",
     value: function getDOM() {
       return this._dom;
-    }
-  }, {
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      var form = this.context.form;
-      var name = this.props.name;
+    } // componentDidMount() {
+    //     const { form } = this.context;
+    //     const { name } = this.props;
+    //     if (name) {
+    //         form.addField(this);
+    //     }
+    // }
 
-      if (name) {
-        form.addField(this);
-      }
-    }
   }, {
     key: "componentWillUnmount",
     value: function componentWillUnmount() {
@@ -1430,6 +1435,8 @@ var _FormItem = _interopRequireDefault(__webpack_require__(/*! ./FormItem */ "./
 
 var _NativeField = _interopRequireDefault(__webpack_require__(/*! ./NativeField */ "./src/NativeField.js"));
 
+_Form.default.Item = _FormItem.default;
+_Form.default.NativeField = _NativeField.default;
 var _default = _Form.default;
 exports.default = _default;
 
@@ -1453,12 +1460,12 @@ exports.default = _default;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! D:\wamp\www\github-projects\react-widget\form\node_modules\packez\lib\fetchPolyfills.js */"./node_modules/packez/lib/fetchPolyfills.js");
-__webpack_require__(/*! D:\wamp\www\github-projects\react-widget\form\node_modules\packez\lib\polyfills.js */"./node_modules/packez/lib/polyfills.js");
+__webpack_require__(/*! D:\wamp64\www\github-project\react-widget\form\node_modules\packez\lib\fetchPolyfills.js */"./node_modules/packez/lib/fetchPolyfills.js");
+__webpack_require__(/*! D:\wamp64\www\github-project\react-widget\form\node_modules\packez\lib\polyfills.js */"./node_modules/packez/lib/polyfills.js");
 module.exports = __webpack_require__(/*! ./examples/index.js */"./examples/index.js");
 
 
 /***/ })
 
 /******/ });
-//# sourceMappingURL=index.3c10ca66.js.map
+//# sourceMappingURL=index.5af740cd.js.map
