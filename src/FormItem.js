@@ -21,6 +21,7 @@ export default class FormItem extends React.Component {
         inline: PropTypes.bool,
         showMessage: PropTypes.bool,
         help: PropTypes.node,
+        style: PropTypes.object,
         //extra: PropTypes.node,
     }
 
@@ -169,6 +170,7 @@ export default class FormItem extends React.Component {
             prefixCls,
             name,
             help,
+            style,
             //extra,
         } = this.props;
         const { inline, labelPosition, labelWidth, alignItems, showMessage } = this.getLabelProps();
@@ -204,6 +206,7 @@ export default class FormItem extends React.Component {
 
         return (
             <div
+                style={style}
                 ref={this.saveDOM}
                 className={classnames(prefixCls, {
                     [`${prefixCls}-inline`]: inline,
