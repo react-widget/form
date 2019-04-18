@@ -35,13 +35,9 @@ export default class FormItem extends React.Component {
 
     constructor(...args) {
         super(...args);
-
         const { form } = this.context;
-        const { name } = this.props;
 
-        if (name) {
-            form.addField(this);
-        }
+        form.addField(this);
     }
 
     saveDOM = dom => {
