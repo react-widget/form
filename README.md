@@ -15,30 +15,29 @@
 | formValue | 表单数据`受控` | object |  |
 | validateDelay |- | number |  |
 | validateTrigger |- | string |  |
-| component |- | string\|ReactNode |  |
-| prefix | 带有前缀图标的 input | string\|ReactNode |  |
-| prefixProps | 前缀图标属性 | object |  |
-| suffix | 带有后缀图标的 input | string\|ReactNode |  |
-| suffixProps | 后缀图标属性 | object |  |
-| type | 声明 input 类型，同原生 input 标签的 type 属性，见：[MDN](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input#属性)。 | string | `text` |
-| onChange | 输入框内容变化时的回调 | function(value,e) | |
-| onPressEnter | 按下回车的回调 | function(e) |  |
-| allowClear | 可以点击清除图标删除内容 | boolean | |
+| validateFieldsAndScroll |- | string |  |
+| showMessage |- | string |  |
+| component | 表单默认元素 | React.Element | form  |
+| rules | 验证规则 | object\|array\|function | null  |
+| labelWidth | 表单标签域宽度 | number\|string | - |
+| labelPosition | 表单标签域位置 | `top` `left` `right` | left |
+| alignItems | 表单控制表单项的alignItems的属性 | string | center |
+| inline | 行内表单模式 | function(value,e) | |
+| onSubmit | 只有当原生表单的onSubmit事件 | function(e) |  |
+| onChange | 按下回车的回调 | function(formValue, e) |  |
+| getFormItemInputProps | 自定义表单输入框控件的属性 | function(e) |  |
 
-Input 的其他属性和 React 自带的 [input](https://facebook.github.io/react/docs/events.html#supported-events) 一致。
 
 ### FormItem
 | 参数 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| enterButton | 是否有确认按钮，可设为按钮文字。该属性会与 append 冲突。 | boolean\|ReactNode | false |
-| onSearch | 点击搜索或按下回车键时的回调 | function(value, event) |  |
-
-其余属性和 Input 一致。
+| - | - | - | - |
+| - | - | - |
 
 ### NativeField
 | 参数 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| autosize | 自适应内容高度，可设置为 `true|false` 或对象：`{ minRows: 2, maxRows: 6 }` | boolean\|object | false |
+| component | 接收`value` `onChange(e)`的控件 | React.Element | input |
 
-其余属性和 Input 一致。
+其余属性传递给component。
 
