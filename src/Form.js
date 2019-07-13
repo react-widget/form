@@ -1,13 +1,13 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import classnames from 'classnames';
-import AsyncValidator from 'async-validator';
-import set from 'lodash/set';
-import get from 'lodash/get';
-import scrollIntoView from 'bplokjs-dom-utils/scrollIntoView';
-import FormContext from './FormContext';
+import React from "react";
+import PropTypes from "prop-types";
+import classnames from "classnames";
+import AsyncValidator from "async-validator";
+import set from "lodash/set";
+import get from "lodash/get";
+import scrollIntoView from "bplokjs-dom-utils/scrollIntoView";
+import FormContext from "./FormContext";
 
-AsyncValidator.warning = function () { };
+AsyncValidator.warning = function() {};
 
 export default class Form extends React.Component {
     static propTypes = {
@@ -15,52 +15,56 @@ export default class Form extends React.Component {
         className: PropTypes.string,
         style: PropTypes.object,
         path2obj: PropTypes.bool,
-        formDefaultValue: PropTypes.object,
+        defaultFormValue: PropTypes.object,
         formValue: PropTypes.object,
         validateDelay: PropTypes.number,
         validateTrigger: PropTypes.string, //change blur none
         component: PropTypes.node,
-        rules: PropTypes.oneOfType([PropTypes.object, PropTypes.array, PropTypes.func]),
+        rules: PropTypes.oneOfType([
+            PropTypes.object,
+            PropTypes.array,
+            PropTypes.func
+        ]),
         labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        labelPosition: PropTypes.oneOf(['top', 'left', 'right']),
-        alignItems: PropTypes.oneOf(['top', 'center', 'bottom']),
+        labelPosition: PropTypes.oneOf(["top", "left", "right"]),
+        alignItems: PropTypes.oneOf(["top", "center", "bottom"]),
         inline: PropTypes.bool,
         onSubmit: PropTypes.func,
         onChange: PropTypes.func,
         validateFieldsAndScroll: PropTypes.bool,
         showMessage: PropTypes.bool,
-        getFormItemInputProps: PropTypes.func,
-    }
+        getFormItemInputProps: PropTypes.func
+    };
 
     static defaultProps = {
-        prefixCls: 'rw-form',
-        className: '',
+        prefixCls: "rw-form",
+        className: "",
         style: {},
         rules: {},
         path2obj: true,
-        component: 'form',
+        component: "form",
         validateDelay: 0,
-        validateTrigger: 'none',
-        labelPosition: 'left',
+        validateTrigger: "none",
+        labelPosition: "left",
         alignItems: "center",
         inline: false,
-        showMessage: true,
-    }
+        showMessage: true
+    };
 
     static getDerivedStateFromProps(nextProps, prevState) {
         return {
-            formValue: nextProps.formValue || prevState.formValue,
-        }
+            formValue: nextProps.formValue || prevState.formValue
+        };
     }
 
-    fields = []
-    _valiateCb = []
+    fields = [];
+    _valiateCb = [];
 
     state = {
         formError: {},
         validatingFields: {},
-        formValue: this.props.formDefaultValue || {},
-    }
+        formValue: this.props.defaultFormValue || {}
+    };
 
     addField(field) {
         this.fields.push(field);
@@ -96,7 +100,7 @@ export default class Form extends React.Component {
             nextFormValue[name] = value;
         }
 
-        if (!('formValue' in this.props)) {
+        if (!("formValue" in this.props)) {
             this.setState({
                 formValue: nextFormValue
             });
@@ -154,12 +158,12 @@ export default class Form extends React.Component {
             .forEach(field => {
                 const fieldProps = field.props;
                 let rules = fieldProps.rules || [];
-                if (typeof rules === 'function') {
+                if (typeof rules === "function") {
                     rules = [
                         {
                             validator: rules
                         }
-                    ]
+                    ];
                 } else if (!Array.isArray(rules)) {
                     rules = [rules];
                 }
@@ -174,12 +178,12 @@ export default class Form extends React.Component {
 
         let rules = this.props.rules[name] || [];
         if (rules) {
-            if (typeof rules === 'function') {
+            if (typeof rules === "function") {
                 rules = [
                     {
                         validator: rules
                     }
-                ]
+                ];
             } else if (!Array.isArray(rules)) {
                 rules = [rules];
             }
@@ -208,7 +212,7 @@ export default class Form extends React.Component {
         this.setState({
             validatingFields: {
                 ...validatingFields,
-                [name]: true,
+                [name]: true
             }
         });
 
@@ -217,20 +221,23 @@ export default class Form extends React.Component {
         const data = { [name]: value };
 
         validator.validate(data, { firstFields: true }, errors => {
-            this.setState({
-                formError: {
-                    ...formError,
-                    [name]: errors ? errors[0].message : null
+            this.setState(
+                {
+                    formError: {
+                        ...formError,
+                        [name]: errors ? errors[0].message : null
+                    },
+                    validatingFields: {
+                        ...validatingFields,
+                        [name]: false
+                    }
                 },
-                validatingFields: {
-                    ...validatingFields,
-                    [name]: false,
-                },
-            }, () => {
-                if (cb instanceof Function) {
-                    cb(errors, value);
+                () => {
+                    if (cb instanceof Function) {
+                        cb(errors, value);
+                    }
                 }
-            });
+            );
         });
     }
 
@@ -273,15 +280,17 @@ export default class Form extends React.Component {
                     formError[error.field] = error.message;
                 });
             }
-            this.setState({
-                formError,
-                validatingFields: {},
-            }, () => {
-                if (callback instanceof Function) {
-                    callback(errors, formValue);
+            this.setState(
+                {
+                    formError,
+                    validatingFields: {}
+                },
+                () => {
+                    if (callback instanceof Function) {
+                        callback(errors, formValue);
+                    }
                 }
-            });
-
+            );
         });
     }
 
@@ -294,7 +303,7 @@ export default class Form extends React.Component {
                 fields.forEach(f => {
                     const name = f.props.name;
                     if (!name) return;
-                    if (!field && (name in formError)) {
+                    if (!field && name in formError) {
                         field = f;
                     }
                 });
@@ -316,7 +325,7 @@ export default class Form extends React.Component {
 
     getFormContext() {
         return {
-            form: this,
+            form: this
         };
     }
 
@@ -335,12 +344,10 @@ export default class Form extends React.Component {
                 <Component
                     style={style}
                     className={classnames(prefixCls, className)}
-                    onSubmit={onSubmit}
-                >
-                    {typeof children === 'function' ? children(this) : children}
+                    onSubmit={onSubmit}>
+                    {typeof children === "function" ? children(this) : children}
                 </Component>
             </FormContext.Provider>
-        )
+        );
     }
 }
-
