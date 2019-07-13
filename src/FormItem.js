@@ -180,10 +180,13 @@ export default class FormItem extends React.Component {
             onBlur
         } = children.props;
 
+        const getFormItemInputProps = form.props.getInputProps || function () { return {} };
+
         const onFieldChange = this.onFieldChange.bind(this);
         const onFieldBlur = this.onFieldBlur.bind(this);
 
         const InputComponent = React.cloneElement(children, {
+            ...getFormItemInputProps(name),
             value: this.getValue(),
             onChange: function (value, event) {
                 if (normalize) {

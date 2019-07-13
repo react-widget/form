@@ -29,6 +29,7 @@ export default class Form extends React.Component {
         onChange: PropTypes.func,
         validateFieldsAndScroll: PropTypes.bool,
         showMessage: PropTypes.bool,
+        getFormItemInputProps: PropTypes.func,
     }
 
     static defaultProps = {
@@ -234,7 +235,7 @@ export default class Form extends React.Component {
     }
 
     validate(callback) {
-        const { formValue } = this.props;
+        const { formValue } = this.state;
         const fields = this.fields;
         const rules = {};
 
