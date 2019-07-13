@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import classnames from "classnames";
 import FormContext from "./FormContext";
+
 export default class FormItemBase extends React.Component {
     static contextType = FormContext;
 
@@ -50,6 +50,8 @@ export default class FormItemBase extends React.Component {
 
         return form.getValue(name);
     }
+
+    onFieldChange(value, e) {}
 
     render() {
         return null;
