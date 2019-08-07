@@ -4,7 +4,7 @@ import classnames from "classnames";
 import AsyncValidator from "async-validator";
 import set from "lodash/set";
 import get from "lodash/get";
-import scrollIntoView from "bplokjs-dom-utils/scrollIntoView";
+// import scrollIntoView from "bplokjs-dom-utils/scrollIntoView";
 import FormContext from "./FormContext";
 
 AsyncValidator.warning = function() {};
@@ -309,7 +309,11 @@ export default class Form extends React.Component {
                 });
 
                 if (field) {
-                    scrollIntoView(field.getDOM());
+                    const dom = field.getDOM();
+
+                    if (dom && dom.scrollIntoView) {
+                        dom.scrollIntoView();
+                    }
                 }
             }
 
