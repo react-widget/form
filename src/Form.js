@@ -4,7 +4,6 @@ import classnames from "classnames";
 import AsyncValidator from "async-validator";
 import set from "lodash/set";
 import get from "lodash/get";
-// import scrollIntoView from "bplokjs-dom-utils/scrollIntoView";
 import FormContext from "./FormContext";
 
 AsyncValidator.warning = function() {};
@@ -26,18 +25,18 @@ export default class Form extends React.Component {
             PropTypes.func
         ]),
         labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        labelPosition: PropTypes.oneOf(["top", "left", "right"]),
+        labelPosition: PropTypes.oneOf(["top", "left"]),
         alignItems: PropTypes.oneOf(["top", "center", "bottom"]),
         inline: PropTypes.bool,
         onSubmit: PropTypes.func,
         onChange: PropTypes.func,
         validateFieldsAndScroll: PropTypes.bool,
         showMessage: PropTypes.bool,
-        getFormItemInputProps: PropTypes.func
+        getInputProps: PropTypes.func
     };
 
     static defaultProps = {
-        prefixCls: "rw-form",
+        prefixCls: "nex-form",
         className: "",
         style: {},
         rules: {},
@@ -348,7 +347,8 @@ export default class Form extends React.Component {
                 <Component
                     style={style}
                     className={classnames(prefixCls, className)}
-                    onSubmit={onSubmit}>
+                    onSubmit={onSubmit}
+                >
                     {typeof children === "function" ? children(this) : children}
                 </Component>
             </FormContext.Provider>
