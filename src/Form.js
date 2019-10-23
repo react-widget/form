@@ -233,8 +233,7 @@ export default class Form extends React.Component {
         return !!validatingFields[name];
     }
 
-    validateField(name, callback) {
-        const { formError, validatingFields } = this.state;
+    _validateField(name, callback) {
         const value = this.getValue(name);
         const validators = this.getFieldValidator(name);
 
@@ -263,23 +262,9 @@ export default class Form extends React.Component {
                 });
             }
 
-            this.setState(
-                {
-                    formError: {
-                        ...formError,
-                        [name]: errors ? errors[0].message : null
-                    },
-                    validatingFields: {
-                        ...validatingFields,
-                        [name]: false
-                    }
-                },
-                () => {
-                    if (typeof callback === "function") {
-                        callback(errors, value);
-                    }
-                }
-            );
+            if (typeof callback === "function") {
+                callback(errors, value);
+            }
         };
 
         const startCheck = () => {
@@ -302,54 +287,44 @@ export default class Form extends React.Component {
             }
         };
 
-        this.setState({
-            validatingFields: {
-                ...validatingFields,
-                [name]: true
-            }
+        startCheck();
+    }
+
+    validateField(name, callback) {
+        const { formError, validatingFields } = this.state;
+        //是否异步探测
+        let isAsync = true;
+
+        this._validateField(name, (errors, value) => {
+            isAsync = false;
+
+            this.setState(
+                {
+                    formError: {
+                        ...formError,
+                        [name]: errors ? errors[0].message : null
+                    },
+                    validatingFields: {
+                        ...validatingFields,
+                        [name]: false
+                    }
+                },
+                () => {
+                    if (typeof callback === "function") {
+                        callback(errors, value);
+                    }
+                }
+            );
         });
 
-        startCheck();
-
-        // const rules = this.getFieldRules(name);
-
-        // if (!rules || rules.length === 0) {
-        //     if (cb instanceof Function) {
-        //         cb(null, value);
-        //     }
-        //     return;
-        // }
-
-        // this.setState({
-        //     validatingFields: {
-        //         ...validatingFields,
-        //         [name]: true
-        //     }
-        // });
-
-        // const descriptor = { [name]: rules };
-        // const validator = new AsyncValidator(descriptor);
-        // const data = { [name]: value };
-
-        // validator.validate(data, { firstFields: true }, errors => {
-        //     this.setState(
-        //         {
-        //             formError: {
-        //                 ...formError,
-        //                 [name]: errors ? errors[0].message : null
-        //             },
-        //             validatingFields: {
-        //                 ...validatingFields,
-        //                 [name]: false
-        //             }
-        //         },
-        //         () => {
-        //             if (cb instanceof Function) {
-        //                 cb(errors, value);
-        //             }
-        //         }
-        //     );
-        // });
+        if (isAsync) {
+            this.setState({
+                validatingFields: {
+                    ...validatingFields,
+                    [name]: true
+                }
+            });
+        }
     }
 
     validate(callback) {
