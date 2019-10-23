@@ -20,7 +20,7 @@ export default class FormItem extends React.Component {
             PropTypes.array,
             PropTypes.func
         ]),
-        validator: PropTypes.func,
+        validator: PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
         // asyncValidator: PropTypes.func,
         required: PropTypes.bool,
         normalize: PropTypes.func,

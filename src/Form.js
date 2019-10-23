@@ -168,17 +168,23 @@ export default class Form extends React.Component {
                 }
 
                 if (fieldProps.validator) {
-                    fieldValidators.push(fieldProps.validator);
+                    fieldValidators.push(
+                        ...(Array.isArray(fieldProps.validator)
+                            ? fieldProps.validator
+                            : [fieldProps.validator])
+                    );
                 }
             });
 
         const validator = this.props.validators[name];
 
         if (validator) {
-            fieldValidators.push(validator);
+            fieldValidators.push(
+                ...(Array.isArray(validator) ? validator : [validator])
+            );
         }
 
-        return fieldValidators;
+        return fieldValidators.filter(v => typeof v === "function");
     }
 
     getFieldRules(name) {
@@ -227,30 +233,36 @@ export default class Form extends React.Component {
         return !!validatingFields[name];
     }
 
-    validateField(name, cb) {
+    validateField(name, callback) {
         const { formError, validatingFields } = this.state;
         const value = this.getValue(name);
-        const rules = this.getFieldRules(name);
+        const validators = this.getFieldValidator(name);
 
-        if (!rules || rules.length === 0) {
-            if (cb instanceof Function) {
-                cb(null, value);
+        const cb = (errors = null) => {
+            if (errors === null && validators.length) {
+                startCheck();
+                return;
             }
-            return;
-        }
 
-        this.setState({
-            validatingFields: {
-                ...validatingFields,
-                [name]: true
+            if (errors !== null) {
+                if (!Array.isArray(errors)) {
+                    errors = [errors];
+                }
+
+                errors = errors.map(error => {
+                    let message = error;
+
+                    if (error instanceof Error) {
+                        message = error.message;
+                    }
+
+                    return {
+                        name,
+                        message
+                    };
+                });
             }
-        });
 
-        const descriptor = { [name]: rules };
-        const validator = new AsyncValidator(descriptor);
-        const data = { [name]: value };
-
-        validator.validate(data, { firstFields: true }, errors => {
             this.setState(
                 {
                     formError: {
@@ -263,12 +275,81 @@ export default class Form extends React.Component {
                     }
                 },
                 () => {
-                    if (cb instanceof Function) {
-                        cb(errors, value);
+                    if (typeof callback === "function") {
+                        callback(errors, value);
                     }
                 }
             );
+        };
+
+        const startCheck = () => {
+            const validator = validators.shift();
+
+            if (!validator) {
+                return; //check finish
+            }
+
+            const ret = validator(value);
+            if (ret === true) {
+                cb();
+            } else if (ret === false) {
+                cb(`${name} fails`);
+            } else if (ret && ret.then) {
+                //thenable
+                ret.then(() => cb(), e => cb(e));
+            } else {
+                cb(ret);
+            }
+        };
+
+        this.setState({
+            validatingFields: {
+                ...validatingFields,
+                [name]: true
+            }
         });
+
+        startCheck();
+
+        // const rules = this.getFieldRules(name);
+
+        // if (!rules || rules.length === 0) {
+        //     if (cb instanceof Function) {
+        //         cb(null, value);
+        //     }
+        //     return;
+        // }
+
+        // this.setState({
+        //     validatingFields: {
+        //         ...validatingFields,
+        //         [name]: true
+        //     }
+        // });
+
+        // const descriptor = { [name]: rules };
+        // const validator = new AsyncValidator(descriptor);
+        // const data = { [name]: value };
+
+        // validator.validate(data, { firstFields: true }, errors => {
+        //     this.setState(
+        //         {
+        //             formError: {
+        //                 ...formError,
+        //                 [name]: errors ? errors[0].message : null
+        //             },
+        //             validatingFields: {
+        //                 ...validatingFields,
+        //                 [name]: false
+        //             }
+        //         },
+        //         () => {
+        //             if (cb instanceof Function) {
+        //                 cb(errors, value);
+        //             }
+        //         }
+        //     );
+        // });
     }
 
     validate(callback) {
