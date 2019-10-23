@@ -5,6 +5,7 @@ import AsyncValidator from "async-validator";
 import set from "lodash/set";
 import get from "lodash/get";
 import FormContext from "./FormContext";
+import { isEmptyValue } from "./utils";
 
 AsyncValidator.warning = function() {};
 
@@ -16,6 +17,7 @@ export default class Form extends React.Component {
         path2obj: PropTypes.bool,
         defaultFormValue: PropTypes.object,
         formValue: PropTypes.object,
+        validators: PropTypes.object,
         validateDelay: PropTypes.number,
         validateTrigger: PropTypes.string, //change blur none
         component: PropTypes.node,
@@ -40,6 +42,7 @@ export default class Form extends React.Component {
         className: "",
         style: {},
         rules: {},
+        validators: {},
         path2obj: true,
         component: "form",
         validateDelay: 0,
@@ -148,6 +151,34 @@ export default class Form extends React.Component {
             ...formError,
             ...errors
         });
+    }
+
+    getFieldValidator(name) {
+        const fieldValidators = [];
+        this.fields
+            .filter(field => field.props.name === name)
+            .forEach(field => {
+                const fieldProps = field.props;
+                if (fieldProps.required) {
+                    fieldValidators.unshift(value => {
+                        if (isEmptyValue(value)) {
+                            return fieldProps.requiredMessage;
+                        }
+                    });
+                }
+
+                if (fieldProps.validator) {
+                    fieldValidators.push(fieldProps.validator);
+                }
+            });
+
+        const validator = this.props.validators[name];
+
+        if (validator) {
+            fieldValidators.push(validator);
+        }
+
+        return fieldValidators;
     }
 
     getFieldRules(name) {

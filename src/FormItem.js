@@ -20,6 +20,8 @@ export default class FormItem extends React.Component {
             PropTypes.array,
             PropTypes.func
         ]),
+        validator: PropTypes.func,
+        // asyncValidator: PropTypes.func,
         required: PropTypes.bool,
         normalize: PropTypes.func,
         validateDelay: PropTypes.number,
@@ -193,7 +195,7 @@ export default class FormItem extends React.Component {
             // normalize,
             label,
             required,
-            labelFor,
+            // labelFor,
             className,
             prefixCls,
             name,
