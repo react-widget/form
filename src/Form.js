@@ -233,9 +233,14 @@ export default class Form extends React.Component {
         return !!validatingFields[name];
     }
 
-    _validateField(name, callback) {
+    _validateField(name, callback = () => {}) {
         const value = this.getValue(name);
         const validators = this.getFieldValidator(name);
+
+        if (!validators.length) {
+            callback();
+            return;
+        }
 
         const cb = (errors = null) => {
             if (errors === null && validators.length) {
@@ -262,9 +267,7 @@ export default class Form extends React.Component {
                 });
             }
 
-            if (typeof callback === "function") {
-                callback(errors, value);
-            }
+            callback(errors, value);
         };
 
         const startCheck = () => {
@@ -293,10 +296,23 @@ export default class Form extends React.Component {
     validateField(name, callback) {
         const { formError, validatingFields } = this.state;
         //是否异步探测
-        let isAsync = true;
+        const asyncMaxTime = 100; //校验时间小于100ms不算异步
+        let asyncTimer = setTimeout(() => {
+            asyncTimer = null;
+            this.setState({
+                validatingFields: {
+                    ...validatingFields,
+                    [name]: true
+                }
+            });
+        }, asyncMaxTime);
+        // let isAsync = true;
 
         this._validateField(name, (errors, value) => {
-            isAsync = false;
+            if (asyncTimer) {
+                clearTimeout(asyncTimer);
+            }
+            // isAsync = false;
 
             this.setState(
                 {
@@ -316,68 +332,71 @@ export default class Form extends React.Component {
                 }
             );
         });
-
-        if (isAsync) {
-            this.setState({
-                validatingFields: {
-                    ...validatingFields,
-                    [name]: true
-                }
-            });
-        }
     }
 
-    validate(callback) {
+    validate(callback = () => {}) {
         const { formValue } = this.state;
         const fields = this.fields;
-        const rules = {};
-
-        if (fields.length === 0 && callback) {
-            callback(null, formValue);
-            return;
-        }
-
-        fields.forEach(field => {
-            const name = field.props.name;
-            if (!name || name in rules) return;
-            const fieldRules = this.getFieldRules(name);
-            if (fieldRules && fieldRules.length) {
-                rules[name] = fieldRules;
-            }
-        });
-
+        const validCounter = 0;
+        const asyncMaxTime = 100; //校验时间小于100ms不算异步
         const validatingFields = {};
+        const formError = [];
+        let asyncTimer = setTimeout(() => {
+            asyncTimer = null;
+            this.setState({
+                validatingFields
+            });
+        }, asyncMaxTime);
 
-        const validator = new AsyncValidator(rules);
-        const data = {};
-        Object.keys(rules).forEach(key => {
-            data[key] = get(formValue, key);
-            validatingFields[key] = true;
-        });
+        const complete = (errors, name) => {
+            validCounter--;
 
-        this.setState({
-            validatingFields
-        });
-
-        validator.validate(data, { firstFields: true }, errors => {
-            const formError = {};
             if (errors) {
-                errors.forEach(error => {
-                    formError[error.field] = error.message;
-                });
+                // formError[name] = errors[0].message;
+                formError.push(...errors);
             }
-            this.setState(
-                {
-                    formError,
-                    validatingFields: {}
-                },
-                () => {
-                    if (callback instanceof Function) {
-                        callback(errors, formValue);
+            if (validCounter <= 0) {
+                this.setState(
+                    {
+                        formError,
+                        validatingFields: {}
+                    },
+                    () => {
+                        callback(
+                            formError.length ? formError : null,
+                            formValue
+                        );
                     }
-                }
-            );
-        });
+                );
+            }
+        };
+
+        if (fields.length) {
+            //校验初始化
+            fields.forEach(field => {
+                const name = field.props.name;
+                validCounter++;
+                validatingFields[name] = true;
+                formError[name] = null;
+            });
+
+            //开始进行字段校验
+            fields.forEach(field => {
+                const name = field.props.name;
+
+                this._validateField(name, errors => {
+                    validatingFields[name] = false;
+                    if (asyncTimer) {
+                        clearTimeout(asyncTimer);
+                        asyncTimer = null;
+                    }
+
+                    complete(errors, name);
+                });
+            });
+        } else {
+            callback(null, formValue);
+        }
     }
 
     validateAndScroll(callback) {
