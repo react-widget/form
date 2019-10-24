@@ -5,7 +5,7 @@ import AsyncValidator from "async-validator";
 import set from "lodash/set";
 import get from "lodash/get";
 import FormContext from "./FormContext";
-import { isEmptyValue } from "./utils";
+import { isEmptyValue, deferred } from "./utils";
 
 AsyncValidator.warning = function() {};
 
@@ -88,10 +88,12 @@ export default class Form extends React.Component {
         return formValue[name];
     }
 
-    setValue(name, value, event, cb) {
+    setValue(name, value, cb) {
         const { path2obj, onChange } = this.props;
         const formValue = this.state.formValue;
+        const defer = deferred();
 
+        // TODO: 后面再考虑下特殊场景
         const nextFormValue = {
             ...formValue
         };
@@ -109,14 +111,55 @@ export default class Form extends React.Component {
         }
 
         if (onChange) {
-            onChange(nextFormValue, event);
+            onChange(nextFormValue);
         }
 
         if (cb) {
-            this._valiateCb.push(cb);
+            this._valiateCb.push(formValue => {
+                cb(formValue);
+                defer.resolve();
+            });
         }
 
-        return this;
+        return defer.promise;
+    }
+
+    setValues(obj = {}, cb) {
+        const { path2obj, onChange } = this.props;
+        const formValue = this.state.formValue;
+        const defer = deferred();
+
+        const nextFormValue = {
+            ...formValue
+        };
+
+        Object.keys(obj).forEach(name => {
+            const value = obj[name];
+            if (path2obj) {
+                set(nextFormValue, name, value);
+            } else {
+                nextFormValue[name] = value;
+            }
+        });
+
+        if (!("formValue" in this.props)) {
+            this.setState({
+                formValue: nextFormValue
+            });
+        }
+
+        if (onChange) {
+            onChange(nextFormValue);
+        }
+
+        if (cb) {
+            this._valiateCb.push(formValue => {
+                cb(formValue);
+                defer.resolve();
+            });
+        }
+
+        return defer.promise;
     }
 
     componentDidUpdate() {
@@ -132,15 +175,19 @@ export default class Form extends React.Component {
         this._valiateCb = [];
     }
 
+    hasError(name) {
+        const { formError } = this.state;
+
+        return formError[name] !== null;
+    }
+
     getError(name) {
         const { formError } = this.state;
-        if (!arguments.length) return formError;
         return formError[name];
     }
 
     cleanErrors() {
         this.setState({
-            validatingFields: {},
             formError: {}
         });
     }
@@ -187,47 +234,6 @@ export default class Form extends React.Component {
         return fieldValidators.filter(v => typeof v === "function");
     }
 
-    getFieldRules(name) {
-        const fieldRules = [];
-        this.fields
-            .filter(field => field.props.name === name)
-            .forEach(field => {
-                const fieldProps = field.props;
-                let rules = fieldProps.rules || [];
-                if (typeof rules === "function") {
-                    rules = [
-                        {
-                            validator: rules
-                        }
-                    ];
-                } else if (!Array.isArray(rules)) {
-                    rules = [rules];
-                }
-                if (fieldProps.required) {
-                    rules.unshift({
-                        required: true
-                    });
-                }
-
-                fieldRules.push(...rules);
-            });
-
-        let rules = this.props.rules[name] || [];
-        if (rules) {
-            if (typeof rules === "function") {
-                rules = [
-                    {
-                        validator: rules
-                    }
-                ];
-            } else if (!Array.isArray(rules)) {
-                rules = [rules];
-            }
-        }
-
-        return rules ? fieldRules.concat(rules) : fieldRules;
-    }
-
     isValidatingField(name) {
         const validatingFields = this.state.validatingFields;
         return !!validatingFields[name];
@@ -238,7 +244,7 @@ export default class Form extends React.Component {
         const validators = this.getFieldValidator(name);
 
         if (!validators.length) {
-            callback();
+            callback(null, value);
             return;
         }
 
@@ -340,7 +346,8 @@ export default class Form extends React.Component {
         const validCounter = 0;
         const asyncMaxTime = 100; //校验时间小于100ms不算异步
         const validatingFields = {};
-        const formError = [];
+        const formError = {};
+        const allErrors = [];
         let asyncTimer = setTimeout(() => {
             asyncTimer = null;
             this.setState({
@@ -352,9 +359,10 @@ export default class Form extends React.Component {
             validCounter--;
 
             if (errors) {
-                // formError[name] = errors[0].message;
-                formError.push(...errors);
+                formError[name] = errors[0].message;
+                allErrors.push(...errors);
             }
+
             if (validCounter <= 0) {
                 this.setState(
                     {
@@ -363,7 +371,7 @@ export default class Form extends React.Component {
                     },
                     () => {
                         callback(
-                            formError.length ? formError : null,
+                            allErrors.length ? allErrors : null,
                             formValue
                         );
                     }
@@ -399,25 +407,19 @@ export default class Form extends React.Component {
         }
     }
 
-    validateAndScroll(callback) {
+    validateAndScroll(callback = () => {}) {
         this.validate((errors, formValue) => {
             if (errors) {
-                let field;
-                const formError = this.state.formError;
                 const fields = this.fields;
-                fields.forEach(f => {
-                    const name = f.props.name;
-                    if (!name) return;
-                    if (!field && name in formError) {
-                        field = f;
-                    }
-                });
-
-                if (field) {
-                    const dom = field.getDOM();
-
-                    if (dom && dom.scrollIntoView) {
-                        dom.scrollIntoView();
+                for (let i = 0; i < fields.length; i++) {
+                    const field = fields[i];
+                    const name = field.props.name;
+                    if (this.hasError(name)) {
+                        const dom = field.getDOM();
+                        if (dom && dom.scrollIntoView) {
+                            dom.scrollIntoView();
+                            break;
+                        }
                     }
                 }
             }

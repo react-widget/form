@@ -119,11 +119,11 @@ export default class FormItem extends React.Component {
         return form.getValue(name);
     }
 
-    onFieldChange = (value, e) => {
+    onFieldChange = value => {
         const { form } = this.context;
         const { name } = this.props;
 
-        form.setValue(name, value, e, () => {
+        form.setValue(name, value, () => {
             const validateTrigger = this.getValidateTrigger();
             const validateDelay = this.getValidateDelay();
 
