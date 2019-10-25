@@ -19,24 +19,22 @@ export default class Form extends React.Component {
         path2obj: PropTypes.bool,
         defaultFormValue: PropTypes.object,
         getDefaultFieldValue: PropTypes.func,
+        renderFieldExtra: PropTypes.func,
         formValue: PropTypes.object,
         validators: PropTypes.object,
         validateDelay: PropTypes.number,
         validateTrigger: PropTypes.string, //change blur none
+        asyncTestDelay: PropTypes.number,
         component: PropTypes.node,
-        rules: PropTypes.oneOfType([
-            PropTypes.object,
-            PropTypes.array,
-            PropTypes.func
-        ]),
         labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        labelStyle: PropTypes.object,
         labelPosition: PropTypes.oneOf(["top", "left"]),
         alignItems: PropTypes.oneOf(["top", "center", "bottom"]),
+        clearErrorOnFocus: PropTypes.bool,
         inline: PropTypes.bool,
         onSubmit: PropTypes.func,
         onChange: PropTypes.func,
         validateFieldsAndScroll: PropTypes.bool,
-        showMessage: PropTypes.bool,
         getInputProps: PropTypes.func
     };
 
@@ -44,7 +42,6 @@ export default class Form extends React.Component {
         prefixCls: "nex-form",
         className: "",
         style: {},
-        rules: {},
         validators: {},
         path2obj: true,
         component: "form",
@@ -54,7 +51,7 @@ export default class Form extends React.Component {
         labelPosition: "left",
         alignItems: "center",
         inline: false,
-        showMessage: true
+        clearErrorOnFocus: true
     };
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -64,7 +61,7 @@ export default class Form extends React.Component {
     }
 
     fields = [];
-    _valiateCb = [];
+    _validateCb = [];
 
     state = {
         formError: {},
@@ -102,7 +99,7 @@ export default class Form extends React.Component {
     setValue(name, value, cb) {
         const { path2obj, onChange } = this.props;
         const formValue = this.state.formValue;
-        const defer = deferred();
+        // const defer = deferred();
 
         // TODO: 后面再考虑下特殊场景
         const nextFormValue = {
@@ -126,19 +123,19 @@ export default class Form extends React.Component {
         }
 
         if (cb) {
-            this._valiateCb.push(formValue => {
+            this._validateCb.push(formValue => {
                 cb(formValue);
-                defer.resolve();
+                // defer.resolve(formValue);
             });
         }
 
-        return defer.promise;
+        // return defer.promise;
     }
 
     setValues(obj = {}, cb) {
         const { path2obj, onChange } = this.props;
         const formValue = this.state.formValue;
-        const defer = deferred();
+        // const defer = deferred();
 
         const nextFormValue = {
             ...formValue
@@ -164,26 +161,26 @@ export default class Form extends React.Component {
         }
 
         if (cb) {
-            this._valiateCb.push(formValue => {
+            this._validateCb.push(formValue => {
                 cb(formValue);
-                defer.resolve();
+                // defer.resolve(formValue);
             });
         }
 
-        return defer.promise;
+        // return defer.promise;
     }
 
     componentDidUpdate() {
         const formValue = this.state.formValue;
-        const validateProcess = this._valiateCb;
-        this._valiateCb = [];
+        const validateProcess = this._validateCb;
+        this._validateCb = [];
         validateProcess.forEach(cb => {
             cb(formValue);
         });
     }
 
     componentWillUnmount() {
-        this._valiateCb = [];
+        this._validateCb = [];
     }
 
     hasError(name) {
@@ -195,6 +192,26 @@ export default class Form extends React.Component {
     getError(name) {
         const { formError } = this.state;
         return formError[name];
+    }
+
+    cleanError(name) {
+        const { formError } = this.state;
+        this.setState({
+            formError: {
+                ...formError,
+                [name]: null
+            }
+        });
+    }
+
+    setError(name, message) {
+        const { formError } = this.state;
+        this.setState({
+            formError: {
+                ...formError,
+                [name]: message
+            }
+        });
     }
 
     cleanErrors() {
@@ -245,9 +262,14 @@ export default class Form extends React.Component {
         return fieldValidators.filter(v => typeof v === "function");
     }
 
-    isValidatingField(name) {
+    isFieldValidating(name) {
         const validatingFields = this.state.validatingFields;
         return !!validatingFields[name];
+    }
+
+    isValidating() {
+        const validatingFields = this.state.validatingFields;
+        return Object.keys(validatingFields).some(key => validatingFields[key]);
     }
 
     _validateField(name, callback) {
@@ -470,16 +492,8 @@ export default class Form extends React.Component {
         });
     }
 
-    onFieldChange(name, value) {
-        const { formValue } = this.state;
-
-        formValue.set(name, value);
-    }
-
     getFormContext() {
-        return {
-            form: this
-        };
+        return Object.create(this);
     }
 
     render() {

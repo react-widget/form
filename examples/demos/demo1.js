@@ -71,6 +71,21 @@ export default class DEMO extends Component {
         };
     }
 
+    renderFieldExtra = (name, component) => {
+        return (
+            <div
+                style={{
+                    color: "red",
+                    position: "absolute",
+                    top: "100%",
+                    left: 0
+                }}
+            >
+                {component.isValidating() ? "校验中..." : component.getError()}
+            </div>
+        );
+    };
+
     render() {
         const { formValue } = this.state;
 
@@ -83,6 +98,7 @@ export default class DEMO extends Component {
                     onChange={formValue => this.setState({ formValue })}
                     onSubmit={this.onSubmit}
                     validators={this.getRules()}
+                    renderFieldExtra={this.renderFieldExtra}
                     inline
                     validateTrigger="blur"
                 >
@@ -150,7 +166,7 @@ export default class DEMO extends Component {
                                     <NativeField component="input" />
                                 </FormItem>
                                 <div>
-                                    {form.isValidatingField("name")
+                                    {form.isFieldValidating("name")
                                         ? "数据校验中..."
                                         : null}
                                 </div>
@@ -189,7 +205,7 @@ export default class DEMO extends Component {
                                     <NativeField component="input" />
                                 </FormItem>
                                 <div>
-                                    {form.isValidatingField("info.list[0]")
+                                    {form.isFieldValidating("info.list[0]")
                                         ? "数据校验中..."
                                         : null}
                                 </div>
@@ -215,7 +231,7 @@ export default class DEMO extends Component {
                                     <NativeField component="input" />
                                 </FormItem>
                                 <div>
-                                    {form.isValidatingField("info.list[1]")
+                                    {form.isFieldValidating("info.list[1]")
                                         ? "数据校验中..."
                                         : null}
                                 </div>
@@ -235,6 +251,7 @@ export default class DEMO extends Component {
                                 >
                                     <NativeField component="textarea" />
                                 </FormItem>
+                                {form.isValidating() ? "表单校验中..." : null}
                                 <pre>{JSON.stringify(formValue)}</pre>
                                 <pre>{JSON.stringify(form.getError())}</pre>
                                 <button>submit</button>
