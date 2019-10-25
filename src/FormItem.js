@@ -61,19 +61,6 @@ export default class FormItem extends React.Component {
         form.removeField(this);
     }
 
-    isRequired() {
-        const { form } = this.context;
-        const { name } = this.props;
-        let rules = form.getFieldRules(name);
-        let isRequired = false;
-
-        if (rules && rules.length) {
-            isRequired = rules.some(rule => rule.required);
-        }
-
-        return isRequired;
-    }
-
     _validateTimer = null;
 
     getValidateTrigger() {
@@ -163,15 +150,15 @@ export default class FormItem extends React.Component {
         return {
             value: this.getValue(),
             ...customProps,
-            onChange: (value, e) => {
+            onChange: value => {
                 if (normalize) {
                     value = normalize(value);
                 }
 
-                onChange && onChange(value, e);
-                customProps.onChange && customProps.onChange(value, e);
+                onChange && onChange(value);
+                customProps.onChange && customProps.onChange(value);
 
-                this.onFieldChange(value, e);
+                this.onFieldChange(value);
             },
             onBlur: e => {
                 onBlur && onBlur(e);
@@ -229,7 +216,7 @@ export default class FormItem extends React.Component {
                         alignItems !== "center",
                     [`${prefixCls}-error`]: error,
                     [`${prefixCls}-validating`]: validating,
-                    [`${prefixCls}-required`]: this.isRequired() || required,
+                    [`${prefixCls}-required`]: required,
                     [`${prefixCls}-with-help`]: help,
                     [`${className}`]: className
                 })}

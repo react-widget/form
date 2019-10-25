@@ -7,7 +7,9 @@ import get from "lodash/get";
 import FormContext from "./FormContext";
 import { isEmptyValue, deferred } from "./utils";
 
-AsyncValidator.warning = function() {};
+function noop() {}
+
+AsyncValidator.warning = noop;
 
 export default class Form extends React.Component {
     static propTypes = {
@@ -16,6 +18,7 @@ export default class Form extends React.Component {
         style: PropTypes.object,
         path2obj: PropTypes.bool,
         defaultFormValue: PropTypes.object,
+        getDefaultFieldValue: PropTypes.func,
         formValue: PropTypes.object,
         validators: PropTypes.object,
         validateDelay: PropTypes.number,
@@ -45,6 +48,7 @@ export default class Form extends React.Component {
         validators: {},
         path2obj: true,
         component: "form",
+        asyncTestDelay: 100,
         validateDelay: 0,
         validateTrigger: "none",
         labelPosition: "left",
@@ -75,17 +79,24 @@ export default class Form extends React.Component {
     removeField(field) {
         var idx = this.fields.indexOf(field);
         if (idx !== -1) {
+            const name = field.props.name;
+
+            this.state.formError[name] = null;
+
             this.fields.splice(idx, 1);
         }
     }
 
     getValue(name) {
+        const { getDefaultFieldValue } = this.props;
         const path2obj = this.props.path2obj;
         const formValue = this.state.formValue;
-        if (path2obj) {
-            return get(formValue, name);
-        }
-        return formValue[name];
+
+        const value = path2obj ? get(formValue, name) : formValue[name];
+
+        return value === undefined && getDefaultFieldValue
+            ? getDefaultFieldValue(name)
+            : value;
     }
 
     setValue(name, value, cb) {
@@ -239,7 +250,9 @@ export default class Form extends React.Component {
         return !!validatingFields[name];
     }
 
-    _validateField(name, callback = () => {}) {
+    _validateField(name, callback) {
+        callback = typeof callback === "function" ? callback : noop;
+
         const value = this.getValue(name);
         const validators = this.getFieldValidator(name);
 
@@ -276,6 +289,7 @@ export default class Form extends React.Component {
             callback(errors, value);
         };
 
+        //串行校验
         const startCheck = () => {
             const validator = validators.shift();
 
@@ -300,9 +314,12 @@ export default class Form extends React.Component {
     }
 
     validateField(name, callback) {
+        callback = typeof callback === "function" ? callback : noop;
+
+        const { asyncTestDelay } = this.props;
         const { formError, validatingFields } = this.state;
+
         //是否异步探测
-        const asyncMaxTime = 100; //校验时间小于100ms不算异步
         let asyncTimer = setTimeout(() => {
             asyncTimer = null;
             this.setState({
@@ -311,7 +328,7 @@ export default class Form extends React.Component {
                     [name]: true
                 }
             });
-        }, asyncMaxTime);
+        }, asyncTestDelay);
         // let isAsync = true;
 
         this._validateField(name, (errors, value) => {
@@ -332,28 +349,28 @@ export default class Form extends React.Component {
                     }
                 },
                 () => {
-                    if (typeof callback === "function") {
-                        callback(errors, value);
-                    }
+                    callback(errors, value);
                 }
             );
         });
     }
 
-    validate(callback = () => {}) {
-        const { formValue } = this.state;
+    validate(callback) {
+        callback = typeof callback === "function" ? callback : noop;
+
+        const { asyncTestDelay } = this.props;
+        const { formValue, formError } = this.state;
         const fields = this.fields;
-        const validCounter = 0;
-        const asyncMaxTime = 100; //校验时间小于100ms不算异步
         const validatingFields = {};
-        const formError = {};
         const allErrors = [];
-        let asyncTimer = setTimeout(() => {
-            asyncTimer = null;
+        let validCounter = 0;
+
+        const updateFormState = () => {
             this.setState({
+                formError,
                 validatingFields
             });
-        }, asyncMaxTime);
+        };
 
         const complete = (errors, name) => {
             validCounter--;
@@ -380,23 +397,46 @@ export default class Form extends React.Component {
         };
 
         if (fields.length) {
+            //包含多个异步校验的情况下只执行一次
+            let hasUpdate = false;
             //校验初始化
             fields.forEach(field => {
                 const name = field.props.name;
                 validCounter++;
                 validatingFields[name] = true;
-                formError[name] = null;
+
+                if (!(name in formError)) {
+                    formError[name] = null;
+                }
             });
 
             //开始进行字段校验
             fields.forEach(field => {
                 const name = field.props.name;
 
+                let isAsyncValidate = false;
+                //检测是否异步校验
+                let asyncTimer = setTimeout(() => {
+                    isAsyncValidate = true;
+                    asyncTimer = null;
+
+                    if (hasUpdate) return;
+                    hasUpdate = true;
+
+                    updateFormState();
+                }, asyncTestDelay);
+
                 this._validateField(name, errors => {
                     validatingFields[name] = false;
+
                     if (asyncTimer) {
                         clearTimeout(asyncTimer);
                         asyncTimer = null;
+                    }
+
+                    //异步校验完成后执行刷新动作
+                    if (isAsyncValidate) {
+                        updateFormState();
                     }
 
                     complete(errors, name);
@@ -407,7 +447,9 @@ export default class Form extends React.Component {
         }
     }
 
-    validateAndScroll(callback = () => {}) {
+    validateAndScroll(callback) {
+        callback = typeof callback === "function" ? callback : noop;
+
         this.validate((errors, formValue) => {
             if (errors) {
                 const fields = this.fields;

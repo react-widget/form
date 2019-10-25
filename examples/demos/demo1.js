@@ -4,14 +4,16 @@ import { Form, FormItem, NativeField } from "../../src/index";
 
 function Input(props) {
     return (
-        <input
+        <NativeField
             {...props}
             className=""
+            type="text"
             style={{
                 height: 32,
                 padding: "4px 7px"
             }}
-        ></input>
+            component="input"
+        />
     );
 }
 
@@ -51,13 +53,11 @@ export default class DEMO extends Component {
 
     getRules() {
         return {
-            "info.address": {
-                type: "email",
-                message: "emial 错误..."
+            "info.address": function() {
+                return false;
             },
-            name: {
-                required: true,
-                message: "必填"
+            name: function(value) {
+                return value === "" ? "不能为空" : true;
             }
             // name(rule, value, callback) {
             //     setTimeout(() => {
@@ -77,11 +77,12 @@ export default class DEMO extends Component {
         return (
             <div>
                 <Form
+                    getDefaultFieldValue={() => ""}
                     ref={form => (this.form = form)}
                     formValue={formValue}
                     onChange={formValue => this.setState({ formValue })}
                     onSubmit={this.onSubmit}
-                    rules={this.getRules()}
+                    validators={this.getRules()}
                     inline
                     validateTrigger="blur"
                 >
@@ -122,7 +123,6 @@ export default class DEMO extends Component {
                                 <FormItem
                                     name="name"
                                     labelWidth={100}
-                                    labelPosition="right"
                                     label="姓名"
                                     inline
                                 >
@@ -167,12 +167,58 @@ export default class DEMO extends Component {
                                 <FormItem name="info.address" label="地址">
                                     <NativeField component="input" />
                                 </FormItem>
-                                <FormItem name="info.list[0]" label="L1">
+                                <FormItem
+                                    name="info.list[0]"
+                                    label="L1"
+                                    validator={value => {
+                                        return new Promise(
+                                            (resolve, reject) => {
+                                                setTimeout(
+                                                    value
+                                                        ? resolve
+                                                        : () =>
+                                                              reject(
+                                                                  "校验失败"
+                                                              ),
+                                                    2000
+                                                );
+                                            }
+                                        );
+                                    }}
+                                >
                                     <NativeField component="input" />
                                 </FormItem>
-                                <FormItem name="info.list[1]" label="L2">
+                                <div>
+                                    {form.isValidatingField("info.list[0]")
+                                        ? "数据校验中..."
+                                        : null}
+                                </div>
+                                <FormItem
+                                    name="info.list[1]"
+                                    label="L2"
+                                    validator={value => {
+                                        return new Promise(
+                                            (resolve, reject) => {
+                                                setTimeout(
+                                                    value
+                                                        ? resolve
+                                                        : () =>
+                                                              reject(
+                                                                  "校验失败"
+                                                              ),
+                                                    1000
+                                                );
+                                            }
+                                        );
+                                    }}
+                                >
                                     <NativeField component="input" />
                                 </FormItem>
+                                <div>
+                                    {form.isValidatingField("info.list[1]")
+                                        ? "数据校验中..."
+                                        : null}
+                                </div>
                                 <FormItem name="info.country" label="国籍">
                                     <NativeField component="select">
                                         <option value="中国">中国</option>
