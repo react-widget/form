@@ -1,18 +1,18 @@
-import React from 'react';
+import React from "react";
 
-export default function NativeField(props) {
+export default function NativeInput(props) {
     const {
-        component: Component = 'input',
+        component: Component = "input",
         value,
         inputRef,
         onChange,
         ...others
     } = props;
 
-    const onInputChange = (e) => {
+    const onInputChange = e => {
         const value = e.target.value;
         onChange && onChange(value, e);
-    }
+    };
 
     return (
         <Component

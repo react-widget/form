@@ -2,6 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames";
 import FormContext from "./FormContext";
+import FormItemContext from "./FormItemContext";
+
 export default class FormItem extends React.Component {
     static contextType = FormContext;
 
@@ -15,8 +17,10 @@ export default class FormItem extends React.Component {
         labelFor: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         labelStyle: PropTypes.object,
+        labelClassName: PropTypes.string,
         labelPosition: PropTypes.oneOf(["top", "left"]),
-        alignItems: PropTypes.oneOf(["top", "center", "bottom"]),
+        controlStyle: PropTypes.object,
+        controlClassName: PropTypes.string,
         validator: PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
         required: PropTypes.bool,
         requiredMessage: PropTypes.string,
@@ -24,12 +28,13 @@ export default class FormItem extends React.Component {
         normalize: PropTypes.func,
         renderExtra: PropTypes.func,
         validateDelay: PropTypes.number,
-        validateTrigger: PropTypes.string, //change blur none
+        validateTrigger: PropTypes.oneOf(["blur", "change"]),
         inline: PropTypes.bool
     };
 
     static defaultProps = {
         prefixCls: "nex-form-item"
+        // requiredMessage: "不能为空"
     };
 
     constructor(...args) {
@@ -47,6 +52,10 @@ export default class FormItem extends React.Component {
         return this._dom;
     }
 
+    getForm() {
+        return this.context;
+    }
+
     componentWillUnmount() {
         const form = this.context;
         form.removeField(this);
@@ -54,14 +63,12 @@ export default class FormItem extends React.Component {
 
     _validateTimer = null;
 
-    getValidateTrigger() {
-        const form = this.context;
-        const { validateTrigger } = form.props;
-        const props = this.props;
+    hasValidateTrigger(type = "none") {
+        let triggers = this.getProp("validateTrigger", []);
 
-        return "validateTrigger" in props
-            ? props.validateTrigger
-            : validateTrigger;
+        triggers = Array.isArray(triggers) ? triggers : [triggers];
+
+        return triggers.indexOf(type) !== -1;
     }
 
     getValidateDelay() {
@@ -146,11 +153,9 @@ export default class FormItem extends React.Component {
         this.setValue(value, formValue => {
             if (formValue[name] /*newValue*/ === value /*oldValue*/) return;
 
-            const validateTrigger = this.getValidateTrigger();
-
             callback && callback();
 
-            if (validateTrigger === "change") {
+            if (this.hasValidateTrigger("change")) {
                 this.triggerValidate();
             }
         });
@@ -161,29 +166,25 @@ export default class FormItem extends React.Component {
         callback && callback();
 
         if (clearErrorOnFocus) {
+            if (this._validateTimer) clearTimeout(this._validateTimer);
             this.cleanError();
         }
     };
 
     handleBlur = callback => {
-        const validateTrigger = this.getValidateTrigger();
-
         callback && callback();
 
-        if (validateTrigger === "blur") {
+        if (this.hasValidateTrigger("blur")) {
             this.triggerValidate();
         }
     };
 
     normalizeChildrenProps() {
-        const form = this.context;
         let { normalize, name, onChange, onFocus, onBlur } = this.props;
 
-        const getInputProps = form.props.getInputProps;
+        const getInputProps = this.getFormProps("getInputProps", () => ({}));
 
-        const customProps = getInputProps
-            ? getInputProps(name, this.props)
-            : {};
+        const customProps = getInputProps(this, name);
 
         return {
             value: this.getValue(),
@@ -193,27 +194,18 @@ export default class FormItem extends React.Component {
                     value = normalize(value);
                 }
 
-                // onChange && onChange(value);
-                // customProps.onChange && customProps.onChange(value);
-
                 this.handleChange(value, () => {
                     onChange && onChange(value);
                     customProps.onChange && customProps.onChange(value);
                 });
             },
             onFocus: e => {
-                // onFocus && onFocus(e);
-                // customProps.onFocus && customProps.onFocus(e);
-
                 this.handleFocus(() => {
                     onFocus && onFocus(e);
                     customProps.onFocus && customProps.onFocus(e);
                 });
             },
             onBlur: e => {
-                // onBlur && onBlur(e);
-                // customProps.onBlur && customProps.onBlur(e);
-
                 this.handleBlur(() => {
                     onBlur && onBlur(e);
                     customProps.onBlur && customProps.onBlur(e);
@@ -244,6 +236,10 @@ export default class FormItem extends React.Component {
         return prop in props ? props[prop] : formProps[prop] || defaultValue;
     }
 
+    getFormItemContext() {
+        return Object.create(this);
+    }
+
     render() {
         const {
             name,
@@ -257,15 +253,14 @@ export default class FormItem extends React.Component {
         } = this.props;
         const inline = this.getProp("inline");
         const labelPosition = this.getProp("labelPosition");
-        const alignItems = this.getProp("alignItems");
         const renderFieldExtra = this.getFormProps("renderFieldExtra");
-        const renderContextExtra = () => {
+        const renderControlExtra = () => {
             if (renderExtra) {
                 return renderExtra(this);
             }
 
             if (renderFieldExtra) {
-                return renderFieldExtra(name, this);
+                return renderFieldExtra(this, name);
             }
 
             return null;
@@ -280,40 +275,46 @@ export default class FormItem extends React.Component {
                 : this.normalizeChildren();
 
         return (
-            <div
-                style={style}
-                ref={this.saveDOM}
-                className={classnames(prefixCls, {
-                    [`${prefixCls}-inline`]: inline,
-                    [`${prefixCls}-position-${labelPosition}`]: labelPosition,
-                    [`${prefixCls}-align-items-${alignItems}`]:
-                        alignItems !== "center",
-                    [`${prefixCls}-error`]: hasError,
-                    [`${prefixCls}-validating`]: isValidating,
-                    [`${prefixCls}-required`]: required,
-                    [`${className}`]: className
-                })}
-            >
-                {label && (
-                    <label
-                        htmlFor={this.getProp("labelFor")}
+            <FormItemContext.Provider value={this.getFormItemContext()}>
+                <div
+                    style={style}
+                    ref={this.saveDOM}
+                    className={classnames(prefixCls, {
+                        [`${prefixCls}-inline`]: inline,
+                        [`${prefixCls}-${labelPosition}`]: labelPosition,
+                        [`has-error`]: hasError,
+                        [`is-validating`]: isValidating,
+                        [`is-required`]: required,
+                        [`${className}`]: className
+                    })}
+                >
+                    {label && (
+                        <label
+                            htmlFor={this.getProp("labelFor")}
+                            className={classnames(
+                                `${prefixCls}-label`,
+                                this.getProp("labelClassName")
+                            )}
+                            style={{
+                                width: this.getProp("labelWidth"),
+                                ...this.getProp("labelStyle", {})
+                            }}
+                        >
+                            {label}
+                        </label>
+                    )}
+                    <div
                         className={classnames(
-                            `${prefixCls}-label`,
-                            this.getProp("labelClassName")
+                            `${prefixCls}-control`,
+                            this.getProp("controlClassName")
                         )}
-                        style={{
-                            width: this.getProp("labelWidth"),
-                            ...this.getProp("labelStyle", {})
-                        }}
+                        style={this.getProp("controlStyle", {})}
                     >
-                        {label}
-                    </label>
-                )}
-                <div className={`${prefixCls}-content`}>
-                    {child}
-                    {renderContextExtra()}
+                        {child}
+                        {renderControlExtra()}
+                    </div>
                 </div>
-            </div>
+            </FormItemContext.Provider>
         );
     }
 }

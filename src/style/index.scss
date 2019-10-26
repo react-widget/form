@@ -1,4 +1,41 @@
-@import "_mixins";
-@import "_var";
-@import "Form";
-@import "FormItem";
+$form-item-cls: nex-form-item;
+
+.#{$form-item-cls} {
+    display: flex;
+
+    &-inline {
+        display: inline-flex;
+    }
+
+    &-label {
+        text-align: right;
+        flex: none;
+    }
+
+    &-top {
+        display: block;
+    }
+
+    &-top.#{$form-item-cls}-inline {
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    &-top &-label {
+        text-align: left;
+        display: block;
+    }
+
+    &-control {
+        position: relative;
+        flex: 1;
+    }
+
+    &.is-required &-label:before {
+        content: "*";
+        display: inline-block;
+        margin-right: 4px;
+        font-family: SimSun;
+        color: red;
+    }
+}

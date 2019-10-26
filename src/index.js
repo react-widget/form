@@ -1,12 +1,24 @@
 import Form from "./Form";
 import FormItem from "./FormItem";
-import NativeField from "./NativeField";
+import NativeInput from "./NativeInput";
 import FormContext from "./FormContext";
+import FormItemContext from "./FormItemContext";
+import useForm from "./useForm";
+import useFormItem from "./useFormItem";
 
-export { Form, FormItem, NativeField, FormContext };
+export {
+    Form,
+    FormItem,
+    NativeInput,
+    FormContext,
+    FormItemContext,
+    useForm,
+    useFormItem
+};
 
 Form.Item = FormItem;
-Form.NativeField = NativeField;
+Form.NativeInput = NativeInput;
 Form.Context = FormContext;
+Form.ItemContext = FormItemContext;
 
 export default Form;

@@ -20,13 +20,15 @@ export default class Form extends React.Component {
         formValue: PropTypes.object,
         validators: PropTypes.object,
         validateDelay: PropTypes.number,
-        validateTrigger: PropTypes.string, //change blur none
+        validateTrigger: PropTypes.oneOf(["blur", "change"]),
         asyncTestDelay: PropTypes.number,
         component: PropTypes.node,
         labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         labelStyle: PropTypes.object,
+        labelClassName: PropTypes.string,
         labelPosition: PropTypes.oneOf(["top", "left"]),
-        alignItems: PropTypes.oneOf(["top", "center", "bottom"]),
+        controlStyle: PropTypes.object,
+        controlClassName: PropTypes.string,
         clearErrorOnFocus: PropTypes.bool,
         inline: PropTypes.bool,
         onSubmit: PropTypes.func,
@@ -43,11 +45,10 @@ export default class Form extends React.Component {
         component: "form",
         asyncTestDelay: 100,
         validateDelay: 0,
-        validateTrigger: "none",
+        validateTrigger: "blur",
         labelPosition: "left",
-        alignItems: "center",
-        inline: false,
-        clearErrorOnFocus: true
+        clearErrorOnFocus: true,
+        inline: false
     };
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -238,7 +239,9 @@ export default class Form extends React.Component {
                 if (fieldProps.required) {
                     fieldValidators.unshift(value => {
                         if (isEmptyValue(value)) {
-                            return fieldProps.requiredMessage;
+                            return fieldProps.requiredMessage == null
+                                ? `${name} fails`
+                                : fieldProps.requiredMessage;
                         }
                     });
                 }
