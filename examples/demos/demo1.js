@@ -99,8 +99,8 @@ export default class DEMO extends Component {
                     onSubmit={this.onSubmit}
                     validators={this.getRules()}
                     renderFieldExtra={this.renderFieldExtra}
-                    inline
                     validateTrigger="blur"
+                    inline
                 >
                     {form => {
                         return (

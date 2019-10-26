@@ -19,6 +19,7 @@ export default class FormItem extends React.Component {
         alignItems: PropTypes.oneOf(["top", "center", "bottom"]),
         validator: PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
         required: PropTypes.bool,
+        requiredMessage: PropTypes.string,
         clearErrorOnFocus: PropTypes.bool,
         normalize: PropTypes.func,
         renderExtra: PropTypes.func,

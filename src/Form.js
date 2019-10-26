@@ -1,15 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames";
-import AsyncValidator from "async-validator";
 import set from "lodash/set";
 import get from "lodash/get";
 import FormContext from "./FormContext";
 import { isEmptyValue, deferred } from "./utils";
 
 function noop() {}
-
-AsyncValidator.warning = noop;
 
 export default class Form extends React.Component {
     static propTypes = {
@@ -34,7 +31,6 @@ export default class Form extends React.Component {
         inline: PropTypes.bool,
         onSubmit: PropTypes.func,
         onChange: PropTypes.func,
-        validateFieldsAndScroll: PropTypes.bool,
         getInputProps: PropTypes.func
     };
 
@@ -186,7 +182,7 @@ export default class Form extends React.Component {
     hasError(name) {
         const { formError } = this.state;
 
-        return formError[name] !== null;
+        return formError[name] != null; // null or undefined
     }
 
     getError(name) {
@@ -196,6 +192,11 @@ export default class Form extends React.Component {
 
     cleanError(name) {
         const { formError } = this.state;
+
+        if (!this.hasError(name)) {
+            return;
+        }
+
         this.setState({
             formError: {
                 ...formError,
@@ -274,7 +275,7 @@ export default class Form extends React.Component {
 
     _validateField(name, callback) {
         callback = typeof callback === "function" ? callback : noop;
-
+        const { formValue } = this.state;
         const value = this.getValue(name);
         const validators = this.getFieldValidator(name);
 
@@ -319,7 +320,7 @@ export default class Form extends React.Component {
                 return; //check finish
             }
 
-            const ret = validator(value);
+            const ret = validator(value, formValue);
             if (ret === true) {
                 cb();
             } else if (ret === false) {
