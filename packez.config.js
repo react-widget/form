@@ -1,6 +1,6 @@
 const _ = require("lodash");
 
-module.exports = function({ method, program, ...deaults }) {
+module.exports = function({ method, program, ...defaults }) {
     const opts = {
         // 自定义配置
         loaders: {
@@ -8,5 +8,5 @@ module.exports = function({ method, program, ...deaults }) {
         }
     };
 
-    return _.defaultsDeep(opts, deaults);
+    return _.defaultsDeep(opts, defaults);
 };

@@ -44,6 +44,7 @@
         "autoprefixer": "^9.6.5",
         "babel-eslint": "^10.0.3",
         "babel-loader": "^8.0.6",
+        "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
         "babel-preset-packez": "^0.4.2",
         "bplokjs-deferred": "^1.0.0",
         "chalk": "^2.4.1",
@@ -72,6 +73,9 @@
         "postcss-safe-parser": "^4.0.1",
         "precss": "^3.1.2",
         "raw-loader": "^0.5.1",
+        "react-widget-base-css": "^0.1.0",
+        "react-widget-icon": "^0.2.0",
+        "react-widget-input": "^0.2.0",
         "sass-loader": "^7.3.1",
         "simple-tree-store": "^1.1.2",
         "style-loader": "^1.0.0",
@@ -80,10 +84,7 @@
         "webpack": "^4.41.2",
         "webpack-dev-server": "^3.9.0",
         "webpack-manifest-plugin": "^2.2.0",
-        "webpack-merge": "^4.2.2",
-        "react-widget-base-css": "^0.1.0",
-        "react-widget-icon": "^0.2.0",
-        "react-widget-input": "^0.2.0"
+        "webpack-merge": "^4.2.2"
     },
     "files": [
         "*.js",
@@ -115,7 +116,7 @@
     },
     "homepage": "https://github.com/react-widget/form#readme",
     "browserslist": [
-        ">1%",
+        ">0.2%",
         "not dead",
         "not ie <= 11",
         "not op_mini all"

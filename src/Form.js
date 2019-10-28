@@ -4,7 +4,7 @@ import classnames from "classnames";
 import set from "lodash/set";
 import get from "lodash/get";
 import FormContext from "./FormContext";
-import { isEmptyValue, deferred } from "./utils";
+import { isEmptyValue } from "./utils";
 
 function noop() {}
 
@@ -96,7 +96,6 @@ export default class Form extends React.Component {
     setValue(name, value, cb) {
         const { path2obj, onChange } = this.props;
         const formValue = this.state.formValue;
-        // const defer = deferred();
 
         // TODO: 后面再考虑下特殊场景
         const nextFormValue = {
@@ -120,19 +119,13 @@ export default class Form extends React.Component {
         }
 
         if (cb) {
-            this._validateCb.push(formValue => {
-                cb(formValue);
-                // defer.resolve(formValue);
-            });
+            this._validateCb.push(cb);
         }
-
-        // return defer.promise;
     }
 
     setValues(obj = {}, cb) {
         const { path2obj, onChange } = this.props;
         const formValue = this.state.formValue;
-        // const defer = deferred();
 
         const nextFormValue = {
             ...formValue
@@ -158,13 +151,8 @@ export default class Form extends React.Component {
         }
 
         if (cb) {
-            this._validateCb.push(formValue => {
-                cb(formValue);
-                // defer.resolve(formValue);
-            });
+            this._validateCb.push(cb);
         }
-
-        // return defer.promise;
     }
 
     componentDidUpdate() {

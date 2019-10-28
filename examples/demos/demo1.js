@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import { Form, FormItem, NativeInput } from "../../src/index";
+import { Form, FormItem, NativeInput, FormContext } from "../../src/index";
 
 function FormItemField({
     type = "text",
@@ -87,7 +87,43 @@ export default class DEMO extends Component {
                     onSubmit={this.onSubmit}
                     renderFieldExtra={this.renderFieldExtra}
                 >
-                    {form => {
+                    <div>
+                        <FormItemField
+                            required
+                            validateDelay={200}
+                            labelPosition="top"
+                            name="A1"
+                            label="A1:"
+                        />
+                        <FormItemField
+                            required
+                            name="username"
+                            label="用户名:"
+                        />
+                        <FormItemField
+                            required
+                            name="password"
+                            label="登录密码:"
+                        />
+                        <FormItemField
+                            required
+                            name="password2"
+                            label="密码确认:"
+                        />
+                        <FormItemField
+                            required
+                            name="email"
+                            label="邮箱地址:"
+                            validator={value => {
+                                return new Promise((resolve, reject) => {
+                                    setTimeout(resolve, 2000);
+                                });
+                            }}
+                        />
+                        <button>submit</button>
+                        <button onClick={this.reset}>reset</button>
+                    </div>
+                    {/* {form => {
                         return (
                             <div>
                                 <FormItemField
@@ -128,7 +164,7 @@ export default class DEMO extends Component {
                                 <button onClick={this.reset}>reset</button>
                             </div>
                         );
-                    }}
+                    }} */}
                 </Form>
             </div>
         );
