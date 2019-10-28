@@ -87,7 +87,6 @@
         "webpack-merge": "^4.2.2"
     },
     "files": [
-        "*.js",
         "lib",
         "*.md"
     ],
