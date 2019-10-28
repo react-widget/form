@@ -8,49 +8,7 @@ import { isEmptyValue } from "./utils";
 
 function noop() {}
 
-export default class Form extends React.Component {
-    static propTypes = {
-        prefixCls: PropTypes.string,
-        className: PropTypes.string,
-        style: PropTypes.object,
-        path2obj: PropTypes.bool,
-        defaultFormValue: PropTypes.object,
-        getDefaultFieldValue: PropTypes.func,
-        renderFieldExtra: PropTypes.func,
-        formValue: PropTypes.object,
-        validators: PropTypes.object,
-        validateDelay: PropTypes.number,
-        validateTrigger: PropTypes.oneOf(["blur", "change"]),
-        asyncTestDelay: PropTypes.number,
-        component: PropTypes.node,
-        labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        labelStyle: PropTypes.object,
-        labelClassName: PropTypes.string,
-        labelPosition: PropTypes.oneOf(["top", "left"]),
-        controlStyle: PropTypes.object,
-        controlClassName: PropTypes.string,
-        clearErrorOnFocus: PropTypes.bool,
-        inline: PropTypes.bool,
-        onSubmit: PropTypes.func,
-        onChange: PropTypes.func,
-        getInputProps: PropTypes.func
-    };
-
-    static defaultProps = {
-        prefixCls: "nex-form",
-        className: "",
-        style: {},
-        validators: {},
-        path2obj: true,
-        component: "form",
-        asyncTestDelay: 100,
-        validateDelay: 0,
-        validateTrigger: "blur",
-        labelPosition: "left",
-        clearErrorOnFocus: true,
-        inline: false
-    };
-
+class Form extends React.Component {
     static getDerivedStateFromProps(nextProps, prevState) {
         return {
             formValue: nextProps.formValue || prevState.formValue
@@ -511,3 +469,47 @@ export default class Form extends React.Component {
         );
     }
 }
+
+Form.propTypes = {
+    prefixCls: PropTypes.string,
+    className: PropTypes.string,
+    style: PropTypes.object,
+    path2obj: PropTypes.bool,
+    defaultFormValue: PropTypes.object,
+    getDefaultFieldValue: PropTypes.func,
+    renderFieldExtra: PropTypes.func,
+    formValue: PropTypes.object,
+    validators: PropTypes.object,
+    validateDelay: PropTypes.number,
+    validateTrigger: PropTypes.oneOf(["blur", "change"]),
+    asyncTestDelay: PropTypes.number,
+    component: PropTypes.node,
+    labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    labelStyle: PropTypes.object,
+    labelClassName: PropTypes.string,
+    labelPosition: PropTypes.oneOf(["top", "left"]),
+    controlStyle: PropTypes.object,
+    controlClassName: PropTypes.string,
+    clearErrorOnFocus: PropTypes.bool,
+    inline: PropTypes.bool,
+    onSubmit: PropTypes.func,
+    onChange: PropTypes.func,
+    getInputProps: PropTypes.func
+};
+
+Form.defaultProps = {
+    prefixCls: "nex-form",
+    className: "",
+    style: {},
+    validators: {},
+    path2obj: true,
+    component: "form",
+    asyncTestDelay: 100,
+    validateDelay: 0,
+    validateTrigger: "blur",
+    labelPosition: "left",
+    clearErrorOnFocus: true,
+    inline: false
+};
+
+export default Form;

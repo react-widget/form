@@ -4,38 +4,8 @@ import classnames from "classnames";
 import FormContext from "./FormContext";
 import FormItemContext from "./FormItemContext";
 
-export default class FormItem extends React.Component {
+class FormItem extends React.Component {
     static contextType = FormContext;
-
-    static propTypes = {
-        children: PropTypes.oneOfType([PropTypes.func, PropTypes.node])
-            .isRequired,
-        name: PropTypes.string,
-        style: PropTypes.object,
-        className: PropTypes.string,
-        label: PropTypes.node,
-        labelFor: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        labelStyle: PropTypes.object,
-        labelClassName: PropTypes.string,
-        labelPosition: PropTypes.oneOf(["top", "left"]),
-        controlStyle: PropTypes.object,
-        controlClassName: PropTypes.string,
-        validator: PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
-        required: PropTypes.bool,
-        requiredMessage: PropTypes.string,
-        clearErrorOnFocus: PropTypes.bool,
-        normalize: PropTypes.func,
-        renderExtra: PropTypes.func,
-        validateDelay: PropTypes.number,
-        validateTrigger: PropTypes.oneOf(["blur", "change"]),
-        inline: PropTypes.bool
-    };
-
-    static defaultProps = {
-        prefixCls: "nex-form-item"
-        // requiredMessage: "不能为空"
-    };
 
     constructor(...args) {
         super(...args);
@@ -318,3 +288,34 @@ export default class FormItem extends React.Component {
         );
     }
 }
+
+FormItem.propTypes = {
+    children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
+    name: PropTypes.string,
+    style: PropTypes.object,
+    className: PropTypes.string,
+    label: PropTypes.node,
+    labelFor: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    labelStyle: PropTypes.object,
+    labelClassName: PropTypes.string,
+    labelPosition: PropTypes.oneOf(["top", "left"]),
+    controlStyle: PropTypes.object,
+    controlClassName: PropTypes.string,
+    validator: PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
+    required: PropTypes.bool,
+    requiredMessage: PropTypes.string,
+    clearErrorOnFocus: PropTypes.bool,
+    normalize: PropTypes.func,
+    renderExtra: PropTypes.func,
+    validateDelay: PropTypes.number,
+    validateTrigger: PropTypes.oneOf(["blur", "change"]),
+    inline: PropTypes.bool
+};
+
+FormItem.defaultProps = {
+    prefixCls: "nex-form-item"
+    // requiredMessage: "不能为空"
+};
+
+export default FormItem;
