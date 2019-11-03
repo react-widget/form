@@ -1,14 +1,9 @@
 {
-  "index.css": "static/css/index.8f87eb2c.chunk.css",
-  "index.js": "static/js/index.8f87eb2c.chunk.js",
-  "index.js.map": "static/js/index.8f87eb2c.chunk.js.map",
+  "index.css": "static/css/index.3626f3b8.chunk.css",
+  "index.js": "static/js/index.3626f3b8.chunk.js",
   "runtime~index.js": "static/js/runtime~index.f795885b.js",
-  "runtime~index.js.map": "static/js/runtime~index.f795885b.js.map",
-  "static/css/2.b4a4d82b.chunk.css": "static/css/2.b4a4d82b.chunk.css",
-  "static/js/2.b4a4d82b.chunk.js": "static/js/2.b4a4d82b.chunk.js",
-  "static/js/2.b4a4d82b.chunk.js.map": "static/js/2.b4a4d82b.chunk.js.map",
+  "static/css/2.71a0092d.chunk.css": "static/css/2.71a0092d.chunk.css",
+  "static/js/2.71a0092d.chunk.js": "static/js/2.71a0092d.chunk.js",
   "index.html": "index.html",
-  "static/css/2.b4a4d82b.chunk.css.map": "static/css/2.b4a4d82b.chunk.css.map",
-  "static/css/index.8f87eb2c.chunk.css.map": "static/css/index.8f87eb2c.chunk.css.map",
   "static/media/index.css": "static/media/ionicons.d535a25a.ttf"
 }

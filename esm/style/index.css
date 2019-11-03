@@ -1,0 +1,25 @@
+
+.nex-form-item {
+  display: flex; }
+  .nex-form-item-inline {
+    display: inline-flex; }
+  .nex-form-item-label {
+    text-align: right;
+    flex: none; }
+  .nex-form-item-top {
+    display: block; }
+  .nex-form-item-top.nex-form-item-inline {
+    display: inline-block;
+    vertical-align: top; }
+  .nex-form-item-top .nex-form-item-label {
+    text-align: left;
+    display: block; }
+  .nex-form-item-control {
+    position: relative;
+    flex: 1 1; }
+  .nex-form-item.is-required .nex-form-item-label:before {
+    content: "*";
+    display: inline-block;
+    margin-right: 4px;
+    font-family: SimSun;
+    color: red; }

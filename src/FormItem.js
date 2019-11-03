@@ -84,11 +84,11 @@ class FormItem extends React.Component {
         return form.isFieldValidating(name);
     }
 
-    validate(callback) {
+    validate(callback, triggerType = "none") {
         const form = this.context;
         const { name } = this.props;
 
-        form.validateField(name, callback);
+        form.validateField(name, callback, triggerType);
     }
 
     getValue() {
@@ -105,28 +105,30 @@ class FormItem extends React.Component {
         form.setValue(name, value, callback);
     }
 
-    triggerValidate() {
+    triggerValidate(triggerType) {
         const validateDelay = this.getValidateDelay();
 
         if (validateDelay > 0) {
             if (this._validateTimer) clearTimeout(this._validateTimer);
             this._validateTimer = setTimeout(() => {
-                this.validate();
+                this.validate(null, triggerType);
             }, validateDelay);
         } else {
-            this.validate();
+            this.validate(null, triggerType);
         }
     }
 
     handleChange = (value, callback) => {
         const { name } = this.props;
+        const oldValue = this.getValue();
+
         this.setValue(value, formValue => {
-            if (formValue[name] /*newValue*/ === value /*oldValue*/) return;
+            if (formValue[name] /*newValue*/ === oldValue /*oldValue*/) return;
 
             callback && callback();
 
             if (this.hasValidateTrigger("change")) {
-                this.triggerValidate();
+                this.triggerValidate("change");
             }
         });
     };
@@ -145,7 +147,7 @@ class FormItem extends React.Component {
         callback && callback();
 
         if (this.hasValidateTrigger("blur")) {
-            this.triggerValidate();
+            this.triggerValidate("blur");
         }
     };
 

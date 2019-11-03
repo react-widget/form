@@ -20,7 +20,7 @@ import {
 ### Types
 
 ```ts
-type ValidateTriggerType = "change" | "blur";
+type ValidateTriggerType = "change" | "blur" | "none";
 
 type Validator = (
     value: any,
@@ -213,13 +213,16 @@ export default function NativeInput(props) {
     isValidating(): boolean;
     validateField(
         name: string,
-        callback: (errors: null | InvalidError[], formValue: {}) => void
+        callback: (errors: null | InvalidError[], formValue: {},isAbort: true | undefined) => void,
+        triggerType: ValidateTriggerType
     ): boolean;
     validate(
-        callback: (errors: null | InvalidError[], formValue: {}) => void
+        callback: (errors: null | InvalidError[], formValue: {},isAbort: true | undefined) => void,
+        triggerType: ValidateTriggerType
     ): boolean;
     validateAndScroll(
-        callback: (errors: null | InvalidError[], formValue: {}) => void
+        callback: (errors: null | InvalidError[], formValue: {},isAbort: true | undefined) => void,
+        triggerType: ValidateTriggerType
     ): boolean;
 }
 ```
@@ -237,7 +240,8 @@ export default function NativeInput(props) {
     setError(message: any): void;
     isValidating(): boolean;
     validate(
-        callback: (errors: null | InvalidError[], formValue: {}) => void
+        callback: (errors: null | InvalidError[], formValue: {},isAbort: true | undefined) => void,
+        triggerType: ValidateTriggerType
     ): boolean;
 }
 ```

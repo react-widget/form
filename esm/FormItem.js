@@ -1,35 +1,18 @@
 
-"use strict";
-
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _extends2 = _interopRequireDefault(require("@babel/runtime/helpers/extends"));
-
-var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime/helpers/assertThisInitialized"));
-
-var _inheritsLoose2 = _interopRequireDefault(require("@babel/runtime/helpers/inheritsLoose"));
-
-var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
-
-var _react = _interopRequireDefault(require("react"));
-
-var _propTypes = _interopRequireDefault(require("prop-types"));
-
-var _classnames2 = _interopRequireDefault(require("classnames"));
-
-var _FormContext = _interopRequireDefault(require("./FormContext"));
-
-var _FormItemContext = _interopRequireDefault(require("./FormItemContext"));
+import _extends from "@babel/runtime/helpers/extends";
+import _assertThisInitialized from "@babel/runtime/helpers/assertThisInitialized";
+import _inheritsLoose from "@babel/runtime/helpers/inheritsLoose";
+import _defineProperty from "@babel/runtime/helpers/defineProperty";
+import React from "react";
+import PropTypes from "prop-types";
+import classnames from "classnames";
+import FormContext from "./FormContext";
+import FormItemContext from "./FormItemContext";
 
 var FormItem =
 /*#__PURE__*/
 function (_React$Component) {
-  (0, _inheritsLoose2.default)(FormItem, _React$Component);
+  _inheritsLoose(FormItem, _React$Component);
 
   function FormItem() {
     var _this;
@@ -39,11 +22,14 @@ function (_React$Component) {
     }
 
     _this = _React$Component.call.apply(_React$Component, [this].concat(args)) || this;
-    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "saveDOM", function (dom) {
+
+    _defineProperty(_assertThisInitialized(_this), "saveDOM", function (dom) {
       _this._dom = dom;
     });
-    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "_validateTimer", null);
-    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "handleChange", function (value, callback) {
+
+    _defineProperty(_assertThisInitialized(_this), "_validateTimer", null);
+
+    _defineProperty(_assertThisInitialized(_this), "handleChange", function (value, callback) {
       var name = _this.props.name;
 
       var oldValue = _this.getValue();
@@ -61,7 +47,8 @@ function (_React$Component) {
         }
       });
     });
-    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "handleFocus", function (callback) {
+
+    _defineProperty(_assertThisInitialized(_this), "handleFocus", function (callback) {
       var clearErrorOnFocus = _this.getProp("clearErrorOnFocus");
 
       callback && callback();
@@ -72,15 +59,17 @@ function (_React$Component) {
         _this.cleanError();
       }
     });
-    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "handleBlur", function (callback) {
+
+    _defineProperty(_assertThisInitialized(_this), "handleBlur", function (callback) {
       callback && callback();
 
       if (_this.hasValidateTrigger("blur")) {
         _this.triggerValidate("blur");
       }
     });
+
     var form = _this.context;
-    form.addField((0, _assertThisInitialized2.default)(_this));
+    form.addField(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -196,7 +185,7 @@ function (_React$Component) {
       return {};
     });
     var customProps = getInputProps(this, name);
-    return (0, _extends2.default)({
+    return _extends({
       value: this.getValue()
     }, customProps, {
       onChange: function onChange(value) {
@@ -225,7 +214,7 @@ function (_React$Component) {
   };
 
   _proto.normalizeChildren = function normalizeChildren() {
-    return _react.default.cloneElement(_react.default.Children.only(this.props.children), this.normalizeChildrenProps());
+    return React.cloneElement(React.Children.only(this.props.children), this.normalizeChildrenProps());
   };
 
   _proto.getFormProps = function getFormProps(prop, defaultValue) {
@@ -277,54 +266,54 @@ function (_React$Component) {
     var hasError = this.hasError();
     var isValidating = this.isValidating();
     var child = typeof children === "function" ? children(this.normalizeChildrenProps(), this) : this.normalizeChildren();
-    return _react.default.createElement(_FormItemContext.default.Provider, {
+    return React.createElement(FormItemContext.Provider, {
       value: this.getFormItemContext()
-    }, _react.default.createElement("div", {
+    }, React.createElement("div", {
       style: style,
       ref: this.saveDOM,
-      className: (0, _classnames2.default)(prefixCls, (_classnames = {}, _classnames[prefixCls + "-inline"] = inline, _classnames[prefixCls + "-" + labelPosition] = labelPosition, _classnames["has-error"] = hasError, _classnames["is-validating"] = isValidating, _classnames["is-required"] = required, _classnames["" + className] = className, _classnames))
-    }, label && _react.default.createElement("label", {
+      className: classnames(prefixCls, (_classnames = {}, _classnames[prefixCls + "-inline"] = inline, _classnames[prefixCls + "-" + labelPosition] = labelPosition, _classnames["has-error"] = hasError, _classnames["is-validating"] = isValidating, _classnames["is-required"] = required, _classnames["" + className] = className, _classnames))
+    }, label && React.createElement("label", {
       htmlFor: this.getProp("labelFor"),
-      className: (0, _classnames2.default)(prefixCls + "-label", this.getProp("labelClassName")),
-      style: (0, _extends2.default)({
+      className: classnames(prefixCls + "-label", this.getProp("labelClassName")),
+      style: _extends({
         width: this.getProp("labelWidth")
       }, this.getProp("labelStyle", {}))
-    }, label), _react.default.createElement("div", {
-      className: (0, _classnames2.default)(prefixCls + "-control", this.getProp("controlClassName")),
+    }, label), React.createElement("div", {
+      className: classnames(prefixCls + "-control", this.getProp("controlClassName")),
       style: this.getProp("controlStyle", {})
     }, child, renderControlExtra())));
   };
 
   return FormItem;
-}(_react.default.Component);
+}(React.Component);
 
-(0, _defineProperty2.default)(FormItem, "contextType", _FormContext.default);
+_defineProperty(FormItem, "contextType", FormContext);
+
 FormItem.propTypes = process.env.NODE_ENV !== "production" ? {
-  children: _propTypes.default.oneOfType([_propTypes.default.func, _propTypes.default.node]).isRequired,
-  name: _propTypes.default.string,
-  style: _propTypes.default.object,
-  className: _propTypes.default.string,
-  label: _propTypes.default.node,
-  labelFor: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
-  labelWidth: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
-  labelStyle: _propTypes.default.object,
-  labelClassName: _propTypes.default.string,
-  labelPosition: _propTypes.default.oneOf(["top", "left"]),
-  controlStyle: _propTypes.default.object,
-  controlClassName: _propTypes.default.string,
-  validator: _propTypes.default.oneOfType([_propTypes.default.func, _propTypes.default.array]),
-  required: _propTypes.default.bool,
-  requiredMessage: _propTypes.default.string,
-  clearErrorOnFocus: _propTypes.default.bool,
-  normalize: _propTypes.default.func,
-  renderExtra: _propTypes.default.func,
-  validateDelay: _propTypes.default.number,
-  validateTrigger: _propTypes.default.oneOf(["blur", "change"]),
-  inline: _propTypes.default.bool
+  children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
+  name: PropTypes.string,
+  style: PropTypes.object,
+  className: PropTypes.string,
+  label: PropTypes.node,
+  labelFor: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  labelStyle: PropTypes.object,
+  labelClassName: PropTypes.string,
+  labelPosition: PropTypes.oneOf(["top", "left"]),
+  controlStyle: PropTypes.object,
+  controlClassName: PropTypes.string,
+  validator: PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
+  required: PropTypes.bool,
+  requiredMessage: PropTypes.string,
+  clearErrorOnFocus: PropTypes.bool,
+  normalize: PropTypes.func,
+  renderExtra: PropTypes.func,
+  validateDelay: PropTypes.number,
+  validateTrigger: PropTypes.oneOf(["blur", "change"]),
+  inline: PropTypes.bool
 } : {};
 FormItem.defaultProps = {
   prefixCls: "nex-form-item" // requiredMessage: "不能为空"
 
 };
-var _default = FormItem;
-exports.default = _default;
+export default FormItem;

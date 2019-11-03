@@ -80,6 +80,7 @@ export default class DEMO extends Component {
             <div>
                 <Form
                     labelWidth={80}
+                    validateTrigger={["change", "blur"]}
                     getDefaultFieldValue={() => ""}
                     ref={form => (this.form = form)}
                     formValue={formValue}
@@ -114,7 +115,8 @@ export default class DEMO extends Component {
                             required
                             name="email"
                             label="邮箱地址:"
-                            validator={value => {
+                            validator={(value, formValue, triggerType) => {
+                                console.log(triggerType);
                                 return new Promise((resolve, reject) => {
                                     setTimeout(resolve, 2000);
                                 });

@@ -1,41 +1,22 @@
 
-"use strict";
-
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _extends7 = _interopRequireDefault(require("@babel/runtime/helpers/extends"));
-
-var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime/helpers/assertThisInitialized"));
-
-var _inheritsLoose2 = _interopRequireDefault(require("@babel/runtime/helpers/inheritsLoose"));
-
-var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
-
-var _react = _interopRequireDefault(require("react"));
-
-var _propTypes = _interopRequireDefault(require("prop-types"));
-
-var _classnames = _interopRequireDefault(require("classnames"));
-
-var _set = _interopRequireDefault(require("lodash/set"));
-
-var _get = _interopRequireDefault(require("lodash/get"));
-
-var _FormContext = _interopRequireDefault(require("./FormContext"));
-
-var _utils = require("./utils");
+import _extends from "@babel/runtime/helpers/extends";
+import _assertThisInitialized from "@babel/runtime/helpers/assertThisInitialized";
+import _inheritsLoose from "@babel/runtime/helpers/inheritsLoose";
+import _defineProperty from "@babel/runtime/helpers/defineProperty";
+import React from "react";
+import PropTypes from "prop-types";
+import classnames from "classnames";
+import set from "lodash/set";
+import get from "lodash/get";
+import FormContext from "./FormContext";
+import { isEmptyValue } from "./utils";
 
 function noop() {}
 
 var Form =
 /*#__PURE__*/
 function (_React$Component) {
-  (0, _inheritsLoose2.default)(Form, _React$Component);
+  _inheritsLoose(Form, _React$Component);
 
   function Form() {
     var _this;
@@ -45,15 +26,21 @@ function (_React$Component) {
     }
 
     _this = _React$Component.call.apply(_React$Component, [this].concat(args)) || this;
-    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "fieldLockId", 1);
-    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "formLockId", 1);
-    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "fields", []);
-    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "_validateCb", []);
-    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "state", {
+
+    _defineProperty(_assertThisInitialized(_this), "fieldLockId", 1);
+
+    _defineProperty(_assertThisInitialized(_this), "formLockId", 1);
+
+    _defineProperty(_assertThisInitialized(_this), "fields", []);
+
+    _defineProperty(_assertThisInitialized(_this), "_validateCb", []);
+
+    _defineProperty(_assertThisInitialized(_this), "state", {
       formError: {},
       validatingFields: {},
       formValue: _this.props.defaultFormValue || {}
     });
+
     return _this;
   }
 
@@ -84,7 +71,7 @@ function (_React$Component) {
     var getDefaultFieldValue = this.props.getDefaultFieldValue;
     var path2obj = this.props.path2obj;
     var formValue = this.state.formValue;
-    var value = path2obj ? (0, _get.default)(formValue, name) : formValue[name];
+    var value = path2obj ? get(formValue, name) : formValue[name];
     return value === undefined && getDefaultFieldValue ? getDefaultFieldValue(name) : value;
   };
 
@@ -94,10 +81,10 @@ function (_React$Component) {
         onChange = _this$props.onChange;
     var formValue = this.state.formValue; // TODO: 后面再考虑下特殊场景
 
-    var nextFormValue = (0, _extends7.default)({}, formValue);
+    var nextFormValue = _extends({}, formValue);
 
     if (path2obj) {
-      (0, _set.default)(nextFormValue, name, value);
+      set(nextFormValue, name, value);
     } else {
       nextFormValue[name] = value;
     }
@@ -126,12 +113,14 @@ function (_React$Component) {
         path2obj = _this$props2.path2obj,
         onChange = _this$props2.onChange;
     var formValue = this.state.formValue;
-    var nextFormValue = (0, _extends7.default)({}, formValue);
+
+    var nextFormValue = _extends({}, formValue);
+
     Object.keys(obj).forEach(function (name) {
       var value = obj[name];
 
       if (path2obj) {
-        (0, _set.default)(nextFormValue, name, value);
+        set(nextFormValue, name, value);
       } else {
         nextFormValue[name] = value;
       }
@@ -185,7 +174,7 @@ function (_React$Component) {
     }
 
     this.setState({
-      formError: (0, _extends7.default)({}, formError, (_extends2 = {}, _extends2[name] = null, _extends2))
+      formError: _extends({}, formError, (_extends2 = {}, _extends2[name] = null, _extends2))
     });
   };
 
@@ -194,7 +183,7 @@ function (_React$Component) {
 
     var formError = this.state.formError;
     this.setState({
-      formError: (0, _extends7.default)({}, formError, (_extends3 = {}, _extends3[name] = message, _extends3))
+      formError: _extends({}, formError, (_extends3 = {}, _extends3[name] = message, _extends3))
     });
   };
 
@@ -206,7 +195,7 @@ function (_React$Component) {
 
   _proto.setErrors = function setErrors(errors) {
     var formError = this.state.formError;
-    this.setState((0, _extends7.default)({}, formError, {}, errors));
+    this.setState(_extends({}, formError, {}, errors));
   };
 
   _proto.getFieldValidatorList = function getFieldValidatorList(name) {
@@ -218,7 +207,7 @@ function (_React$Component) {
 
       if (fieldProps.required) {
         fieldValidators.unshift(function (value) {
-          if ((0, _utils.isEmptyValue)(value)) {
+          if (isEmptyValue(value)) {
             return fieldProps.requiredMessage == null ? name + " check fail" : fieldProps.requiredMessage;
           }
         });
@@ -344,7 +333,7 @@ function (_React$Component) {
       if (lockId !== _this2.fieldLockId) return;
 
       _this2.setState({
-        validatingFields: (0, _extends7.default)({}, validatingFields, (_extends4 = {}, _extends4[name] = true, _extends4))
+        validatingFields: _extends({}, validatingFields, (_extends4 = {}, _extends4[name] = true, _extends4))
       });
     }, asyncTestDelay); // let isAsync = true;
 
@@ -364,8 +353,8 @@ function (_React$Component) {
       }
 
       _this2.setState({
-        formError: (0, _extends7.default)({}, formError, (_extends5 = {}, _extends5[name] = errors ? errors[0].message : null, _extends5)),
-        validatingFields: (0, _extends7.default)({}, validatingFields, (_extends6 = {}, _extends6[name] = false, _extends6))
+        formError: _extends({}, formError, (_extends5 = {}, _extends5[name] = errors ? errors[0].message : null, _extends5)),
+        validatingFields: _extends({}, validatingFields, (_extends6 = {}, _extends6[name] = false, _extends6))
       }, function () {
         callback(errors, value);
       });
@@ -507,43 +496,43 @@ function (_React$Component) {
         onSubmit = _this$props3.onSubmit,
         Component = _this$props3.component,
         children = _this$props3.children;
-    return _react.default.createElement(_FormContext.default.Provider, {
+    return React.createElement(FormContext.Provider, {
       value: this.getFormContext()
-    }, _react.default.createElement(Component, {
+    }, React.createElement(Component, {
       style: style,
-      className: (0, _classnames.default)(prefixCls, className),
+      className: classnames(prefixCls, className),
       onSubmit: onSubmit
     }, typeof children === "function" ? children(this) : children));
   };
 
   return Form;
-}(_react.default.Component);
+}(React.Component);
 
 Form.propTypes = process.env.NODE_ENV !== "production" ? {
-  prefixCls: _propTypes.default.string,
-  className: _propTypes.default.string,
-  style: _propTypes.default.object,
-  path2obj: _propTypes.default.bool,
-  defaultFormValue: _propTypes.default.object,
-  getDefaultFieldValue: _propTypes.default.func,
-  renderFieldExtra: _propTypes.default.func,
-  formValue: _propTypes.default.object,
-  validators: _propTypes.default.object,
-  validateDelay: _propTypes.default.number,
-  validateTrigger: _propTypes.default.oneOf(["blur", "change"]),
-  asyncTestDelay: _propTypes.default.number,
-  component: _propTypes.default.node,
-  labelWidth: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
-  labelStyle: _propTypes.default.object,
-  labelClassName: _propTypes.default.string,
-  labelPosition: _propTypes.default.oneOf(["top", "left"]),
-  controlStyle: _propTypes.default.object,
-  controlClassName: _propTypes.default.string,
-  clearErrorOnFocus: _propTypes.default.bool,
-  inline: _propTypes.default.bool,
-  onSubmit: _propTypes.default.func,
-  onChange: _propTypes.default.func,
-  getInputProps: _propTypes.default.func
+  prefixCls: PropTypes.string,
+  className: PropTypes.string,
+  style: PropTypes.object,
+  path2obj: PropTypes.bool,
+  defaultFormValue: PropTypes.object,
+  getDefaultFieldValue: PropTypes.func,
+  renderFieldExtra: PropTypes.func,
+  formValue: PropTypes.object,
+  validators: PropTypes.object,
+  validateDelay: PropTypes.number,
+  validateTrigger: PropTypes.oneOf(["blur", "change"]),
+  asyncTestDelay: PropTypes.number,
+  component: PropTypes.node,
+  labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  labelStyle: PropTypes.object,
+  labelClassName: PropTypes.string,
+  labelPosition: PropTypes.oneOf(["top", "left"]),
+  controlStyle: PropTypes.object,
+  controlClassName: PropTypes.string,
+  clearErrorOnFocus: PropTypes.bool,
+  inline: PropTypes.bool,
+  onSubmit: PropTypes.func,
+  onChange: PropTypes.func,
+  getInputProps: PropTypes.func
 } : {};
 Form.defaultProps = {
   prefixCls: "nex-form",
@@ -559,5 +548,4 @@ Form.defaultProps = {
   clearErrorOnFocus: true,
   inline: false
 };
-var _default = Form;
-exports.default = _default;
+export default Form;

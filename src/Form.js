@@ -15,6 +15,10 @@ class Form extends React.Component {
         };
     }
 
+    //异步校验加乐观锁
+    fieldLockId = 1;
+    formLockId = 1;
+
     fields = [];
     _validateCb = [];
 
@@ -176,7 +180,7 @@ class Form extends React.Component {
         });
     }
 
-    getFieldValidator(name) {
+    getFieldValidatorList(name) {
         const fieldValidators = [];
         this.fields
             .filter(field => field.props.name === name)
@@ -186,7 +190,7 @@ class Form extends React.Component {
                     fieldValidators.unshift(value => {
                         if (isEmptyValue(value)) {
                             return fieldProps.requiredMessage == null
-                                ? `${name} fails`
+                                ? `${name} check fail`
                                 : fieldProps.requiredMessage;
                         }
                     });
@@ -222,11 +226,11 @@ class Form extends React.Component {
         return Object.keys(validatingFields).some(key => validatingFields[key]);
     }
 
-    _validateField(name, callback) {
+    _validateField(name, callback, triggerType = "none") {
         callback = typeof callback === "function" ? callback : noop;
         const { formValue } = this.state;
         const value = this.getValue(name);
-        const validators = this.getFieldValidator(name);
+        const validators = this.getFieldValidatorList(name);
 
         if (!validators.length) {
             callback(null, value);
@@ -269,7 +273,7 @@ class Form extends React.Component {
                 return; //check finish
             }
 
-            const ret = validator(value, formValue);
+            const ret = validator(value, formValue, triggerType);
             if (ret === true) {
                 cb();
             } else if (ret === false) {
@@ -285,15 +289,19 @@ class Form extends React.Component {
         startCheck();
     }
 
-    validateField(name, callback) {
+    validateField(name, callback, triggerType) {
         callback = typeof callback === "function" ? callback : noop;
 
         const { asyncTestDelay } = this.props;
         const { formError, validatingFields } = this.state;
+        const lockId = ++this.fieldLockId;
 
         //是否异步探测
         let asyncTimer = setTimeout(() => {
             asyncTimer = null;
+
+            if (lockId !== this.fieldLockId) return;
+
             this.setState({
                 validatingFields: {
                     ...validatingFields,
@@ -303,35 +311,46 @@ class Form extends React.Component {
         }, asyncTestDelay);
         // let isAsync = true;
 
-        this._validateField(name, (errors, value) => {
-            if (asyncTimer) {
-                clearTimeout(asyncTimer);
-            }
-            // isAsync = false;
-
-            this.setState(
-                {
-                    formError: {
-                        ...formError,
-                        [name]: errors ? errors[0].message : null
-                    },
-                    validatingFields: {
-                        ...validatingFields,
-                        [name]: false
-                    }
-                },
-                () => {
-                    callback(errors, value);
+        this._validateField(
+            name,
+            (errors, value) => {
+                if (asyncTimer) {
+                    clearTimeout(asyncTimer);
                 }
-            );
-        });
+                // isAsync = false;
+
+                if (lockId !== this.fieldLockId) {
+                    callback(errors, value, true /* abort state */);
+                    return;
+                }
+
+                this.setState(
+                    {
+                        formError: {
+                            ...formError,
+                            [name]: errors ? errors[0].message : null
+                        },
+                        validatingFields: {
+                            ...validatingFields,
+                            [name]: false
+                        }
+                    },
+                    () => {
+                        callback(errors, value);
+                    }
+                );
+            },
+            triggerType
+        );
     }
 
-    validate(callback) {
+    validate(callback, triggerType) {
         callback = typeof callback === "function" ? callback : noop;
 
         const { asyncTestDelay } = this.props;
         const { formValue, formError } = this.state;
+        this.fieldLockId++; //validate优先级高于validateField
+        const lockId = ++this.formLockId;
         const fields = this.fields;
         const validatingFields = {};
         const allErrors = [];
@@ -353,6 +372,15 @@ class Form extends React.Component {
             }
 
             if (validCounter <= 0) {
+                if (lockId !== this.formLockId) {
+                    callback(
+                        allErrors.length ? allErrors : null,
+                        formValue,
+                        true /* abort state */
+                    );
+                    return;
+                }
+
                 this.setState(
                     {
                         formError,
@@ -395,34 +423,40 @@ class Form extends React.Component {
                     if (hasUpdate) return;
                     hasUpdate = true;
 
+                    if (lockId !== this.formLockId) return;
+
                     updateFormState();
                 }, asyncTestDelay);
 
-                this._validateField(name, errors => {
-                    validatingFields[name] = false;
+                this._validateField(
+                    name,
+                    errors => {
+                        validatingFields[name] = false;
 
-                    if (asyncTimer) {
-                        clearTimeout(asyncTimer);
-                        asyncTimer = null;
-                    }
+                        if (asyncTimer) {
+                            clearTimeout(asyncTimer);
+                            asyncTimer = null;
+                        }
 
-                    //异步校验完成后执行刷新动作
-                    if (isAsyncValidate) {
-                        updateFormState();
-                    }
+                        //异步校验完成后执行刷新动作
+                        if (isAsyncValidate) {
+                            updateFormState();
+                        }
 
-                    complete(errors, name);
-                });
+                        complete(errors, name);
+                    },
+                    triggerType
+                );
             });
         } else {
             callback(null, formValue);
         }
     }
 
-    validateAndScroll(callback) {
+    validateAndScroll(callback, triggerType) {
         callback = typeof callback === "function" ? callback : noop;
 
-        this.validate((errors, formValue) => {
+        this.validate((errors, formValue, isAbort) => {
             if (errors) {
                 const fields = this.fields;
                 for (let i = 0; i < fields.length; i++) {
@@ -438,8 +472,8 @@ class Form extends React.Component {
                 }
             }
 
-            callback(errors, formValue);
-        });
+            callback(errors, formValue, isAbort);
+        }, triggerType);
     }
 
     getFormContext() {
@@ -506,7 +540,7 @@ Form.defaultProps = {
     component: "form",
     asyncTestDelay: 100,
     validateDelay: 0,
-    validateTrigger: "blur",
+    validateTrigger: ["blur", "change"],
     labelPosition: "left",
     clearErrorOnFocus: true,
     inline: false
