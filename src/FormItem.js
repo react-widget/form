@@ -9,7 +9,7 @@ class FormItem extends React.Component {
 
     constructor(...args) {
         super(...args);
-        const form = this.context;
+        const form = this.getForm();
 
         form.addField(this);
     }
@@ -23,11 +23,11 @@ class FormItem extends React.Component {
     }
 
     getForm() {
-        return this.context;
+        return this.context.form;
     }
 
     componentWillUnmount() {
-        const form = this.context;
+        const form = this.getForm();
         form.removeField(this);
     }
 
@@ -42,7 +42,7 @@ class FormItem extends React.Component {
     }
 
     getValidateDelay() {
-        const form = this.context;
+        const form = this.getForm();
         const { validateDelay } = form.props;
         const props = this.props;
 
@@ -50,56 +50,56 @@ class FormItem extends React.Component {
     }
 
     hasError() {
-        const form = this.context;
+        const form = this.getForm();
         const { name } = this.props;
 
         return form.hasError(name);
     }
 
     getError() {
-        const form = this.context;
+        const form = this.getForm();
         const { name } = this.props;
 
         return form.getError(name);
     }
 
     cleanError() {
-        const form = this.context;
+        const form = this.getForm();
         const { name } = this.props;
 
         return form.cleanError(name);
     }
 
     setError(message) {
-        const form = this.context;
+        const form = this.getForm();
         const { name } = this.props;
 
         return form.setError(name, message);
     }
 
     isValidating() {
-        const form = this.context;
+        const form = this.getForm();
         const { name } = this.props;
 
         return form.isFieldValidating(name);
     }
 
     validate(callback, triggerType = "none") {
-        const form = this.context;
+        const form = this.getForm();
         const { name } = this.props;
 
         form.validateField(name, callback, triggerType);
     }
 
     getValue() {
-        const form = this.context;
+        const form = this.getForm();
         const { name } = this.props;
 
         return form.getValue(name);
     }
 
     setValue(value, callback) {
-        const form = this.context;
+        const form = this.getForm();
         const { name } = this.props;
 
         form.setValue(name, value, callback);
@@ -194,14 +194,14 @@ class FormItem extends React.Component {
     }
 
     getFormProps(prop, defaultValue) {
-        const form = this.context;
+        const form = this.getForm();
         const formProps = form.props;
 
         return formProps[prop] || defaultValue;
     }
 
     getProp(prop, defaultValue) {
-        const form = this.context;
+        const form = this.getForm();
         const formProps = form.props;
         const props = this.props;
 

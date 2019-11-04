@@ -2,5 +2,6 @@ import React from "react";
 import FormContext from "./FormContext";
 
 export default () => {
-    return React.useContext(FormContext);
+    const context = React.useContext(FormContext);
+    return context.form;
 };

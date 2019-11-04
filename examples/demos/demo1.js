@@ -83,7 +83,7 @@ export default class DEMO extends Component {
                     validateTrigger={["change", "blur"]}
                     getDefaultFieldValue={() => ""}
                     ref={form => (this.form = form)}
-                    formValue={formValue}
+                    // formValue={formValue}
                     onChange={formValue => this.setState({ formValue })}
                     onSubmit={this.onSubmit}
                     renderFieldExtra={this.renderFieldExtra}

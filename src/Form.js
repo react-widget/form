@@ -477,7 +477,7 @@ class Form extends React.Component {
     }
 
     getFormContext() {
-        return Object.create(this);
+        return { form: this };
     }
 
     render() {

@@ -485,7 +485,9 @@ function (_React$Component) {
   };
 
   _proto.getFormContext = function getFormContext() {
-    return Object.create(this);
+    return {
+      form: this
+    };
   };
 
   _proto.render = function render() {
