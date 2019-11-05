@@ -17,13 +17,11 @@ declare namespace ReactWidgetForm {
         defaultFormValue?: {};
         formValue?: {};
         getDefaultFieldValue?: (name: string) => any;
-        renderFieldExtra?: (
-            component: FormItem,
-            name: string
-        ) => React.ReactNode;
+        renderControlExtra?: (component: FormItem) => React.ReactNode;
         validators?: {
             [name: string]: Validator | Validator[];
         };
+        requiredMessage?: string;
         validateDelay?: number;
         validateTrigger?: ValidateTriggerType | ValidateTriggerType[];
         asyncTestDelay?: number;
@@ -38,7 +36,7 @@ declare namespace ReactWidgetForm {
         inline?: boolean;
         onSubmit?: (e: React.SyntheticEvent) => void;
         onChange?: (formValue: {}) => void;
-        getInputProps?: (component: FormItem, name: string) => {};
+        getInputProps?: (component: FormItem) => {};
     }
     interface FormItemProps {
         children:

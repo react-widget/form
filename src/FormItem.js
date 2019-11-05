@@ -156,7 +156,7 @@ class FormItem extends React.Component {
 
         const getInputProps = this.getFormProps("getInputProps", () => ({}));
 
-        const customProps = getInputProps(this, name);
+        const customProps = getInputProps(this);
 
         return {
             value: this.getValue(),
@@ -225,14 +225,14 @@ class FormItem extends React.Component {
         } = this.props;
         const inline = this.getProp("inline");
         const labelPosition = this.getProp("labelPosition");
-        const renderFieldExtra = this.getFormProps("renderFieldExtra");
+        const _renderControlExtra = this.getFormProps("renderControlExtra");
         const renderControlExtra = () => {
             if (renderExtra) {
                 return renderExtra(this);
             }
 
-            if (renderFieldExtra) {
-                return renderFieldExtra(this, name);
+            if (_renderControlExtra) {
+                return _renderControlExtra(this);
             }
 
             return null;
@@ -317,7 +317,6 @@ FormItem.propTypes = {
 
 FormItem.defaultProps = {
     prefixCls: "nex-form-item"
-    // requiredMessage: "不能为空"
 };
 
 export default FormItem;

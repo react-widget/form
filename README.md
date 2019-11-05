@@ -46,12 +46,12 @@ defaultFormValue?: {};
 formValue?: {};
 getDefaultFieldValue?: (name: string) => any;
 renderFieldExtra?: (
-    component: FormItem,
-    name: string
+    component: FormItem
 ) => React.ReactNode;
 validators?: {
     [name: string]: Validator | Validator[];
 };
+requiredMessage?: string;
 validateDelay?: number;
 validateTrigger?: ValidateTriggerType | ValidateTriggerType[];
 asyncTestDelay?: number;
@@ -66,7 +66,7 @@ clearErrorOnFocus?: boolean;
 inline?: boolean;
 onSubmit?: (e: React.SyntheticEvent) => void;
 onChange?: (formValue: {}) => void;
-getInputProps?: (component: FormItem, name: string) => {};
+getInputProps?: (component: FormItem) => {};
 ```
 
 ### FormItem

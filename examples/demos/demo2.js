@@ -87,7 +87,7 @@ export default class DEMO extends Component {
                     validators={this.getRules()}
                     onChange={formValue => this.setState({ formValue })}
                     onSubmit={this.onSubmit}
-                    renderFieldExtra={this.renderFieldExtra}
+                    renderControlExtra={this.renderFieldExtra}
                     validateTrigger="blur"
                     inline
                 >

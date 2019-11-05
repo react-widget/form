@@ -185,7 +185,7 @@ function (_React$Component) {
     var getInputProps = this.getFormProps("getInputProps", function () {
       return {};
     });
-    var customProps = getInputProps(this, name);
+    var customProps = getInputProps(this);
     return _extends({
       value: this.getValue()
     }, customProps, {
@@ -250,15 +250,16 @@ function (_React$Component) {
         children = _this$props2.children;
     var inline = this.getProp("inline");
     var labelPosition = this.getProp("labelPosition");
-    var renderFieldExtra = this.getFormProps("renderFieldExtra");
+
+    var _renderControlExtra = this.getFormProps("renderControlExtra");
 
     var renderControlExtra = function renderControlExtra() {
       if (renderExtra) {
         return renderExtra(_this4);
       }
 
-      if (renderFieldExtra) {
-        return renderFieldExtra(_this4, name);
+      if (_renderControlExtra) {
+        return _renderControlExtra(_this4);
       }
 
       return null;
@@ -314,7 +315,6 @@ FormItem.propTypes = process.env.NODE_ENV !== "production" ? {
   inline: PropTypes.bool
 } : {};
 FormItem.defaultProps = {
-  prefixCls: "nex-form-item" // requiredMessage: "不能为空"
-
+  prefixCls: "nex-form-item"
 };
 export default FormItem;

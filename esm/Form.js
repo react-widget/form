@@ -208,7 +208,7 @@ function (_React$Component) {
       if (fieldProps.required) {
         fieldValidators.unshift(function (value) {
           if (isEmptyValue(value)) {
-            return fieldProps.requiredMessage == null ? name + " check fail" : fieldProps.requiredMessage;
+            return field.getProp("requiredMessage", name + " check fail");
           }
         });
       }
@@ -293,16 +293,16 @@ function (_React$Component) {
 
       if (!validator) {
         return; //check finish
-      }
+      } // 校验方法返回 true undefined null 代表校验成功，校验失败则直接返回失败信息
+
 
       var ret = validator(value, formValue, triggerType);
 
       if (ret === true) {
         cb();
       } else if (ret === false) {
-        cb(name + " fails");
+        cb(name + " check fail");
       } else if (ret && ret.then) {
-        //thenable
         ret.then(function () {
           return cb();
         }, function (e) {
@@ -517,13 +517,14 @@ Form.propTypes = process.env.NODE_ENV !== "production" ? {
   path2obj: PropTypes.bool,
   defaultFormValue: PropTypes.object,
   getDefaultFieldValue: PropTypes.func,
-  renderFieldExtra: PropTypes.func,
+  renderControlExtra: PropTypes.func,
   formValue: PropTypes.object,
   validators: PropTypes.object,
   validateDelay: PropTypes.number,
-  validateTrigger: PropTypes.oneOf(["blur", "change"]),
+  validateTrigger: PropTypes.oneOfType([PropTypes.oneOf(["blur", "change", "none"]), PropTypes.array]),
   asyncTestDelay: PropTypes.number,
   component: PropTypes.node,
+  requiredMessage: PropTypes.string,
   labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   labelStyle: PropTypes.object,
   labelClassName: PropTypes.string,

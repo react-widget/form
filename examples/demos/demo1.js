@@ -11,7 +11,6 @@ function FormItemField({
     return (
         <FormItem
             {...resetProps}
-            requiredMessage="不能为空"
             style={{
                 marginBottom: 24
             }}
@@ -82,11 +81,12 @@ export default class DEMO extends Component {
                     labelWidth={80}
                     validateTrigger={["change", "blur"]}
                     getDefaultFieldValue={() => ""}
+                    requiredMessage="不能为空"
                     ref={form => (this.form = form)}
                     // formValue={formValue}
                     onChange={formValue => this.setState({ formValue })}
                     onSubmit={this.onSubmit}
-                    renderFieldExtra={this.renderFieldExtra}
+                    renderControlExtra={this.renderFieldExtra}
                 >
                     <div>
                         <FormItemField
