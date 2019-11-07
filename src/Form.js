@@ -16,7 +16,7 @@ class Form extends React.Component {
     }
 
     //异步校验加乐观锁
-    fieldLockId = 1;
+    fieldLocks = {};
     formLockId = 1;
 
     fields = [];
@@ -29,6 +29,8 @@ class Form extends React.Component {
     };
 
     addField(field) {
+        const { name } = field.props;
+        field._initialValue = this.getValue(name);
         this.fields.push(field);
     }
 
@@ -41,6 +43,48 @@ class Form extends React.Component {
 
             this.fields.splice(idx, 1);
         }
+    }
+
+    reset(cb) {
+        const initialFormValue = {};
+
+        this.fields.forEach(field => {
+            initialFormValue[field.props.name] = field._initialValue;
+        });
+
+        this.fieldLocks = {};
+        this.formLockId++;
+        this.state.validatingFields = {};
+        this.state.formValue = initialFormValue;
+        // this.formError = {};
+        this.cleanErrors();
+
+        // this.setState({
+        //     formError: {},
+        //     validatingFields: {},
+        //     formValue: initialFormValue
+        // });
+
+        this.setValues({}, cb);
+    }
+
+    resetField(name, cb) {
+        this.cleanError(name);
+
+        let initialValue;
+
+        this.fields.forEach(field => {
+            if (field.props.name === name) {
+                initialValue = field._initialValue;
+            }
+        });
+
+        this.fieldLocks[name] = 1;
+        this.state.validatingFields[name] = false;
+        // this.formError[name] = null;
+        this.cleanError(name);
+
+        this.setValue(name, initialValue, cb);
     }
 
     getFormValue() {
@@ -315,13 +359,16 @@ class Form extends React.Component {
 
         const { asyncTestDelay } = this.props;
         const { formError, validatingFields } = this.state;
-        const lockId = ++this.fieldLockId;
+
+        this.fieldLocks[name] = this.fieldLocks[name] || 1;
+
+        const lockId = ++this.fieldLocks[name];
 
         //是否异步探测
         let asyncTimer = setTimeout(() => {
             asyncTimer = null;
 
-            if (lockId !== this.fieldLockId) return;
+            if (lockId !== this.fieldLocks[name]) return;
 
             this.setState({
                 validatingFields: {
@@ -340,7 +387,7 @@ class Form extends React.Component {
                 }
                 // isAsync = false;
 
-                if (lockId !== this.fieldLockId) {
+                if (lockId !== this.fieldLocks[name]) {
                     callback(errors, value, true /* abort state */);
                     return;
                 }
@@ -370,7 +417,7 @@ class Form extends React.Component {
 
         const { asyncTestDelay } = this.props;
         const { formValue, formError } = this.state;
-        this.fieldLockId++; //validate优先级高于validateField
+        this.fieldLocks = {}; //validate优先级高于validateField
         const lockId = ++this.formLockId;
         const fields = this.fields;
         const validatingFields = {};

@@ -49,6 +49,12 @@ class FormItem extends React.Component {
         return "validateDelay" in props ? props.validateDelay : validateDelay;
     }
 
+    reset(cb) {
+        const form = this.getForm();
+        const { name } = this.props;
+        form.resetField(name, cb);
+    }
+
     hasError() {
         const form = this.getForm();
         const { name } = this.props;

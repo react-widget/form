@@ -200,6 +200,8 @@ export default function NativeInput(props) {
 ```ts
 {
     getValue(name: string): any;
+    reset(cb: () => void): void;
+    resetField(cb: () => void): void;
     setValue(
        name: string,
        value: any,
@@ -235,6 +237,7 @@ export default function NativeInput(props) {
 {
     getDOM(): any;
     getForm(): Form;
+    reset(cb: () => void): void;
     getValue(): any;
     setValue(value: any, callback: (formValue: {}) => void): void;
     hasError(): boolean;

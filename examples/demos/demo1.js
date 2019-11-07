@@ -27,7 +27,7 @@ function FormItemField({
 export default class DEMO extends Component {
     state = {
         formValue: {
-            username: "",
+            username: "默认",
             password: "",
             password2: "",
             email: ""
@@ -36,16 +36,22 @@ export default class DEMO extends Component {
 
     reset = e => {
         e.preventDefault();
-        this.setState({
-            formValue: {
-                username: "",
-                password: "",
-                password2: "",
-                email: ""
-            }
-        });
+        if (this.form) {
+            this.form.reset(() => {
+                console.log(23);
+                // this.forceUpdate();
+            });
+        }
+        // this.setState({
+        //     formValue: {
+        //         username: "",
+        //         password: "",
+        //         password2: "",
+        //         email: ""
+        //     }
+        // });
 
-        this.form.cleanErrors();
+        // this.form.cleanErrors();
     };
 
     onSubmit = e => {
@@ -59,6 +65,7 @@ export default class DEMO extends Component {
     };
 
     renderFieldExtra = component => {
+        console.log("update");
         return (
             <div
                 style={{
@@ -82,9 +89,9 @@ export default class DEMO extends Component {
                     // validateTrigger={["change", "blur"]}
                     getDefaultFieldValue={() => ""}
                     requiredMessage="不能为空"
-                    ref={form => (this.form = form)}
+                    ref={form => ((this.form = form), (window._form = form))}
                     labelAlign="right"
-                    // formValue={formValue}
+                    formValue={formValue}
                     onChange={formValue => this.setState({ formValue })}
                     onSubmit={this.onSubmit}
                     renderControlExtra={this.renderFieldExtra}

@@ -27,7 +27,7 @@ function (_React$Component) {
 
     _this = _React$Component.call.apply(_React$Component, [this].concat(args)) || this;
 
-    _defineProperty(_assertThisInitialized(_this), "fieldLockId", 1);
+    _defineProperty(_assertThisInitialized(_this), "fieldLocks", {});
 
     _defineProperty(_assertThisInitialized(_this), "formLockId", 1);
 
@@ -54,6 +54,8 @@ function (_React$Component) {
   var _proto = Form.prototype;
 
   _proto.addField = function addField(field) {
+    var name = field.props.name;
+    field._initialValue = this.getValue(name);
     this.fields.push(field);
   };
 
@@ -65,6 +67,40 @@ function (_React$Component) {
       this.state.formError[name] = null;
       this.fields.splice(idx, 1);
     }
+  };
+
+  _proto.reset = function reset(cb) {
+    var initialFormValue = {};
+    this.fields.forEach(function (field) {
+      initialFormValue[field.props.name] = field._initialValue;
+    });
+    this.fieldLocks = {};
+    this.formLockId++;
+    this.state.validatingFields = {};
+    this.state.formValue = initialFormValue; // this.formError = {};
+
+    this.cleanErrors(); // this.setState({
+    //     formError: {},
+    //     validatingFields: {},
+    //     formValue: initialFormValue
+    // });
+
+    this.setValues({}, cb);
+  };
+
+  _proto.resetField = function resetField(name, cb) {
+    this.cleanError(name);
+    var initialValue;
+    this.fields.forEach(function (field) {
+      if (field.props.name === name) {
+        initialValue = field._initialValue;
+      }
+    });
+    this.fieldLocks[name] = 1;
+    this.state.validatingFields[name] = false; // this.formError[name] = null;
+
+    this.cleanError(name);
+    this.setValue(name, initialValue, cb);
   };
 
   _proto.getFormValue = function getFormValue() {
@@ -344,13 +380,14 @@ function (_React$Component) {
     var _this$state = this.state,
         formError = _this$state.formError,
         validatingFields = _this$state.validatingFields;
-    var lockId = ++this.fieldLockId; //是否异步探测
+    this.fieldLocks[name] = this.fieldLocks[name] || 1;
+    var lockId = ++this.fieldLocks[name]; //是否异步探测
 
     var asyncTimer = setTimeout(function () {
       var _extends4;
 
       asyncTimer = null;
-      if (lockId !== _this2.fieldLockId) return;
+      if (lockId !== _this2.fieldLocks[name]) return;
 
       _this2.setState({
         validatingFields: _extends({}, validatingFields, (_extends4 = {}, _extends4[name] = true, _extends4))
@@ -365,7 +402,7 @@ function (_React$Component) {
       } // isAsync = false;
 
 
-      if (lockId !== _this2.fieldLockId) {
+      if (lockId !== _this2.fieldLocks[name]) {
         callback(errors, value, true
         /* abort state */
         );
@@ -389,7 +426,7 @@ function (_React$Component) {
     var _this$state2 = this.state,
         formValue = _this$state2.formValue,
         formError = _this$state2.formError;
-    this.fieldLockId++; //validate优先级高于validateField
+    this.fieldLocks = {}; //validate优先级高于validateField
 
     var lockId = ++this.formLockId;
     var fields = this.fields;
