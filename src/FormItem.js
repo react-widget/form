@@ -153,17 +153,27 @@ class FormItem extends React.Component {
 
     normalizeChildrenProps() {
         let { normalize, name, onChange, onFocus, onBlur } = this.props;
+        const form = this.getForm();
 
-        const getInputProps = this.getFormProps("getInputProps", () => ({}));
+        const _normalize = this.getFormProp("normalizeFieldValue");
+
+        if (_normalize && !normalize) {
+            normalize = _normalize.bind(null, name);
+        }
+
+        const getInputProps = this.getFormProp("getInputProps", () => ({}));
 
         const customProps = getInputProps(this);
-
+        //valueTrigger 	收集子节点的值的时机 待开发...
         return {
             value: this.getValue(),
             ...customProps,
             onChange: value => {
+                const formValue = form.getFormValue();
+                const prevValue = this.getValue();
+
                 if (normalize) {
-                    value = normalize(value);
+                    value = normalize(value, prevValue, formValue);
                 }
 
                 this.handleChange(value, () => {
@@ -193,7 +203,7 @@ class FormItem extends React.Component {
         );
     }
 
-    getFormProps(prop, defaultValue) {
+    getFormProp(prop, defaultValue) {
         const form = this.getForm();
         const formProps = form.props;
 
@@ -225,7 +235,8 @@ class FormItem extends React.Component {
         } = this.props;
         const inline = this.getProp("inline");
         const labelPosition = this.getProp("labelPosition");
-        const _renderControlExtra = this.getFormProps("renderControlExtra");
+        const labelAlign = this.getProp("labelAlign");
+        const _renderControlExtra = this.getFormProp("renderControlExtra");
         const renderControlExtra = () => {
             if (renderExtra) {
                 return renderExtra(this);
@@ -264,7 +275,12 @@ class FormItem extends React.Component {
                         <label
                             htmlFor={this.getProp("labelFor")}
                             className={classnames(
-                                `${prefixCls}-label`,
+                                {
+                                    [`${prefixCls}-label`]: true,
+                                    [`${prefixCls}-label-left`]:
+                                        labelAlign === "left" &&
+                                        labelPosition === "left"
+                                },
                                 this.getProp("labelClassName")
                             )}
                             style={{
@@ -302,6 +318,7 @@ FormItem.propTypes = {
     labelStyle: PropTypes.object,
     labelClassName: PropTypes.string,
     labelPosition: PropTypes.oneOf(["top", "left"]),
+    labelAlign: PropTypes.oneOf(["left", "right"]),
     controlStyle: PropTypes.object,
     controlClassName: PropTypes.string,
     validator: PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
@@ -311,7 +328,7 @@ FormItem.propTypes = {
     normalize: PropTypes.func,
     renderExtra: PropTypes.func,
     validateDelay: PropTypes.number,
-    validateTrigger: PropTypes.oneOf(["blur", "change"]),
+    validateTrigger: PropTypes.oneOf(["blur", "change"]), // onBlur onChange
     inline: PropTypes.bool
 };
 

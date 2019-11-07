@@ -6,6 +6,8 @@
   .nex-form-item-label {
     text-align: right;
     flex: none; }
+  .nex-form-item-label-left {
+    text-align: left; }
   .nex-form-item-top {
     display: block; }
   .nex-form-item-top.nex-form-item-inline {

@@ -182,16 +182,29 @@ function (_React$Component) {
         _onChange = _this$props.onChange,
         _onFocus = _this$props.onFocus,
         _onBlur = _this$props.onBlur;
-    var getInputProps = this.getFormProps("getInputProps", function () {
+    var form = this.getForm();
+
+    var _normalize = this.getFormProp("normalizeFieldValue");
+
+    if (_normalize && !normalize) {
+      normalize = _normalize.bind(null, name);
+    }
+
+    var getInputProps = this.getFormProp("getInputProps", function () {
       return {};
     });
-    var customProps = getInputProps(this);
+    var customProps = getInputProps(this); //valueTrigger 	收集子节点的值的时机 待开发...
+
     return _extends({
       value: this.getValue()
     }, customProps, {
       onChange: function onChange(value) {
+        var formValue = form.getFormValue();
+
+        var prevValue = _this3.getValue();
+
         if (normalize) {
-          value = normalize(value);
+          value = normalize(value, prevValue, formValue);
         }
 
         _this3.handleChange(value, function () {
@@ -218,7 +231,7 @@ function (_React$Component) {
     return React.cloneElement(React.Children.only(this.props.children), this.normalizeChildrenProps());
   };
 
-  _proto.getFormProps = function getFormProps(prop, defaultValue) {
+  _proto.getFormProp = function getFormProp(prop, defaultValue) {
     var form = this.getForm();
     var formProps = form.props;
     return formProps[prop] || defaultValue;
@@ -237,7 +250,8 @@ function (_React$Component) {
 
   _proto.render = function render() {
     var _this4 = this,
-        _classnames;
+        _classnames,
+        _classnames2;
 
     var _this$props2 = this.props,
         name = _this$props2.name,
@@ -250,8 +264,9 @@ function (_React$Component) {
         children = _this$props2.children;
     var inline = this.getProp("inline");
     var labelPosition = this.getProp("labelPosition");
+    var labelAlign = this.getProp("labelAlign");
 
-    var _renderControlExtra = this.getFormProps("renderControlExtra");
+    var _renderControlExtra = this.getFormProp("renderControlExtra");
 
     var renderControlExtra = function renderControlExtra() {
       if (renderExtra) {
@@ -276,7 +291,7 @@ function (_React$Component) {
       className: classnames(prefixCls, (_classnames = {}, _classnames[prefixCls + "-inline"] = inline, _classnames[prefixCls + "-" + labelPosition] = labelPosition, _classnames["has-error"] = hasError, _classnames["is-validating"] = isValidating, _classnames["is-required"] = required, _classnames["" + className] = className, _classnames))
     }, label && React.createElement("label", {
       htmlFor: this.getProp("labelFor"),
-      className: classnames(prefixCls + "-label", this.getProp("labelClassName")),
+      className: classnames((_classnames2 = {}, _classnames2[prefixCls + "-label"] = true, _classnames2[prefixCls + "-label-left"] = labelAlign === "left" && labelPosition === "left", _classnames2), this.getProp("labelClassName")),
       style: _extends({
         width: this.getProp("labelWidth")
       }, this.getProp("labelStyle", {}))
@@ -302,6 +317,7 @@ FormItem.propTypes = process.env.NODE_ENV !== "production" ? {
   labelStyle: PropTypes.object,
   labelClassName: PropTypes.string,
   labelPosition: PropTypes.oneOf(["top", "left"]),
+  labelAlign: PropTypes.oneOf(["left", "right"]),
   controlStyle: PropTypes.object,
   controlClassName: PropTypes.string,
   validator: PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
@@ -312,6 +328,7 @@ FormItem.propTypes = process.env.NODE_ENV !== "production" ? {
   renderExtra: PropTypes.func,
   validateDelay: PropTypes.number,
   validateTrigger: PropTypes.oneOf(["blur", "change"]),
+  // onBlur onChange
   inline: PropTypes.bool
 } : {};
 FormItem.defaultProps = {

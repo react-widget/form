@@ -79,10 +79,11 @@ export default class DEMO extends Component {
             <div>
                 <Form
                     labelWidth={80}
-                    validateTrigger={["change", "blur"]}
+                    // validateTrigger={["change", "blur"]}
                     getDefaultFieldValue={() => ""}
                     requiredMessage="不能为空"
                     ref={form => (this.form = form)}
+                    labelAlign="right"
                     // formValue={formValue}
                     onChange={formValue => this.setState({ formValue })}
                     onSubmit={this.onSubmit}

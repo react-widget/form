@@ -67,41 +67,12 @@ function (_React$Component) {
     }
   };
 
-  _proto.getValue = function getValue(name) {
-    var getDefaultFieldValue = this.props.getDefaultFieldValue;
-    var path2obj = this.props.path2obj;
-    var formValue = this.state.formValue;
-    var value = path2obj ? get(formValue, name) : formValue[name];
-    return value === undefined && getDefaultFieldValue ? getDefaultFieldValue(name) : value;
+  _proto.getFormValue = function getFormValue() {
+    return this.state.formValue;
   };
 
-  _proto.setValue = function setValue(name, value, cb) {
-    var _this$props = this.props,
-        path2obj = _this$props.path2obj,
-        onChange = _this$props.onChange;
-    var formValue = this.state.formValue; // TODO: 后面再考虑下特殊场景
-
-    var nextFormValue = _extends({}, formValue);
-
-    if (path2obj) {
-      set(nextFormValue, name, value);
-    } else {
-      nextFormValue[name] = value;
-    }
-
-    if (!("formValue" in this.props)) {
-      this.setState({
-        formValue: nextFormValue
-      });
-    }
-
-    if (onChange) {
-      onChange(nextFormValue);
-    }
-
-    if (cb) {
-      this._validateCb.push(cb);
-    }
+  _proto.getValues = function getValues() {
+    return this.state.formValue;
   };
 
   _proto.setValues = function setValues(obj, cb) {
@@ -109,9 +80,9 @@ function (_React$Component) {
       obj = {};
     }
 
-    var _this$props2 = this.props,
-        path2obj = _this$props2.path2obj,
-        onChange = _this$props2.onChange;
+    var _this$props = this.props,
+        path2obj = _this$props.path2obj,
+        onChange = _this$props.onChange;
     var formValue = this.state.formValue;
 
     var nextFormValue = _extends({}, formValue);
@@ -139,6 +110,55 @@ function (_React$Component) {
     if (cb) {
       this._validateCb.push(cb);
     }
+  };
+
+  _proto.setFormValue = function setFormValue(formValue, cb) {
+    return this.setValues(formValue, cb);
+  };
+
+  _proto.getValue = function getValue(name) {
+    var getDefaultFieldValue = this.props.getDefaultFieldValue;
+    var path2obj = this.props.path2obj;
+    var formValue = this.state.formValue;
+    var value = path2obj ? get(formValue, name) : formValue[name];
+    return value === undefined && getDefaultFieldValue ? getDefaultFieldValue(name, formValue) : value;
+  };
+
+  _proto.setValue = function setValue(name, value, cb) {
+    var _this$props2 = this.props,
+        path2obj = _this$props2.path2obj,
+        onChange = _this$props2.onChange;
+    var formValue = this.state.formValue; // TODO: 后面再考虑下特殊场景
+
+    var nextFormValue = _extends({}, formValue);
+
+    if (path2obj) {
+      set(nextFormValue, name, value);
+    } else {
+      nextFormValue[name] = value;
+    }
+
+    if (!("formValue" in this.props)) {
+      this.setState({
+        formValue: nextFormValue
+      });
+    }
+
+    if (onChange) {
+      onChange(nextFormValue);
+    }
+
+    if (cb) {
+      this._validateCb.push(cb);
+    }
+  };
+
+  _proto.getFieldValue = function getFieldValue(name) {
+    return this.getValue(name);
+  };
+
+  _proto.setFieldValue = function setFieldValue(name, value, cb) {
+    return this.setValue(name, value, cb);
   };
 
   _proto.componentDidUpdate = function componentDidUpdate() {
@@ -529,10 +549,12 @@ Form.propTypes = process.env.NODE_ENV !== "production" ? {
   labelStyle: PropTypes.object,
   labelClassName: PropTypes.string,
   labelPosition: PropTypes.oneOf(["top", "left"]),
+  labelAlign: PropTypes.oneOf(["left", "right"]),
   controlStyle: PropTypes.object,
   controlClassName: PropTypes.string,
   clearErrorOnFocus: PropTypes.bool,
   inline: PropTypes.bool,
+  normalizeFieldValue: PropTypes.func,
   onSubmit: PropTypes.func,
   onChange: PropTypes.func,
   getInputProps: PropTypes.func
@@ -546,8 +568,10 @@ Form.defaultProps = {
   component: "form",
   asyncTestDelay: 100,
   validateDelay: 0,
-  validateTrigger: ["blur", "change"],
+  validateTrigger: ["change"],
+  //"blur",
   labelPosition: "left",
+  labelAlign: "right",
   clearErrorOnFocus: true,
   inline: false
 };

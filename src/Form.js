@@ -43,6 +43,50 @@ class Form extends React.Component {
         }
     }
 
+    getFormValue() {
+        return this.state.formValue;
+    }
+
+    getValues() {
+        return this.state.formValue;
+    }
+
+    setValues(obj = {}, cb) {
+        const { path2obj, onChange } = this.props;
+        const formValue = this.state.formValue;
+
+        const nextFormValue = {
+            ...formValue
+        };
+
+        Object.keys(obj).forEach(name => {
+            const value = obj[name];
+            if (path2obj) {
+                set(nextFormValue, name, value);
+            } else {
+                nextFormValue[name] = value;
+            }
+        });
+
+        if (!("formValue" in this.props)) {
+            this.setState({
+                formValue: nextFormValue
+            });
+        }
+
+        if (onChange) {
+            onChange(nextFormValue);
+        }
+
+        if (cb) {
+            this._validateCb.push(cb);
+        }
+    }
+
+    setFormValue(formValue, cb) {
+        return this.setValues(formValue, cb);
+    }
+
     getValue(name) {
         const { getDefaultFieldValue } = this.props;
         const path2obj = this.props.path2obj;
@@ -51,7 +95,7 @@ class Form extends React.Component {
         const value = path2obj ? get(formValue, name) : formValue[name];
 
         return value === undefined && getDefaultFieldValue
-            ? getDefaultFieldValue(name)
+            ? getDefaultFieldValue(name, formValue)
             : value;
     }
 
@@ -85,36 +129,12 @@ class Form extends React.Component {
         }
     }
 
-    setValues(obj = {}, cb) {
-        const { path2obj, onChange } = this.props;
-        const formValue = this.state.formValue;
+    getFieldValue(name) {
+        return this.getValue(name);
+    }
 
-        const nextFormValue = {
-            ...formValue
-        };
-
-        Object.keys(obj).forEach(name => {
-            const value = obj[name];
-            if (path2obj) {
-                set(nextFormValue, name, value);
-            } else {
-                nextFormValue[name] = value;
-            }
-        });
-
-        if (!("formValue" in this.props)) {
-            this.setState({
-                formValue: nextFormValue
-            });
-        }
-
-        if (onChange) {
-            onChange(nextFormValue);
-        }
-
-        if (cb) {
-            this._validateCb.push(cb);
-        }
+    setFieldValue(name, value, cb) {
+        return this.setValue(name, value, cb);
     }
 
     componentDidUpdate() {
@@ -527,10 +547,12 @@ Form.propTypes = {
     labelStyle: PropTypes.object,
     labelClassName: PropTypes.string,
     labelPosition: PropTypes.oneOf(["top", "left"]),
+    labelAlign: PropTypes.oneOf(["left", "right"]),
     controlStyle: PropTypes.object,
     controlClassName: PropTypes.string,
     clearErrorOnFocus: PropTypes.bool,
     inline: PropTypes.bool,
+    normalizeFieldValue: PropTypes.func,
     onSubmit: PropTypes.func,
     onChange: PropTypes.func,
     getInputProps: PropTypes.func
@@ -545,8 +567,9 @@ Form.defaultProps = {
     component: "form",
     asyncTestDelay: 100,
     validateDelay: 0,
-    validateTrigger: ["blur", "change"],
+    validateTrigger: ["change"], //"blur",
     labelPosition: "left",
+    labelAlign: "right",
     clearErrorOnFocus: true,
     inline: false
 };

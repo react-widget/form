@@ -16,7 +16,7 @@ declare namespace ReactWidgetForm {
         path2obj?: boolean;
         defaultFormValue?: {};
         formValue?: {};
-        getDefaultFieldValue?: (name: string) => any;
+        getDefaultFieldValue?: (name: string, formValue: {}) => any;
         renderControlExtra?: (component: FormItem) => React.ReactNode;
         validators?: {
             [name: string]: Validator | Validator[];
@@ -30,10 +30,17 @@ declare namespace ReactWidgetForm {
         labelClassName?: string;
         labelStyle?: React.CSSProperties;
         labelPosition?: "top" | "left";
+        labelAlign?: "left" | "right";
         controlStyle?: React.CSSProperties;
         controlClassName?: string;
         clearErrorOnFocus?: boolean;
         inline?: boolean;
+        normalizeFieldValue?: (
+            name: string,
+            value: any,
+            prevValue: any,
+            formValue: {}
+        ) => any;
         onSubmit?: (e: React.SyntheticEvent) => void;
         onChange?: (formValue: {}) => void;
         getInputProps?: (component: FormItem) => {};
@@ -53,12 +60,13 @@ declare namespace ReactWidgetForm {
         labelClassName?: string;
         labelStyle?: React.CSSProperties;
         labelPosition?: "top" | "left";
+        labelAlign?: "left" | "right";
         controlStyle?: React.CSSProperties;
         controlClassName?: string;
         required?: boolean;
         requiredMessage?: string;
         clearErrorOnFocus?: boolean;
-        normalize?: (value: any) => any;
+        normalize?: (value: any, prevValue: any, formValue: {}) => any;
         renderExtra?: (component: FormItem) => React.ReactNode;
         validateDelay?: number;
         validateTrigger?: ValidateTriggerType | ValidateTriggerType[];
@@ -89,13 +97,22 @@ declare namespace ReactWidgetForm {
     }
 
     export class Form extends React.Component<FormProps, {}> {
+        getFormValue(): {};
+        getValues(): {};
+        setFormValue(formValue: {}, callback: (formValue: {}) => void): void;
+        setValues(formValue: {}, callback: (formValue: {}) => void): void;
         getValue(name: string): any;
+        getFieldValue(name: string): any;
         setValue(
             name: string,
             value: any,
             callback: (formValue: {}) => void
         ): void;
-        setValues(formValue: {}, callback: (formValue: {}) => void): void;
+        setFieldValue(
+            name: string,
+            value: any,
+            callback: (formValue: {}) => void
+        ): void;
         hasError(name: string): boolean;
         getError(name: string): any;
         cleanError(name: string): void;
