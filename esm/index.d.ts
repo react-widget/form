@@ -63,6 +63,7 @@ declare namespace ReactWidgetForm {
         labelAlign?: "left" | "right";
         controlStyle?: React.CSSProperties;
         controlClassName?: string;
+        showRequiredMark?: boolean;
         required?: boolean;
         requiredMessage?: string;
         clearErrorOnFocus?: boolean;

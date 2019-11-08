@@ -225,13 +225,14 @@ class FormItem extends React.Component {
     }
 
     getFormItemContext() {
-        return Object.create(this);
+        return { formItem: this };
     }
 
     render() {
         const {
             name,
             label,
+            showRequiredMark,
             required,
             className,
             prefixCls,
@@ -273,7 +274,7 @@ class FormItem extends React.Component {
                         [`${prefixCls}-${labelPosition}`]: labelPosition,
                         [`has-error`]: hasError,
                         [`is-validating`]: isValidating,
-                        [`is-required`]: required,
+                        [`is-required`]: required || showRequiredMark,
                         [`${className}`]: className
                     })}
                 >
@@ -328,6 +329,7 @@ FormItem.propTypes = {
     controlStyle: PropTypes.object,
     controlClassName: PropTypes.string,
     validator: PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
+    showRequiredMark: PropTypes.bool,
     required: PropTypes.bool,
     requiredMessage: PropTypes.string,
     clearErrorOnFocus: PropTypes.bool,
@@ -339,7 +341,8 @@ FormItem.propTypes = {
 };
 
 FormItem.defaultProps = {
-    prefixCls: "nex-form-item"
+    prefixCls: "nex-form-item",
+    showRequiredMark: false
 };
 
 export default FormItem;

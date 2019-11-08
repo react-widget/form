@@ -251,7 +251,9 @@ function (_React$Component) {
   };
 
   _proto.getFormItemContext = function getFormItemContext() {
-    return Object.create(this);
+    return {
+      formItem: this
+    };
   };
 
   _proto.render = function render() {
@@ -262,6 +264,7 @@ function (_React$Component) {
     var _this$props2 = this.props,
         name = _this$props2.name,
         label = _this$props2.label,
+        showRequiredMark = _this$props2.showRequiredMark,
         required = _this$props2.required,
         className = _this$props2.className,
         prefixCls = _this$props2.prefixCls,
@@ -294,7 +297,7 @@ function (_React$Component) {
     }, React.createElement("div", {
       style: style,
       ref: this.saveDOM,
-      className: classnames(prefixCls, (_classnames = {}, _classnames[prefixCls + "-inline"] = inline, _classnames[prefixCls + "-" + labelPosition] = labelPosition, _classnames["has-error"] = hasError, _classnames["is-validating"] = isValidating, _classnames["is-required"] = required, _classnames["" + className] = className, _classnames))
+      className: classnames(prefixCls, (_classnames = {}, _classnames[prefixCls + "-inline"] = inline, _classnames[prefixCls + "-" + labelPosition] = labelPosition, _classnames["has-error"] = hasError, _classnames["is-validating"] = isValidating, _classnames["is-required"] = required || showRequiredMark, _classnames["" + className] = className, _classnames))
     }, label && React.createElement("label", {
       htmlFor: this.getProp("labelFor"),
       className: classnames((_classnames2 = {}, _classnames2[prefixCls + "-label"] = true, _classnames2[prefixCls + "-label-left"] = labelAlign === "left" && labelPosition === "left", _classnames2), this.getProp("labelClassName")),
@@ -327,6 +330,7 @@ FormItem.propTypes = process.env.NODE_ENV !== "production" ? {
   controlStyle: PropTypes.object,
   controlClassName: PropTypes.string,
   validator: PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
+  showRequiredMark: PropTypes.bool,
   required: PropTypes.bool,
   requiredMessage: PropTypes.string,
   clearErrorOnFocus: PropTypes.bool,
@@ -338,6 +342,7 @@ FormItem.propTypes = process.env.NODE_ENV !== "production" ? {
   inline: PropTypes.bool
 } : {};
 FormItem.defaultProps = {
-  prefixCls: "nex-form-item"
+  prefixCls: "nex-form-item",
+  showRequiredMark: false
 };
 export default FormItem;

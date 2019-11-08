@@ -91,6 +91,7 @@ labelPosition?: "top" | "left";
 labelAlign?: "left" | "right";
 controlStyle?: React.CSSProperties;
 controlClassName?: string;
+showRequiredMark?: boolean;
 required?: boolean;
 requiredMessage?: string;
 clearErrorOnFocus?: boolean;
@@ -275,6 +276,10 @@ $form-item-cls: nex-form-item;
         flex: none;
     }
 
+    &-label-left {
+        text-align: left;
+    }
+
     &-top {
         display: block;
     }
@@ -302,6 +307,7 @@ $form-item-cls: nex-form-item;
         color: red;
     }
 }
+
 
 ```
 

@@ -65,7 +65,6 @@ export default class DEMO extends Component {
     };
 
     renderFieldExtra = component => {
-        console.log("update");
         return (
             <div
                 style={{

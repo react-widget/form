@@ -39,6 +39,7 @@ class Form extends React.Component {
         if (idx !== -1) {
             const name = field.props.name;
 
+            // eslint-disable-next-line
             this.state.formError[name] = null;
 
             this.fields.splice(idx, 1);
@@ -53,11 +54,14 @@ class Form extends React.Component {
         });
 
         this.fieldLocks = {};
-        this.formLockId++;
+        this.formLockId = 1;
+        // eslint-disable-next-line
         this.state.validatingFields = {};
+        // eslint-disable-next-line
         this.state.formValue = initialFormValue;
-        // this.formError = {};
-        this.cleanErrors();
+        // eslint-disable-next-line
+        this.state.formError = {};
+        // this.cleanErrors();
 
         // this.setState({
         //     formError: {},
@@ -80,9 +84,11 @@ class Form extends React.Component {
         });
 
         this.fieldLocks[name] = 1;
+        // eslint-disable-next-line
         this.state.validatingFields[name] = false;
-        // this.formError[name] = null;
-        this.cleanError(name);
+        // eslint-disable-next-line
+        this.state.formError[name] = null;
+        // this.cleanError(name);
 
         this.setValue(name, initialValue, cb);
     }
@@ -425,6 +431,8 @@ class Form extends React.Component {
         let validCounter = 0;
 
         const updateFormState = () => {
+            if (lockId !== this.formLockId) return;
+
             this.setState({
                 formError,
                 validatingFields
@@ -446,8 +454,11 @@ class Form extends React.Component {
                         formValue,
                         true /* abort state */
                     );
+                    console.log("abort");
                     return;
                 }
+
+                console.log("validate");
 
                 this.setState(
                     {
@@ -490,8 +501,6 @@ class Form extends React.Component {
 
                     if (hasUpdate) return;
                     hasUpdate = true;
-
-                    if (lockId !== this.formLockId) return;
 
                     updateFormState();
                 }, asyncTestDelay);
@@ -548,6 +557,10 @@ class Form extends React.Component {
         return { form: this };
     }
 
+    handleSubmit = e => {
+        e.preventDefault();
+    };
+
     render() {
         const {
             prefixCls,
@@ -563,7 +576,7 @@ class Form extends React.Component {
                 <Component
                     style={style}
                     className={classnames(prefixCls, className)}
-                    onSubmit={onSubmit}
+                    onSubmit={onSubmit || this.handleSubmit}
                 >
                     {typeof children === "function" ? children(this) : children}
                 </Component>

@@ -41,6 +41,10 @@ function (_React$Component) {
       formValue: _this.props.defaultFormValue || {}
     });
 
+    _defineProperty(_assertThisInitialized(_this), "handleSubmit", function (e) {
+      e.preventDefault();
+    });
+
     return _this;
   }
 
@@ -63,7 +67,8 @@ function (_React$Component) {
     var idx = this.fields.indexOf(field);
 
     if (idx !== -1) {
-      var name = field.props.name;
+      var name = field.props.name; // eslint-disable-next-line
+
       this.state.formError[name] = null;
       this.fields.splice(idx, 1);
     }
@@ -75,11 +80,14 @@ function (_React$Component) {
       initialFormValue[field.props.name] = field._initialValue;
     });
     this.fieldLocks = {};
-    this.formLockId++;
-    this.state.validatingFields = {};
-    this.state.formValue = initialFormValue; // this.formError = {};
+    this.formLockId = 1; // eslint-disable-next-line
 
-    this.cleanErrors(); // this.setState({
+    this.state.validatingFields = {}; // eslint-disable-next-line
+
+    this.state.formValue = initialFormValue; // eslint-disable-next-line
+
+    this.state.formError = {}; // this.cleanErrors();
+    // this.setState({
     //     formError: {},
     //     validatingFields: {},
     //     formValue: initialFormValue
@@ -96,10 +104,12 @@ function (_React$Component) {
         initialValue = field._initialValue;
       }
     });
-    this.fieldLocks[name] = 1;
-    this.state.validatingFields[name] = false; // this.formError[name] = null;
+    this.fieldLocks[name] = 1; // eslint-disable-next-line
 
-    this.cleanError(name);
+    this.state.validatingFields[name] = false; // eslint-disable-next-line
+
+    this.state.formError[name] = null; // this.cleanError(name);
+
     this.setValue(name, initialValue, cb);
   };
 
@@ -435,6 +445,8 @@ function (_React$Component) {
     var validCounter = 0;
 
     var updateFormState = function updateFormState() {
+      if (lockId !== _this3.formLockId) return;
+
       _this3.setState({
         formError: formError,
         validatingFields: validatingFields
@@ -454,8 +466,11 @@ function (_React$Component) {
           callback(allErrors.length ? allErrors : null, formValue, true
           /* abort state */
           );
+          console.log("abort");
           return;
         }
+
+        console.log("validate");
 
         _this3.setState({
           formError: formError,
@@ -489,7 +504,6 @@ function (_React$Component) {
           asyncTimer = null;
           if (hasUpdate) return;
           hasUpdate = true;
-          if (lockId !== _this3.formLockId) return;
           updateFormState();
         }, asyncTestDelay);
 
@@ -560,7 +574,7 @@ function (_React$Component) {
     }, React.createElement(Component, {
       style: style,
       className: classnames(prefixCls, className),
-      onSubmit: onSubmit
+      onSubmit: onSubmit || this.handleSubmit
     }, typeof children === "function" ? children(this) : children));
   };
 

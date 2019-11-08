@@ -2,5 +2,6 @@
 import React from "react";
 import FormItemContext from "./FormItemContext";
 export default (function () {
-  return React.useContext(FormItemContext);
+  var context = React.useContext(FormItemContext);
+  return context.formItem;
 });
