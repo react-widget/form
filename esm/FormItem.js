@@ -30,16 +30,14 @@ function (_React$Component) {
     _defineProperty(_assertThisInitialized(_this), "_validateTimer", null);
 
     _defineProperty(_assertThisInitialized(_this), "handleChange", function (value, callback) {
-      var name = _this.props.name;
+      var oldValue = _this.getValue(); //是否有必要检测？
 
-      var oldValue = _this.getValue();
+
+      if (value === oldValue) {
+        return;
+      }
 
       _this.setValue(value, function (formValue) {
-        if (formValue[name]
-        /*newValue*/
-        === oldValue
-        /*oldValue*/
-        ) return;
         callback && callback();
 
         if (_this.hasValidateTrigger("change")) {
@@ -104,6 +102,12 @@ function (_React$Component) {
     var validateDelay = form.props.validateDelay;
     var props = this.props;
     return "validateDelay" in props ? props.validateDelay : validateDelay;
+  };
+
+  _proto.getInitialValue = function getInitialValue() {
+    var name = this.props.name;
+    var form = this.getForm();
+    return form.getInitialValue(name);
   };
 
   _proto.reset = function reset(cb) {
@@ -199,7 +203,7 @@ function (_React$Component) {
     var getInputProps = this.getFormProp("getInputProps", function () {
       return {};
     });
-    var customProps = getInputProps(this); //valueTrigger 	收集子节点的值的时机 待开发...
+    var customProps = getInputProps(this); //valueTrigger 	收集子节点的值的时机，暂不开发...
 
     return _extends({
       value: this.getValue()

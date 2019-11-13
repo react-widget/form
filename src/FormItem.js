@@ -49,6 +49,13 @@ class FormItem extends React.Component {
         return "validateDelay" in props ? props.validateDelay : validateDelay;
     }
 
+    getInitialValue() {
+        const { name } = this.props;
+        const form = this.getForm();
+
+        return form.getInitialValue(name);
+    }
+
     reset(cb) {
         const form = this.getForm();
         const { name } = this.props;
@@ -125,12 +132,14 @@ class FormItem extends React.Component {
     }
 
     handleChange = (value, callback) => {
-        const { name } = this.props;
         const oldValue = this.getValue();
 
-        this.setValue(value, formValue => {
-            if (formValue[name] /*newValue*/ === oldValue /*oldValue*/) return;
+        //是否有必要检测？
+        if (value === oldValue) {
+            return;
+        }
 
+        this.setValue(value, formValue => {
             callback && callback();
 
             if (this.hasValidateTrigger("change")) {
@@ -170,7 +179,7 @@ class FormItem extends React.Component {
         const getInputProps = this.getFormProp("getInputProps", () => ({}));
 
         const customProps = getInputProps(this);
-        //valueTrigger 	收集子节点的值的时机 待开发...
+        //valueTrigger 	收集子节点的值的时机，暂不开发...
         return {
             value: this.getValue(),
             ...customProps,

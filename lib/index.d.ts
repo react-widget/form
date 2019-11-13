@@ -114,7 +114,9 @@ declare namespace ReactWidgetForm {
             value: any,
             callback: (formValue: {}) => void
         ): void;
+        getInitialFormValue(): {};
         reset(cb: () => void): void;
+        getInitialValue(name: string): any;
         resetField(cb: () => void): void;
         hasError(name: string): boolean;
         getError(name: string): any;
@@ -153,6 +155,7 @@ declare namespace ReactWidgetForm {
     export class FormItem extends React.Component<FormItemProps, {}> {
         getDOM(): any;
         getForm(): Form;
+        getInitialValue(): any;
         reset(cb: () => void): void;
         getValue(): any;
         setValue(value: any, callback: (formValue: {}) => void): void;

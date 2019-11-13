@@ -74,11 +74,16 @@ function (_React$Component) {
     }
   };
 
-  _proto.reset = function reset(cb) {
+  _proto.getInitialFormValue = function getInitialFormValue() {
     var initialFormValue = {};
     this.fields.forEach(function (field) {
       initialFormValue[field.props.name] = field._initialValue;
     });
+    return initialFormValue;
+  };
+
+  _proto.reset = function reset(cb) {
+    var initialFormValue = this.getInitialFormValue();
     this.fieldLocks = {};
     this.formLockId = 1; // eslint-disable-next-line
 
@@ -96,14 +101,19 @@ function (_React$Component) {
     this.setValues({}, cb);
   };
 
-  _proto.resetField = function resetField(name, cb) {
-    this.cleanError(name);
+  _proto.getInitialValue = function getInitialValue(name) {
     var initialValue;
     this.fields.forEach(function (field) {
       if (field.props.name === name) {
         initialValue = field._initialValue;
       }
     });
+    return initialValue;
+  };
+
+  _proto.resetField = function resetField(name, cb) {
+    this.cleanError(name);
+    var initialValue = this.getInitialValue(name);
     this.fieldLocks[name] = 1; // eslint-disable-next-line
 
     this.state.validatingFields[name] = false; // eslint-disable-next-line
@@ -130,9 +140,8 @@ function (_React$Component) {
         path2obj = _this$props.path2obj,
         onChange = _this$props.onChange;
     var formValue = this.state.formValue;
-
-    var nextFormValue = _extends({}, formValue);
-
+    var isControlled = "formValue" in this.props;
+    var nextFormValue = formValue;
     Object.keys(obj).forEach(function (name) {
       var value = obj[name];
 
@@ -143,7 +152,7 @@ function (_React$Component) {
       }
     });
 
-    if (!("formValue" in this.props)) {
+    if (!isControlled) {
       this.setState({
         formValue: nextFormValue
       });
@@ -174,9 +183,9 @@ function (_React$Component) {
     var _this$props2 = this.props,
         path2obj = _this$props2.path2obj,
         onChange = _this$props2.onChange;
-    var formValue = this.state.formValue; // TODO: 后面再考虑下特殊场景
-
-    var nextFormValue = _extends({}, formValue);
+    var formValue = this.state.formValue;
+    var isControlled = "formValue" in this.props;
+    var nextFormValue = formValue;
 
     if (path2obj) {
       set(nextFormValue, name, value);
@@ -184,7 +193,7 @@ function (_React$Component) {
       nextFormValue[name] = value;
     }
 
-    if (!("formValue" in this.props)) {
+    if (!isControlled) {
       this.setState({
         formValue: nextFormValue
       });
