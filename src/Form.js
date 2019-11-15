@@ -11,7 +11,7 @@ function noop() {}
 class Form extends React.Component {
     static getDerivedStateFromProps(nextProps, prevState) {
         return {
-            formValue: nextProps.formValue || prevState.formValue
+            formValue: nextProps.formValue || prevState.formValue,
         };
     }
 
@@ -25,7 +25,7 @@ class Form extends React.Component {
     state = {
         formError: {},
         validatingFields: {},
-        formValue: this.props.defaultFormValue || {}
+        formValue: this.props.defaultFormValue || {},
     };
 
     addField(field) {
@@ -132,7 +132,7 @@ class Form extends React.Component {
 
         if (!isControlled) {
             this.setState({
-                formValue: nextFormValue
+                formValue: nextFormValue,
             });
         }
 
@@ -177,7 +177,7 @@ class Form extends React.Component {
 
         if (!isControlled) {
             this.setState({
-                formValue: nextFormValue
+                formValue: nextFormValue,
             });
         }
 
@@ -232,8 +232,8 @@ class Form extends React.Component {
         this.setState({
             formError: {
                 ...formError,
-                [name]: null
-            }
+                [name]: null,
+            },
         });
     }
 
@@ -242,14 +242,14 @@ class Form extends React.Component {
         this.setState({
             formError: {
                 ...formError,
-                [name]: message
-            }
+                [name]: message,
+            },
         });
     }
 
     cleanErrors() {
         this.setState({
-            formError: {}
+            formError: {},
         });
     }
 
@@ -257,7 +257,7 @@ class Form extends React.Component {
         const { formError } = this.state;
         this.setState({
             ...formError,
-            ...errors
+            ...errors,
         });
     }
 
@@ -266,7 +266,11 @@ class Form extends React.Component {
         this.fields
             .filter(field => field.props.name === name)
             .forEach(field => {
+                const disableValidator = field.getProp("disableValidator");
+                if (disableValidator) return;
+
                 const fieldProps = field.props;
+
                 if (fieldProps.required) {
                     fieldValidators.unshift(value => {
                         if (isEmptyValue(value)) {
@@ -339,7 +343,7 @@ class Form extends React.Component {
 
                     return {
                         name,
-                        message
+                        message,
                     };
                 });
             }
@@ -362,7 +366,10 @@ class Form extends React.Component {
             } else if (ret === false) {
                 cb(`${name} check fail`);
             } else if (ret && ret.then) {
-                ret.then(() => cb(), e => cb(e));
+                ret.then(
+                    () => cb(),
+                    e => cb(e)
+                );
             } else {
                 cb(ret);
             }
@@ -381,7 +388,7 @@ class Form extends React.Component {
 
         const lockId = ++this.fieldLocks[name];
 
-        //是否异步探测
+        //是否异步检测
         let asyncTimer = setTimeout(() => {
             asyncTimer = null;
 
@@ -390,11 +397,14 @@ class Form extends React.Component {
             this.setState({
                 validatingFields: {
                     ...validatingFields,
-                    [name]: true
-                }
+                    [name]: true,
+                },
+                formError: {
+                    ...formError,
+                    [name]: null,
+                },
             });
         }, asyncTestDelay);
-        // let isAsync = true;
 
         this._validateField(
             name,
@@ -402,7 +412,6 @@ class Form extends React.Component {
                 if (asyncTimer) {
                     clearTimeout(asyncTimer);
                 }
-                // isAsync = false;
 
                 if (lockId !== this.fieldLocks[name]) {
                     callback(errors, value, true /* abort state */);
@@ -413,12 +422,12 @@ class Form extends React.Component {
                     {
                         formError: {
                             ...formError,
-                            [name]: errors ? errors[0].message : null
+                            [name]: errors ? errors[0].message : null,
                         },
                         validatingFields: {
                             ...validatingFields,
-                            [name]: false
-                        }
+                            [name]: false,
+                        },
                     },
                     () => {
                         callback(errors, value);
@@ -431,9 +440,11 @@ class Form extends React.Component {
 
     validate(callback, triggerType) {
         callback = typeof callback === "function" ? callback : noop;
-
+        const formError = {};
+        let asyncUpdateTimer = null;
+        let hasRunComplete = false;
         const { asyncTestDelay } = this.props;
-        const { formValue, formError } = this.state;
+        const { formValue } = this.state;
         this.fieldLocks = {}; //validate优先级高于validateField
         const lockId = ++this.formLockId;
         const fields = this.fields;
@@ -446,7 +457,7 @@ class Form extends React.Component {
 
             this.setState({
                 formError,
-                validatingFields
+                validatingFields,
             });
         };
 
@@ -459,22 +470,25 @@ class Form extends React.Component {
             }
 
             if (validCounter <= 0) {
+                hasRunComplete = true;
+                if (asyncUpdateTimer) {
+                    clearTimeout(asyncUpdateTimer);
+                    asyncUpdateTimer = null;
+                }
+
                 if (lockId !== this.formLockId) {
                     callback(
                         allErrors.length ? allErrors : null,
                         formValue,
                         true /* abort state */
                     );
-                    console.log("abort");
                     return;
                 }
-
-                console.log("validate");
 
                 this.setState(
                     {
                         formError,
-                        validatingFields: {}
+                        validatingFields: {},
                     },
                     () => {
                         callback(
@@ -487,17 +501,15 @@ class Form extends React.Component {
         };
 
         if (fields.length) {
-            //包含多个异步校验的情况下只执行一次
-            let hasUpdate = false;
             //校验初始化
             fields.forEach(field => {
                 const name = field.props.name;
                 validCounter++;
                 validatingFields[name] = true;
 
-                if (!(name in formError)) {
-                    formError[name] = null;
-                }
+                // if (!(name in formError)) {
+                //     formError[name] = null;
+                // }
             });
 
             //开始进行字段校验
@@ -509,11 +521,6 @@ class Form extends React.Component {
                 let asyncTimer = setTimeout(() => {
                     isAsyncValidate = true;
                     asyncTimer = null;
-
-                    if (hasUpdate) return;
-                    hasUpdate = true;
-
-                    updateFormState();
                 }, asyncTestDelay);
 
                 this._validateField(
@@ -536,6 +543,14 @@ class Form extends React.Component {
                     triggerType
                 );
             });
+
+            //如果校验方法中存在异步校验则先显示同步校验的信息及异步状态
+            asyncUpdateTimer = setTimeout(() => {
+                asyncUpdateTimer = null;
+                //如果不存在异步校验，hasRunComplete会为true
+                if (hasRunComplete) return;
+                updateFormState();
+            }, asyncTestDelay);
         } else {
             callback(null, formValue);
         }
@@ -579,7 +594,7 @@ class Form extends React.Component {
             className,
             onSubmit,
             component: Component,
-            children
+            children,
         } = this.props;
 
         return (
@@ -605,11 +620,12 @@ Form.propTypes = {
     getDefaultFieldValue: PropTypes.func,
     renderControlExtra: PropTypes.func,
     formValue: PropTypes.object,
+    disableValidator: PropTypes.func,
     validators: PropTypes.object,
     validateDelay: PropTypes.number,
     validateTrigger: PropTypes.oneOfType([
         PropTypes.oneOf(["blur", "change", "none"]),
-        PropTypes.array
+        PropTypes.array,
     ]),
     asyncTestDelay: PropTypes.number,
     component: PropTypes.node,
@@ -626,23 +642,24 @@ Form.propTypes = {
     normalizeFieldValue: PropTypes.func,
     onSubmit: PropTypes.func,
     onChange: PropTypes.func,
-    getInputProps: PropTypes.func
+    getInputProps: PropTypes.func,
 };
 
 Form.defaultProps = {
     prefixCls: "nex-form",
     className: "",
     style: {},
+    disableValidator: false,
     validators: {},
     path2obj: true,
     component: "form",
-    asyncTestDelay: 100,
+    asyncTestDelay: 16,
     validateDelay: 0,
     validateTrigger: ["change"], //"blur",
     labelPosition: "left",
     labelAlign: "right",
     clearErrorOnFocus: true,
-    inline: false
+    inline: false,
 };
 
 export default Form;

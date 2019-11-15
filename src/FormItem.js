@@ -4,12 +4,17 @@ import classnames from "classnames";
 import FormContext from "./FormContext";
 import FormItemContext from "./FormItemContext";
 
+let fid = 1;
+
 class FormItem extends React.Component {
     static contextType = FormContext;
 
     constructor(...args) {
         super(...args);
         const form = this.getForm();
+
+        //组件id
+        this._fid = fid++;
 
         form.addField(this);
     }
@@ -132,13 +137,6 @@ class FormItem extends React.Component {
     }
 
     handleChange = (value, callback) => {
-        const oldValue = this.getValue();
-
-        //是否有必要检测？
-        if (value === oldValue) {
-            return;
-        }
-
         this.setValue(value, formValue => {
             callback && callback();
 
@@ -207,7 +205,7 @@ class FormItem extends React.Component {
                     onBlur && onBlur(e);
                     customProps.onBlur && customProps.onBlur(e);
                 });
-            }
+            },
         };
     }
 
@@ -222,7 +220,7 @@ class FormItem extends React.Component {
         const form = this.getForm();
         const formProps = form.props;
 
-        return formProps[prop] || defaultValue;
+        return prop in formProps ? formProps[prop] : defaultValue;
     }
 
     getProp(prop, defaultValue) {
@@ -230,7 +228,11 @@ class FormItem extends React.Component {
         const formProps = form.props;
         const props = this.props;
 
-        return prop in props ? props[prop] : formProps[prop] || defaultValue;
+        return prop in props
+            ? props[prop]
+            : prop in formProps
+            ? formProps[prop]
+            : defaultValue;
     }
 
     getFormItemContext() {
@@ -247,8 +249,9 @@ class FormItem extends React.Component {
             prefixCls,
             style,
             renderExtra,
-            children
+            children,
         } = this.props;
+        const disableValidator = this.getProp("disableValidator");
         const inline = this.getProp("inline");
         const labelPosition = this.getProp("labelPosition");
         const labelAlign = this.getProp("labelAlign");
@@ -283,8 +286,9 @@ class FormItem extends React.Component {
                         [`${prefixCls}-${labelPosition}`]: labelPosition,
                         [`has-error`]: hasError,
                         [`is-validating`]: isValidating,
-                        [`is-required`]: required || showRequiredMark,
-                        [`${className}`]: className
+                        [`is-required`]:
+                            (required || showRequiredMark) && !disableValidator,
+                        [`${className}`]: className,
                     })}
                 >
                     {label && (
@@ -295,13 +299,13 @@ class FormItem extends React.Component {
                                     [`${prefixCls}-label`]: true,
                                     [`${prefixCls}-label-left`]:
                                         labelAlign === "left" &&
-                                        labelPosition === "left"
+                                        labelPosition === "left",
                                 },
                                 this.getProp("labelClassName")
                             )}
                             style={{
                                 width: this.getProp("labelWidth"),
-                                ...this.getProp("labelStyle", {})
+                                ...this.getProp("labelStyle", {}),
                             }}
                         >
                             {label}
@@ -346,12 +350,12 @@ FormItem.propTypes = {
     renderExtra: PropTypes.func,
     validateDelay: PropTypes.number,
     validateTrigger: PropTypes.oneOf(["blur", "change"]), // onBlur onChange
-    inline: PropTypes.bool
+    inline: PropTypes.bool,
 };
 
 FormItem.defaultProps = {
     prefixCls: "nex-form-item",
-    showRequiredMark: false
+    showRequiredMark: false,
 };
 
 export default FormItem;
