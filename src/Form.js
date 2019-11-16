@@ -649,6 +649,7 @@ Form.defaultProps = {
     prefixCls: "nex-form",
     className: "",
     style: {},
+    //实验性质，有序可能移除
     disableValidator: false,
     validators: {},
     path2obj: true,

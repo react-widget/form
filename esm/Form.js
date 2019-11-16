@@ -278,6 +278,8 @@ function (_React$Component) {
     this.fields.filter(function (field) {
       return field.props.name === name;
     }).forEach(function (field) {
+      var disableValidator = field.getProp("disableValidator");
+      if (disableValidator) return;
       var fieldProps = field.props;
 
       if (fieldProps.required) {
@@ -400,26 +402,26 @@ function (_React$Component) {
         formError = _this$state.formError,
         validatingFields = _this$state.validatingFields;
     this.fieldLocks[name] = this.fieldLocks[name] || 1;
-    var lockId = ++this.fieldLocks[name]; //是否异步探测
+    var lockId = ++this.fieldLocks[name]; //是否异步检测
 
     var asyncTimer = setTimeout(function () {
-      var _extends4;
+      var _extends4, _extends5;
 
       asyncTimer = null;
       if (lockId !== _this2.fieldLocks[name]) return;
 
       _this2.setState({
-        validatingFields: _extends({}, validatingFields, (_extends4 = {}, _extends4[name] = true, _extends4))
+        validatingFields: _extends({}, validatingFields, (_extends4 = {}, _extends4[name] = true, _extends4)),
+        formError: _extends({}, formError, (_extends5 = {}, _extends5[name] = null, _extends5))
       });
-    }, asyncTestDelay); // let isAsync = true;
+    }, asyncTestDelay);
 
     this._validateField(name, function (errors, value) {
-      var _extends5, _extends6;
+      var _extends6, _extends7;
 
       if (asyncTimer) {
         clearTimeout(asyncTimer);
-      } // isAsync = false;
-
+      }
 
       if (lockId !== _this2.fieldLocks[name]) {
         callback(errors, value, true
@@ -429,8 +431,8 @@ function (_React$Component) {
       }
 
       _this2.setState({
-        formError: _extends({}, formError, (_extends5 = {}, _extends5[name] = errors ? errors[0].message : null, _extends5)),
-        validatingFields: _extends({}, validatingFields, (_extends6 = {}, _extends6[name] = false, _extends6))
+        formError: _extends({}, formError, (_extends6 = {}, _extends6[name] = errors ? errors[0].message : null, _extends6)),
+        validatingFields: _extends({}, validatingFields, (_extends7 = {}, _extends7[name] = false, _extends7))
       }, function () {
         callback(errors, value);
       });
@@ -441,10 +443,11 @@ function (_React$Component) {
     var _this3 = this;
 
     callback = typeof callback === "function" ? callback : noop;
+    var formError = {};
+    var asyncUpdateTimer = null;
+    var hasRunComplete = false;
     var asyncTestDelay = this.props.asyncTestDelay;
-    var _this$state2 = this.state,
-        formValue = _this$state2.formValue,
-        formError = _this$state2.formError;
+    var formValue = this.state.formValue;
     this.fieldLocks = {}; //validate优先级高于validateField
 
     var lockId = ++this.formLockId;
@@ -471,15 +474,19 @@ function (_React$Component) {
       }
 
       if (validCounter <= 0) {
+        hasRunComplete = true;
+
+        if (asyncUpdateTimer) {
+          clearTimeout(asyncUpdateTimer);
+          asyncUpdateTimer = null;
+        }
+
         if (lockId !== _this3.formLockId) {
           callback(allErrors.length ? allErrors : null, formValue, true
           /* abort state */
           );
-          console.log("abort");
           return;
         }
-
-        console.log("validate");
 
         _this3.setState({
           formError: formError,
@@ -491,17 +498,13 @@ function (_React$Component) {
     };
 
     if (fields.length) {
-      //包含多个异步校验的情况下只执行一次
-      var hasUpdate = false; //校验初始化
-
+      //校验初始化
       fields.forEach(function (field) {
         var name = field.props.name;
         validCounter++;
-        validatingFields[name] = true;
-
-        if (!(name in formError)) {
-          formError[name] = null;
-        }
+        validatingFields[name] = true; // if (!(name in formError)) {
+        //     formError[name] = null;
+        // }
       }); //开始进行字段校验
 
       fields.forEach(function (field) {
@@ -511,9 +514,6 @@ function (_React$Component) {
         var asyncTimer = setTimeout(function () {
           isAsyncValidate = true;
           asyncTimer = null;
-          if (hasUpdate) return;
-          hasUpdate = true;
-          updateFormState();
         }, asyncTestDelay);
 
         _this3._validateField(name, function (errors) {
@@ -531,7 +531,14 @@ function (_React$Component) {
 
           complete(errors, name);
         }, triggerType);
-      });
+      }); //如果校验方法中存在异步校验则先显示同步校验的信息及异步状态
+
+      asyncUpdateTimer = setTimeout(function () {
+        asyncUpdateTimer = null; //如果不存在异步校验，hasRunComplete会为true
+
+        if (hasRunComplete) return;
+        updateFormState();
+      }, asyncTestDelay);
     } else {
       callback(null, formValue);
     }
@@ -599,6 +606,7 @@ Form.propTypes = process.env.NODE_ENV !== "production" ? {
   getDefaultFieldValue: PropTypes.func,
   renderControlExtra: PropTypes.func,
   formValue: PropTypes.object,
+  disableValidator: PropTypes.func,
   validators: PropTypes.object,
   validateDelay: PropTypes.number,
   validateTrigger: PropTypes.oneOfType([PropTypes.oneOf(["blur", "change", "none"]), PropTypes.array]),
@@ -623,10 +631,12 @@ Form.defaultProps = {
   prefixCls: "nex-form",
   className: "",
   style: {},
+  //实验性质，有序可能移除
+  disableValidator: false,
   validators: {},
   path2obj: true,
   component: "form",
-  asyncTestDelay: 100,
+  asyncTestDelay: 16,
   validateDelay: 0,
   validateTrigger: ["change"],
   //"blur",

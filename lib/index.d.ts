@@ -5,7 +5,8 @@ declare namespace ReactWidgetForm {
 
     type Validator = (
         value: any,
-        formValue: {}
+        formValue: {},
+        triggerType: ValidateTriggerType
     ) => boolean | string | Error | Promise;
 
     interface FormProps {

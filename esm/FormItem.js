@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 import classnames from "classnames";
 import FormContext from "./FormContext";
 import FormItemContext from "./FormItemContext";
+var fid = 1;
 
 var FormItem =
 /*#__PURE__*/
@@ -30,13 +31,6 @@ function (_React$Component) {
     _defineProperty(_assertThisInitialized(_this), "_validateTimer", null);
 
     _defineProperty(_assertThisInitialized(_this), "handleChange", function (value, callback) {
-      var oldValue = _this.getValue(); //是否有必要检测？
-
-
-      if (value === oldValue) {
-        return;
-      }
-
       _this.setValue(value, function (formValue) {
         callback && callback();
 
@@ -66,8 +60,10 @@ function (_React$Component) {
       }
     });
 
-    var form = _this.getForm();
+    var form = _this.getForm(); //组件id
 
+
+    _this._fid = fid++;
     form.addField(_assertThisInitialized(_this));
     return _this;
   }
@@ -244,14 +240,14 @@ function (_React$Component) {
   _proto.getFormProp = function getFormProp(prop, defaultValue) {
     var form = this.getForm();
     var formProps = form.props;
-    return formProps[prop] || defaultValue;
+    return prop in formProps ? formProps[prop] : defaultValue;
   };
 
   _proto.getProp = function getProp(prop, defaultValue) {
     var form = this.getForm();
     var formProps = form.props;
     var props = this.props;
-    return prop in props ? props[prop] : formProps[prop] || defaultValue;
+    return prop in props ? props[prop] : prop in formProps ? formProps[prop] : defaultValue;
   };
 
   _proto.getFormItemContext = function getFormItemContext() {
@@ -274,7 +270,9 @@ function (_React$Component) {
         prefixCls = _this$props2.prefixCls,
         style = _this$props2.style,
         renderExtra = _this$props2.renderExtra,
-        children = _this$props2.children;
+        children = _this$props2.children; //实验性质，有序可能移除
+
+    var disableValidator = this.getProp("disableValidator");
     var inline = this.getProp("inline");
     var labelPosition = this.getProp("labelPosition");
     var labelAlign = this.getProp("labelAlign");
@@ -301,7 +299,7 @@ function (_React$Component) {
     }, React.createElement("div", {
       style: style,
       ref: this.saveDOM,
-      className: classnames(prefixCls, (_classnames = {}, _classnames[prefixCls + "-inline"] = inline, _classnames[prefixCls + "-" + labelPosition] = labelPosition, _classnames["has-error"] = hasError, _classnames["is-validating"] = isValidating, _classnames["is-required"] = required || showRequiredMark, _classnames["" + className] = className, _classnames))
+      className: classnames(prefixCls, (_classnames = {}, _classnames[prefixCls + "-inline"] = inline, _classnames[prefixCls + "-" + labelPosition] = labelPosition, _classnames["has-error"] = hasError, _classnames["is-validating"] = isValidating, _classnames["is-required"] = (required || showRequiredMark) && !disableValidator, _classnames["" + className] = className, _classnames))
     }, label && React.createElement("label", {
       htmlFor: this.getProp("labelFor"),
       className: classnames((_classnames2 = {}, _classnames2[prefixCls + "-label"] = true, _classnames2[prefixCls + "-label-left"] = labelAlign === "left" && labelPosition === "left", _classnames2), this.getProp("labelClassName")),

@@ -10,14 +10,16 @@ export {
     Form,
     FormItem,
     NativeInput,
+    NativeInput as NativeField,
     FormContext,
     FormItemContext,
     useForm,
-    useFormItem
+    useFormItem,
 };
 
 Form.Item = FormItem;
 Form.NativeInput = NativeInput;
+Form.NativeField = NativeInput;
 Form.Context = FormContext;
 Form.ItemContext = FormItemContext;
 

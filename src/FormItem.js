@@ -251,6 +251,7 @@ class FormItem extends React.Component {
             renderExtra,
             children,
         } = this.props;
+        //实验性质，有序可能移除
         const disableValidator = this.getProp("disableValidator");
         const inline = this.getProp("inline");
         const labelPosition = this.getProp("labelPosition");

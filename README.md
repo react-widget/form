@@ -24,7 +24,8 @@ type ValidateTriggerType = "change" | "blur" | "none";
 
 type Validator = (
     value: any,
-    formValue: {}
+    formValue: {},
+    triggerType: ValidateTriggerType
 ) => boolean | string | Error | Promise;
 
 type InvalidError = {
