@@ -1,12 +1,12 @@
 module.exports = function() {
     return {
-        babelOptions: {
+        babel: {
             plugins: [
                 [
                     "babel-plugin-transform-react-remove-prop-types",
-                    { mode: "wrap" }
-                ]
-            ]
-        }
+                    { mode: "wrap" },
+                ],
+            ],
+        },
     };
 };
