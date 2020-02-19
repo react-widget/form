@@ -3,20 +3,66 @@ import PropTypes from "prop-types";
 import set from "lodash/set";
 import get from "lodash/get";
 
+import { FormItem } from "./FormItem";
+
+export interface IFormProps {
+    prefixCls?: string;
+    className?: string;
+    style?: React.CSSProperties;
+    path2obj?: boolean;
+    defaultFormValue?: Record<string, any>;
+    getDefaultFieldValue?: () => any;
+    renderControlExtra?: () => any;
+    formValue?: Record<string, any>;
+    disableValidator?: () => any;
+    validators?: object;
+    validateDelay?: number;
+    validateTrigger?:
+        | "blur"
+        | "change"
+        | "none"
+        | Array<"blur" | "change" | "none">;
+    asyncTestDelay?: number;
+    component?: React.ReactNode;
+    requiredMessage?: string;
+    labelWidth?: number;
+    labelStyle?: React.CSSProperties;
+    labelClassName?: string;
+    labelPosition?: "top" | "left";
+    labelAlign?: "left" | "right";
+    controlStyle?: {};
+    controlClassName?: string;
+    clearErrorOnFocus?: boolean;
+    inline?: boolean;
+    normalizeFieldValue?: () => any;
+    onSubmit?: () => any;
+    onChange?: () => any;
+    getInputProps?: () => any;
+}
+
+interface IFormState {
+    formError: Record<string, any>;
+    validatingFields: Record<string, any>;
+    formValue: Record<string, any>;
+}
+
 function noop() {}
 
-class Form extends React.Component {
-    static getDerivedStateFromProps(nextProps, prevState) {
+export class Form extends React.Component<IFormProps, IFormState> {
+    static getDerivedStateFromProps(
+        nextProps: IFormProps,
+        prevState: IFormState
+    ) {
         return {
             formValue: nextProps.formValue || prevState.formValue,
         };
     }
 
     //异步校验加乐观锁
-    fieldLocks = {};
-    formLockId = 1;
+    fieldLocks: Record<string, any> = {};
+    formLockId: number = 1;
 
-    fields = [];
+    fields: FormItem[] = [];
     _validateCb = [];
 
     state = {
@@ -25,7 +71,7 @@ class Form extends React.Component {
         formValue: this.props.defaultFormValue || {},
     };
 
-    addField(field) {
+    addField(field: FormItem) {
         const { name } = field.props;
         field._initialValue = this.getValue(name);
         this.fields.push(field);
@@ -612,7 +658,7 @@ Form.propTypes = {
     prefixCls: PropTypes.string,
     className: PropTypes.string,
     style: PropTypes.object,
-    path2obj: PropTypes.bool,
+    path2obj: boolean,
     defaultFormValue: PropTypes.object,
     getDefaultFieldValue: PropTypes.func,
     renderControlExtra: PropTypes.func,
@@ -634,30 +680,30 @@ Form.propTypes = {
     labelAlign: PropTypes.oneOf(["left", "right"]),
     controlStyle: PropTypes.object,
     controlClassName: PropTypes.string,
-    clearErrorOnFocus: PropTypes.bool,
-    inline: PropTypes.bool,
+    clearErrorOnFocus: boolean,
+    inline: boolean,
     normalizeFieldValue: PropTypes.func,
     onSubmit: PropTypes.func,
     onChange: PropTypes.func,
     getInputProps: PropTypes.func,
 };
 
-Form.defaultProps = {
-    prefixCls: "nex-form",
-    className: "",
-    style: {},
-    //实验性质，有序可能移除
-    disableValidator: false,
-    validators: {},
-    path2obj: true,
-    component: "form",
-    asyncTestDelay: 16,
-    validateDelay: 0,
-    validateTrigger: ["change"], //"blur",
-    labelPosition: "left",
-    labelAlign: "right",
-    clearErrorOnFocus: true,
-    inline: false,
-};
+// Form.defaultProps = {
+//     prefixCls: "nex-form",
+//     className: "",
+//     style: {},
+//     //实验性质，有序可能移除
+//     disableValidator: false,
+//     validators: {},
+//     path2obj: true,
+//     component: "form",
+//     asyncTestDelay: 16,
+//     validateDelay: 0,
+//     validateTrigger: ["change"], //"blur",
+//     labelPosition: "left",
+//     labelAlign: "right",
+//     clearErrorOnFocus: true,
+//     inline: false,
+// };
 
 export default Form;

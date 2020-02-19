@@ -1,3 +1,7 @@
-import React from 'react';
+import React from "react";
 
-export default React.createContext({});
+export interface IFormContext {
+    form: Record<string, any>;
+}
+
+export default React.createContext<IFormContext>({ form: {} });

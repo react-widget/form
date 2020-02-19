@@ -1,13 +1,40 @@
 import React from "react";
-import PropTypes from "prop-types";
+import PropTypes, { number } from "prop-types";
 import classnames from "classnames";
 import FormContext from "./FormContext";
 import FormItemContext from "./FormItemContext";
 
+export interface IFormItem {
+    children: () => React.ReactNode | React.ReactNode;//PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
+    name: string;//PropTypes.string;
+    style: React.CSSProperties;
+    className: string;
+    label: React.ReactNode;
+    labelFor: string; //PropTypes.oneOfType([string PropTypes.number]),
+    labelWidth: string | number;//PropTypes.oneOfType([string PropTypes.number]),
+    labelStyle: {};
+    labelClassName: string;
+    labelPosition: "top"| "left"; //PropTypes.oneOf(["top", "left"]),
+    labelAlign: "left"| "right"; //PropTypes.oneOf(["left", "right"]),
+    controlStyle: {};
+    controlClassName: string;
+    validator: () => boolean;//PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
+    showRequiredMark: boolean;
+    required: boolean;
+    requiredMessage: string;
+    clearErrorOnFocus: boolean;
+    normalize: () => void,
+    renderExtra: () => void,
+    validateDelay: number,
+    validateTrigger: "blur"| "change", // onBlur onChange
+    inline: boolean;
+}
+
 let fid = 1;
 
-class FormItem extends React.Component {
+export class FormItem extends React.Component<IFormItem> {
     static contextType = FormContext;
+    _initialValue?: any;
 
     constructor(...args) {
         super(...args);
@@ -330,28 +357,28 @@ class FormItem extends React.Component {
 
 FormItem.propTypes = {
     children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
-    name: PropTypes.string,
-    style: PropTypes.object,
-    className: PropTypes.string,
-    label: PropTypes.node,
-    labelFor: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    labelStyle: PropTypes.object,
-    labelClassName: PropTypes.string,
+    name: string
+    style: {};
+    className: string
+    label: React.ReactNode;
+    labelFor: PropTypes.oneOfType([string PropTypes.number]),
+    labelWidth: PropTypes.oneOfType([string PropTypes.number]),
+    labelStyle: {};
+    labelClassName: string
     labelPosition: PropTypes.oneOf(["top", "left"]),
     labelAlign: PropTypes.oneOf(["left", "right"]),
-    controlStyle: PropTypes.object,
-    controlClassName: PropTypes.string,
+    controlStyle: {};
+    controlClassName: string
     validator: PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
-    showRequiredMark: PropTypes.bool,
-    required: PropTypes.bool,
-    requiredMessage: PropTypes.string,
-    clearErrorOnFocus: PropTypes.bool,
+    showRequiredMark: boolean;
+    required: boolean;
+    requiredMessage: string
+    clearErrorOnFocus: boolean;
     normalize: PropTypes.func,
     renderExtra: PropTypes.func,
     validateDelay: PropTypes.number,
     validateTrigger: PropTypes.oneOf(["blur", "change"]), // onBlur onChange
-    inline: PropTypes.bool,
+    inline: boolean;
 };
 
 FormItem.defaultProps = {
