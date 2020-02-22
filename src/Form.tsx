@@ -1,21 +1,33 @@
 import React from "react";
-import PropTypes from "prop-types";
+import classnames from "classnames";
 import set from "lodash/set";
 import get from "lodash/get";
-
+import isFunction from "lodash/isFunction";
+import FormContext from "./FormContext";
 import { FormItem } from "./FormItem";
+import { isEmptyValue } from "./utils";
+
+import {
+    FormValue,
+    TriggerType,
+    ValidationError,
+    ValueChangeCallback,
+    ValidationCallback,
+    Validator,
+} from "./types";
 
 export interface IFormProps {
     prefixCls?: string;
     className?: string;
+    children?: ((instance: Form) => React.ReactNode) | React.ReactNode;
     style?: React.CSSProperties;
     path2obj?: boolean;
-    defaultFormValue?: Record<string, any>;
-    getDefaultFieldValue?: () => any;
-    renderControlExtra?: () => any;
-    formValue?: Record<string, any>;
-    disableValidator?: () => any;
-    validators?: object;
+    defaultFormValue?: FormValue;
+    getDefaultFieldValue?: (name: string, formValue: FormValue) => any;
+    renderControlExtra?: (formItem: FormItem) => React.ReactNode;
+    formValue?: FormValue;
+    disableValidator?: boolean;
+    validators?: Record<string, Validator | Validator[]>;
     validateDelay?: number;
     validateTrigger?:
         | "blur"
@@ -23,32 +35,50 @@ export interface IFormProps {
         | "none"
         | Array<"blur" | "change" | "none">;
     asyncTestDelay?: number;
-    component?: React.ReactNode;
+    component?: React.ElementType;
     requiredMessage?: string;
     labelWidth?: number;
     labelStyle?: React.CSSProperties;
     labelClassName?: string;
     labelPosition?: "top" | "left";
     labelAlign?: "left" | "right";
-    controlStyle?: {};
+    controlStyle?: React.CSSProperties;
     controlClassName?: string;
     clearErrorOnFocus?: boolean;
     inline?: boolean;
     normalizeFieldValue?: () => any;
     onSubmit?: () => any;
-    onChange?: () => any;
+    onChange?: (formValue: FormValue) => void;
     getInputProps?: () => any;
 }
 
 interface IFormState {
     formError: Record<string, any>;
     validatingFields: Record<string, any>;
-    formValue: Record<string, any>;
+    formValue: FormValue;
 }
 
 function noop() {}
 
 export class Form extends React.Component<IFormProps, IFormState> {
+    static defaultProps = {
+        prefixCls: "nex-form",
+        className: "",
+        style: {},
+        //实验性质，有序可能移除
+        disableValidator: false,
+        validators: {},
+        path2obj: true,
+        component: "form",
+        asyncTestDelay: 16,
+        validateDelay: 0,
+        validateTrigger: ["change"], //"blur",
+        labelPosition: "left",
+        labelAlign: "right",
+        clearErrorOnFocus: true,
+        inline: false,
+    };
+
     static getDerivedStateFromProps(
         nextProps: IFormProps,
         prevState: IFormState
@@ -72,12 +102,12 @@ export class Form extends React.Component<IFormProps, IFormState> {
     };
 
     addField(field: FormItem) {
-        const { name } = field.props;
-        field._initialValue = this.getValue(name);
+        // const { name } = field.props;
+        // field._initialValue = this.getValue(name);
         this.fields.push(field);
     }
 
-    removeField(field) {
+    removeField(field: FormItem) {
         var idx = this.fields.indexOf(field);
         if (idx !== -1) {
             const name = field.props.name;
@@ -126,14 +156,14 @@ export class Form extends React.Component<IFormProps, IFormState> {
 
         this.fields.forEach(field => {
             if (field.props.name === name) {
-                initialValue = field._initialValue;
+                initialValue = field.getInitialValue();
             }
         });
 
         return initialValue;
     }
 
-    resetField(name, cb) {
+    resetField(name: string, cb) {
         this.cleanError(name);
 
         let initialValue = this.getInitialValue(name);
@@ -188,11 +218,11 @@ export class Form extends React.Component<IFormProps, IFormState> {
         }
     }
 
-    setFormValue(formValue, cb) {
+    setFormValue(formValue, cb: ValueChangeCallback) {
         return this.setValues(formValue, cb);
     }
 
-    getValue(name) {
+    getValue(name: string) {
         const { getDefaultFieldValue } = this.props;
         const path2obj = this.props.path2obj;
         const formValue = this.state.formValue;
@@ -204,7 +234,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
             : value;
     }
 
-    setValue(name, value, cb) {
+    setValue(name: string, value: any, cb: ValueChangeCallback) {
         const { path2obj, onChange } = this.props;
         const formValue = this.state.formValue;
 
@@ -233,11 +263,11 @@ export class Form extends React.Component<IFormProps, IFormState> {
         }
     }
 
-    getFieldValue(name) {
+    getFieldValue(name: string) {
         return this.getValue(name);
     }
 
-    setFieldValue(name, value, cb) {
+    setFieldValue(name: string, value: any, cb: ValueChangeCallback) {
         return this.setValue(name, value, cb);
     }
 
@@ -254,18 +284,18 @@ export class Form extends React.Component<IFormProps, IFormState> {
         this._validateCb = [];
     }
 
-    hasError(name) {
+    hasError(name: string) {
         const { formError } = this.state;
 
         return formError[name] != null; // null or undefined
     }
 
-    getError(name) {
+    getError(name: string) {
         const { formError } = this.state;
         return formError[name];
     }
 
-    cleanError(name) {
+    cleanError(name: string) {
         const { formError } = this.state;
 
         if (!this.hasError(name)) {
@@ -280,7 +310,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
         });
     }
 
-    setError(name, message) {
+    setError(name: string, message: any) {
         const { formError } = this.state;
         this.setState({
             formError: {
@@ -296,7 +326,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
         });
     }
 
-    setErrors(errors) {
+    setErrors(errors: Record<string, any>) {
         const { formError } = this.state;
         this.setState({
             ...formError,
@@ -304,7 +334,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
         });
     }
 
-    getFieldValidatorList(name) {
+    getFieldValidatorList(name: string): Validator[] {
         const fieldValidators = [];
         this.fields
             .filter(field => field.props.name === name)
@@ -345,7 +375,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
         return fieldValidators.filter(v => typeof v === "function");
     }
 
-    isFieldValidating(name) {
+    isFieldValidating(name: string) {
         const validatingFields = this.state.validatingFields;
         return !!validatingFields[name];
     }
@@ -355,7 +385,11 @@ export class Form extends React.Component<IFormProps, IFormState> {
         return Object.keys(validatingFields).some(key => validatingFields[key]);
     }
 
-    _validateField(name, callback, triggerType = "none") {
+    _validateField(
+        name: string,
+        callback: ValidationCallback,
+        triggerType = "none"
+    ) {
         callback = typeof callback === "function" ? callback : noop;
         const { formValue } = this.state;
         const value = this.getValue(name);
@@ -411,7 +445,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
             } else if (ret && ret.then) {
                 ret.then(
                     () => cb(),
-                    e => cb(e)
+                    (e: any) => cb(e)
                 );
             } else {
                 cb(ret);
@@ -421,7 +455,11 @@ export class Form extends React.Component<IFormProps, IFormState> {
         startCheck();
     }
 
-    validateField(name, callback, triggerType) {
+    validateField(
+        name: string,
+        callback: ValidationCallback,
+        triggerType: TriggerType
+    ) {
         callback = typeof callback === "function" ? callback : noop;
 
         const { asyncTestDelay } = this.props;
@@ -481,7 +519,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
         );
     }
 
-    validate(callback, triggerType) {
+    validate(callback: ValidationCallback, triggerType: TriggerType) {
         callback = typeof callback === "function" ? callback : noop;
         const formError = {};
         let asyncUpdateTimer = null;
@@ -647,63 +685,11 @@ export class Form extends React.Component<IFormProps, IFormState> {
                     className={classnames(prefixCls, className)}
                     onSubmit={onSubmit || this.handleSubmit}
                 >
-                    {typeof children === "function" ? children(this) : children}
+                    {isFunction(children) ? children(this) : children}
                 </Component>
             </FormContext.Provider>
         );
     }
 }
-
-Form.propTypes = {
-    prefixCls: PropTypes.string,
-    className: PropTypes.string,
-    style: PropTypes.object,
-    path2obj: boolean,
-    defaultFormValue: PropTypes.object,
-    getDefaultFieldValue: PropTypes.func,
-    renderControlExtra: PropTypes.func,
-    formValue: PropTypes.object,
-    disableValidator: PropTypes.func,
-    validators: PropTypes.object,
-    validateDelay: PropTypes.number,
-    validateTrigger: PropTypes.oneOfType([
-        PropTypes.oneOf(["blur", "change", "none"]),
-        PropTypes.array,
-    ]),
-    asyncTestDelay: PropTypes.number,
-    component: PropTypes.node,
-    requiredMessage: PropTypes.string,
-    labelWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    labelStyle: PropTypes.object,
-    labelClassName: PropTypes.string,
-    labelPosition: PropTypes.oneOf(["top", "left"]),
-    labelAlign: PropTypes.oneOf(["left", "right"]),
-    controlStyle: PropTypes.object,
-    controlClassName: PropTypes.string,
-    clearErrorOnFocus: boolean,
-    inline: boolean,
-    normalizeFieldValue: PropTypes.func,
-    onSubmit: PropTypes.func,
-    onChange: PropTypes.func,
-    getInputProps: PropTypes.func,
-};
-
-// Form.defaultProps = {
-//     prefixCls: "nex-form",
-//     className: "",
-//     style: {},
-//     //实验性质，有序可能移除
-//     disableValidator: false,
-//     validators: {},
-//     path2obj: true,
-//     component: "form",
-//     asyncTestDelay: 16,
-//     validateDelay: 0,
-//     validateTrigger: ["change"], //"blur",
-//     labelPosition: "left",
-//     labelAlign: "right",
-//     clearErrorOnFocus: true,
-//     inline: false,
-// };
 
 export default Form;

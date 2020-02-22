@@ -1,52 +1,104 @@
 import React from "react";
-import PropTypes, { number } from "prop-types";
+import isFunction from "lodash/isFunction";
 import classnames from "classnames";
 import FormContext from "./FormContext";
 import FormItemContext from "./FormItemContext";
 
-export interface IFormItem {
-    children: () => React.ReactNode | React.ReactNode;//PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
-    name: string;//PropTypes.string;
-    style: React.CSSProperties;
-    className: string;
-    label: React.ReactNode;
-    labelFor: string; //PropTypes.oneOfType([string PropTypes.number]),
-    labelWidth: string | number;//PropTypes.oneOfType([string PropTypes.number]),
-    labelStyle: {};
-    labelClassName: string;
-    labelPosition: "top"| "left"; //PropTypes.oneOf(["top", "left"]),
-    labelAlign: "left"| "right"; //PropTypes.oneOf(["left", "right"]),
-    controlStyle: {};
-    controlClassName: string;
-    validator: () => boolean;//PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
-    showRequiredMark: boolean;
-    required: boolean;
-    requiredMessage: string;
-    clearErrorOnFocus: boolean;
-    normalize: () => void,
-    renderExtra: () => void,
-    validateDelay: number,
-    validateTrigger: "blur"| "change", // onBlur onChange
-    inline: boolean;
+type FormValue = Record<string, any>;
+
+type CommonProps =
+    | "validateTrigger"
+    | "clearErrorOnFocus"
+    | "disableValidator"
+    | "inline"
+    | "labelPosition"
+    | "labelAlign"
+    | "renderControlExtra"
+    | "labelClassName"
+    | "labelWidth"
+    | "labelStyle"
+    | "controlClassName"
+    | "controlStyle"
+    | "requiredMessage";
+
+export interface IFormItemProps {
+    prefixCls?: string;
+    children?:
+        | ((props: IFormItemProps, instance: FormItem) => React.ReactNode)
+        | React.ReactNode; //PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
+    name?: string; //PropTypes.string;
+    style?: React.CSSProperties;
+    className?: string;
+    disableValidator?: boolean;
+    label?: React.ReactNode;
+    labelFor?: string; //PropTypes.oneOfType([string PropTypes.number]),
+    labelWidth?: string | number; //PropTypes.oneOfType([string PropTypes.number]),
+    labelStyle?: React.CSSProperties;
+    labelClassName?: string;
+    labelPosition?: "top" | "left"; //PropTypes.oneOf(["top", "left"]),
+    labelAlign?: "left" | "right"; //PropTypes.oneOf(["left", "right"]),
+    controlStyle?: {};
+    controlClassName?: string;
+    validator?: () => boolean; //PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
+    showRequiredMark?: boolean;
+    required?: boolean;
+    requiredMessage?: string;
+    clearErrorOnFocus?: boolean;
+    normalize?: (value: any, prevValue: any, formValue: FormValue) => void;
+    renderExtra?: (instance: FormItem) => React.ReactNode;
+    validateDelay?: number;
+    validateTrigger?:
+        | "blur"
+        | "change"
+        | "none"
+        | ("blur" | "change" | "none")[]; // onBlur onChange
+    inline?: boolean;
+    renderControlExtra: () => React.ReactNode;
+    onChange: (value: any) => void;
+    onFocus: (e: React.FocusEvent) => void;
+    onBlur: (e: React.FocusEvent) => void;
 }
 
 let fid = 1;
 
-export class FormItem extends React.Component<IFormItem> {
+export class FormItem extends React.Component<IFormItemProps> {
     static contextType = FormContext;
-    _initialValue?: any;
 
-    constructor(...args) {
-        super(...args);
+    static defaultProps = {
+        prefixCls: "nex-form-item",
+        showRequiredMark: false,
+    };
+
+    _initialValue?: any;
+    context!: React.ContextType<typeof FormContext>;
+    _dom: HTMLDivElement;
+    _fid: number = fid++;
+    _validateTimer: NodeJS.Timeout | null = null;
+
+    constructor(props: IFormItemProps) {
+        super(props);
         const form = this.getForm();
 
+        this._initialValue = this.getValue();
+
         //组件id
-        this._fid = fid++;
+        // this._fid = fid++;
 
         form.addField(this);
     }
 
-    saveDOM = dom => {
+    getInitialValue() {
+        return this._initialValue;
+    }
+
+    // getInitialValue() {
+    //     const { name } = this.props;
+    //     const form = this.getForm();
+
+    //     return form.getInitialValue(name);
+    // }
+
+    saveDOM = (dom: HTMLDivElement) => {
         this._dom = dom;
     };
 
@@ -63,12 +115,12 @@ export class FormItem extends React.Component<IFormItem> {
         form.removeField(this);
     }
 
-    _validateTimer = null;
-
     hasValidateTrigger(type = "none") {
-        let triggers = this.getProp("validateTrigger", []);
+        let validateTrigger = this.getProp("validateTrigger", []);
 
-        triggers = Array.isArray(triggers) ? triggers : [triggers];
+        let triggers: string[] = Array.isArray(validateTrigger)
+            ? validateTrigger
+            : [validateTrigger];
 
         return triggers.indexOf(type) !== -1;
     }
@@ -79,13 +131,6 @@ export class FormItem extends React.Component<IFormItem> {
         const props = this.props;
 
         return "validateDelay" in props ? props.validateDelay : validateDelay;
-    }
-
-    getInitialValue() {
-        const { name } = this.props;
-        const form = this.getForm();
-
-        return form.getInitialValue(name);
     }
 
     reset(cb) {
@@ -191,7 +236,7 @@ export class FormItem extends React.Component<IFormItem> {
         }
     };
 
-    normalizeChildrenProps() {
+    normalizeChildrenProps(): IFormItemProps {
         let { normalize, name, onChange, onFocus, onBlur } = this.props;
         const form = this.getForm();
 
@@ -236,21 +281,21 @@ export class FormItem extends React.Component<IFormItem> {
         };
     }
 
-    normalizeChildren() {
+    normalizeChildren(children) {
         return React.cloneElement(
-            React.Children.only(this.props.children),
+            React.Children.only(children),
             this.normalizeChildrenProps()
         );
     }
 
-    getFormProp(prop, defaultValue) {
+    getFormProp(prop, defaultValue?) {
         const form = this.getForm();
         const formProps = form.props;
 
         return prop in formProps ? formProps[prop] : defaultValue;
     }
 
-    getProp(prop, defaultValue) {
+    getProp<T extends CommonProps>(prop: T, defaultValue?: IFormItemProps[T]) {
         const form = this.getForm();
         const formProps = form.props;
         const props = this.props;
@@ -270,6 +315,7 @@ export class FormItem extends React.Component<IFormItem> {
         const {
             name,
             label,
+            labelFor,
             showRequiredMark,
             required,
             className,
@@ -278,7 +324,7 @@ export class FormItem extends React.Component<IFormItem> {
             renderExtra,
             children,
         } = this.props;
-        //实验性质，有序可能移除
+        //实验性质，有可能移除
         const disableValidator = this.getProp("disableValidator");
         const inline = this.getProp("inline");
         const labelPosition = this.getProp("labelPosition");
@@ -299,10 +345,9 @@ export class FormItem extends React.Component<IFormItem> {
         const hasError = this.hasError();
         const isValidating = this.isValidating();
 
-        const child =
-            typeof children === "function"
-                ? children(this.normalizeChildrenProps(), this)
-                : this.normalizeChildren();
+        const child = isFunction(children)
+            ? children(this.normalizeChildrenProps(), this)
+            : this.normalizeChildren(children);
 
         return (
             <FormItemContext.Provider value={this.getFormItemContext()}>
@@ -321,7 +366,7 @@ export class FormItem extends React.Component<IFormItem> {
                 >
                     {label && (
                         <label
-                            htmlFor={this.getProp("labelFor")}
+                            htmlFor={labelFor}
                             className={classnames(
                                 {
                                     [`${prefixCls}-label`]: true,
@@ -354,36 +399,5 @@ export class FormItem extends React.Component<IFormItem> {
         );
     }
 }
-
-FormItem.propTypes = {
-    children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
-    name: string
-    style: {};
-    className: string
-    label: React.ReactNode;
-    labelFor: PropTypes.oneOfType([string PropTypes.number]),
-    labelWidth: PropTypes.oneOfType([string PropTypes.number]),
-    labelStyle: {};
-    labelClassName: string
-    labelPosition: PropTypes.oneOf(["top", "left"]),
-    labelAlign: PropTypes.oneOf(["left", "right"]),
-    controlStyle: {};
-    controlClassName: string
-    validator: PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
-    showRequiredMark: boolean;
-    required: boolean;
-    requiredMessage: string
-    clearErrorOnFocus: boolean;
-    normalize: PropTypes.func,
-    renderExtra: PropTypes.func,
-    validateDelay: PropTypes.number,
-    validateTrigger: PropTypes.oneOf(["blur", "change"]), // onBlur onChange
-    inline: boolean;
-};
-
-FormItem.defaultProps = {
-    prefixCls: "nex-form-item",
-    showRequiredMark: false,
-};
 
 export default FormItem;
