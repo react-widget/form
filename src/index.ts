@@ -17,10 +17,10 @@ export {
     useFormItem,
 };
 
-Form.Item = FormItem;
-Form.NativeInput = NativeInput;
-Form.NativeField = NativeInput;
-Form.Context = FormContext;
-Form.ItemContext = FormItemContext;
+// Form.Item = FormItem;
+// Form.NativeInput = NativeInput;
+// Form.NativeField = NativeInput;
+// Form.Context = FormContext;
+// Form.ItemContext = FormItemContext;
 
 export default Form;

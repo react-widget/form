@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import classnames from "classnames";
 import set from "lodash/set";
 import get from "lodash/get";
@@ -10,42 +10,60 @@ import { isEmptyValue } from "./utils";
 import {
     FormValue,
     TriggerType,
+    ValidateTrigger,
     ValidationError,
     ValueChangeCallback,
     ValidationCallback,
     Validator,
 } from "./types";
 
+interface FormDefaultProps {
+    prefixCls: string;
+    className: string;
+    style: React.CSSProperties;
+    disableValidator: boolean;
+    validators: Record<string, Validator | Validator[]>;
+    path2obj: boolean;
+    component: React.ElementType;
+    asyncTestDelay: number;
+    validateDelay: number;
+    validateTrigger: ValidateTrigger;
+    labelPosition: "top" | "left";
+    labelAlign: "left" | "right";
+    clearErrorOnFocus: boolean;
+    inline: boolean;
+}
+
+const defaultProps: FormDefaultProps = {
+    prefixCls: "nex-form",
+    className: "",
+    style: {},
+    //实验性质，有序可能移除
+    disableValidator: false,
+    validators: {},
+    path2obj: true,
+    component: "form",
+    asyncTestDelay: 16,
+    validateDelay: 0,
+    validateTrigger: ["change"], //"blur",
+    labelPosition: "left",
+    labelAlign: "right",
+    clearErrorOnFocus: true,
+    inline: false,
+};
+
 export interface IFormProps {
-    prefixCls?: string;
-    className?: string;
     children?: ((instance: Form) => React.ReactNode) | React.ReactNode;
-    style?: React.CSSProperties;
-    path2obj?: boolean;
     defaultFormValue?: FormValue;
     getDefaultFieldValue?: (name: string, formValue: FormValue) => any;
     renderControlExtra?: (formItem: FormItem) => React.ReactNode;
     formValue?: FormValue;
-    disableValidator?: boolean;
-    validators?: Record<string, Validator | Validator[]>;
-    validateDelay?: number;
-    validateTrigger?:
-        | "blur"
-        | "change"
-        | "none"
-        | Array<"blur" | "change" | "none">;
-    asyncTestDelay?: number;
-    component?: React.ElementType;
     requiredMessage?: string;
     labelWidth?: number;
     labelStyle?: React.CSSProperties;
     labelClassName?: string;
-    labelPosition?: "top" | "left";
-    labelAlign?: "left" | "right";
     controlStyle?: React.CSSProperties;
     controlClassName?: string;
-    clearErrorOnFocus?: boolean;
-    inline?: boolean;
     normalizeFieldValue?: () => any;
     onSubmit?: () => any;
     onChange?: (formValue: FormValue) => void;
@@ -54,30 +72,17 @@ export interface IFormProps {
 
 interface IFormState {
     formError: Record<string, any>;
-    validatingFields: Record<string, any>;
+    validatingFields: Record<string, boolean>;
     formValue: FormValue;
 }
 
 function noop() {}
 
-export class Form extends React.Component<IFormProps, IFormState> {
-    static defaultProps = {
-        prefixCls: "nex-form",
-        className: "",
-        style: {},
-        //实验性质，有序可能移除
-        disableValidator: false,
-        validators: {},
-        path2obj: true,
-        component: "form",
-        asyncTestDelay: 16,
-        validateDelay: 0,
-        validateTrigger: ["change"], //"blur",
-        labelPosition: "left",
-        labelAlign: "right",
-        clearErrorOnFocus: true,
-        inline: false,
-    };
+export class Form extends React.Component<
+    IFormProps & Partial<FormDefaultProps>,
+    IFormState
+> {
+    static defaultProps = defaultProps;
 
     static getDerivedStateFromProps(
         nextProps: IFormProps,
@@ -88,12 +93,14 @@ export class Form extends React.Component<IFormProps, IFormState> {
         };
     }
 
+    readonly props: IFormProps & FormDefaultProps;
+
     //异步校验加乐观锁
     fieldLocks: Record<string, any> = {};
     formLockId: number = 1;
 
     fields: FormItem[] = [];
-    _validateCb = [];
+    _validateCb: ValueChangeCallback[] = [];
 
     state = {
         formError: {},
@@ -120,7 +127,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
     }
 
     getInitialFormValue() {
-        const initialFormValue = {};
+        const initialFormValue: FormValue = {};
 
         this.fields.forEach(field => {
             initialFormValue[field.props.name] = field._initialValue;
@@ -335,7 +342,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
     }
 
     getFieldValidatorList(name: string): Validator[] {
-        const fieldValidators = [];
+        const fieldValidators: Validator[] = [];
         this.fields
             .filter(field => field.props.name === name)
             .forEach(field => {
@@ -352,6 +359,8 @@ export class Form extends React.Component<IFormProps, IFormState> {
                                 `${name} check fail`
                             );
                         }
+
+                        return true;
                     });
                 }
 
@@ -400,7 +409,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
             return;
         }
 
-        const cb = (errors = null) => {
+        const cb = (errors: any = null) => {
             if (errors === null && validators.length) {
                 startCheck();
                 return;
@@ -470,7 +479,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
         const lockId = ++this.fieldLocks[name];
 
         //是否异步检测
-        let asyncTimer = setTimeout(() => {
+        let asyncTimer: number | null = setTimeout(() => {
             asyncTimer = null;
 
             if (lockId !== this.fieldLocks[name]) return;
@@ -522,7 +531,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
     validate(callback: ValidationCallback, triggerType: TriggerType) {
         callback = typeof callback === "function" ? callback : noop;
         const formError = {};
-        let asyncUpdateTimer = null;
+        let asyncUpdateTimer: number | null = null;
         let hasRunComplete = false;
         const { asyncTestDelay } = this.props;
         const { formValue } = this.state;
@@ -530,7 +539,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
         const lockId = ++this.formLockId;
         const fields = this.fields;
         const validatingFields = {};
-        const allErrors = [];
+        const allErrors: ValidationError[] = [];
         let validCounter = 0;
 
         const updateFormState = () => {
@@ -542,7 +551,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
             });
         };
 
-        const complete = (errors, name) => {
+        const complete = (errors: ValidationError[] | null, name: string) => {
             validCounter--;
 
             if (errors) {
@@ -599,7 +608,7 @@ export class Form extends React.Component<IFormProps, IFormState> {
 
                 let isAsyncValidate = false;
                 //检测是否异步校验
-                let asyncTimer = setTimeout(() => {
+                let asyncTimer: number | null = setTimeout(() => {
                     isAsyncValidate = true;
                     asyncTimer = null;
                 }, asyncTestDelay);
@@ -660,11 +669,11 @@ export class Form extends React.Component<IFormProps, IFormState> {
         }, triggerType);
     }
 
-    getFormContext() {
+    getFormContext(this: Form) {
         return { form: this };
     }
 
-    handleSubmit = e => {
+    handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
     };
 

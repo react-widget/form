@@ -4,7 +4,14 @@ import classnames from "classnames";
 import FormContext from "./FormContext";
 import FormItemContext from "./FormItemContext";
 
-type FormValue = Record<string, any>;
+import {
+    FormValue,
+    TriggerType,
+    ValidationError,
+    ValueChangeCallback,
+    ValidationCallback,
+    Validator,
+} from "./types";
 
 type CommonProps =
     | "validateTrigger"
@@ -21,12 +28,25 @@ type CommonProps =
     | "controlStyle"
     | "requiredMessage";
 
-export interface IFormItemProps {
-    prefixCls?: string;
+interface FormItemDefaultProps {
+    prefixCls: string;
+    showRequiredMark: boolean;
+    name: string;
+    validateDelay: number;
+}
+
+const defaultProps: FormItemDefaultProps = {
+    prefixCls: "nex-form-item",
+    showRequiredMark: false,
+    name: "",
+    validateDelay: 0,
+};
+
+interface FormItemProps {
     children?:
         | ((props: IFormItemProps, instance: FormItem) => React.ReactNode)
         | React.ReactNode; //PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
-    name?: string; //PropTypes.string;
+
     style?: React.CSSProperties;
     className?: string;
     disableValidator?: boolean;
@@ -40,40 +60,41 @@ export interface IFormItemProps {
     controlStyle?: {};
     controlClassName?: string;
     validator?: () => boolean; //PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
-    showRequiredMark?: boolean;
+
     required?: boolean;
     requiredMessage?: string;
     clearErrorOnFocus?: boolean;
     normalize?: (value: any, prevValue: any, formValue: FormValue) => void;
     renderExtra?: (instance: FormItem) => React.ReactNode;
-    validateDelay?: number;
     validateTrigger?:
         | "blur"
         | "change"
         | "none"
         | ("blur" | "change" | "none")[]; // onBlur onChange
     inline?: boolean;
-    renderControlExtra: () => React.ReactNode;
-    onChange: (value: any) => void;
-    onFocus: (e: React.FocusEvent) => void;
-    onBlur: (e: React.FocusEvent) => void;
+    renderControlExtra?: () => React.ReactNode;
+    onChange?: (value: any) => void;
+    onFocus?: (e: React.FocusEvent) => void;
+    onBlur?: (e: React.FocusEvent) => void;
 }
+
+type Props = FormItemProps & FormItemDefaultProps;
+export type IFormItemProps = FormItemProps & Partial<FormItemDefaultProps>;
 
 let fid = 1;
 
 export class FormItem extends React.Component<IFormItemProps> {
     static contextType = FormContext;
 
-    static defaultProps = {
-        prefixCls: "nex-form-item",
-        showRequiredMark: false,
-    };
+    static defaultProps = defaultProps;
+
+    readonly props: Props;
 
     _initialValue?: any;
     context!: React.ContextType<typeof FormContext>;
     _dom: HTMLDivElement;
     _fid: number = fid++;
-    _validateTimer: NodeJS.Timeout | null = null;
+    _validateTimer: number | null = null;
 
     constructor(props: IFormItemProps) {
         super(props);
@@ -116,7 +137,7 @@ export class FormItem extends React.Component<IFormItemProps> {
     }
 
     hasValidateTrigger(type = "none") {
-        let validateTrigger = this.getProp("validateTrigger", []);
+        let validateTrigger = this.getProp("validateTrigger") || [];
 
         let triggers: string[] = Array.isArray(validateTrigger)
             ? validateTrigger
@@ -174,7 +195,7 @@ export class FormItem extends React.Component<IFormItemProps> {
         return form.isFieldValidating(name);
     }
 
-    validate(callback, triggerType = "none") {
+    validate(callback, triggerType: TriggerType = "none") {
         const form = this.getForm();
         const { name } = this.props;
 
@@ -236,7 +257,7 @@ export class FormItem extends React.Component<IFormItemProps> {
         }
     };
 
-    normalizeChildrenProps(): IFormItemProps {
+    normalizeChildrenProps(): Props {
         let { normalize, name, onChange, onFocus, onBlur } = this.props;
         const form = this.getForm();
 
@@ -295,7 +316,7 @@ export class FormItem extends React.Component<IFormItemProps> {
         return prop in formProps ? formProps[prop] : defaultValue;
     }
 
-    getProp<T extends CommonProps>(prop: T, defaultValue?: IFormItemProps[T]) {
+    getProp<T extends CommonProps>(prop: T, defaultValue?: Props[T]) {
         const form = this.getForm();
         const formProps = form.props;
         const props = this.props;
@@ -307,7 +328,7 @@ export class FormItem extends React.Component<IFormItemProps> {
             : defaultValue;
     }
 
-    getFormItemContext() {
+    getFormItemContext(this: FormItem) {
         return { formItem: this };
     }
 

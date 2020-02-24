@@ -15,6 +15,7 @@
     },
     "devDependencies": {
         "@babel/core": "^7.8.4",
+        "@types/lodash": "^4.14.149",
         "babel-preset-packez": "^0.4.2",
         "core-js": "^3.6.4",
         "jquery": "^3.4.1",
@@ -28,7 +29,7 @@
     ],
     "scripts": {
         "docs": "packez build ./examples/index.js -d docs -w -c",
-        "start": "transform-es src -d lib -c -w",
+        "start": "tsc -w",
         "cjs": "transform-es src -d lib -c -t cjs",
         "esm": "transform-es src -d esm -c -t esm",
         "demo": "packez server ./examples/index.js -d dist -w -c",
