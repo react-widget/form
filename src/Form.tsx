@@ -17,7 +17,7 @@ import {
     Validator,
 } from "./types";
 
-interface FormDefaultProps {
+export interface IFormProps {
     prefixCls: string;
     className: string;
     style: React.CSSProperties;
@@ -32,27 +32,7 @@ interface FormDefaultProps {
     labelAlign: "left" | "right";
     clearErrorOnFocus: boolean;
     inline: boolean;
-}
 
-const defaultProps: FormDefaultProps = {
-    prefixCls: "nex-form",
-    className: "",
-    style: {},
-    //实验性质，有序可能移除
-    disableValidator: false,
-    validators: {},
-    path2obj: true,
-    component: "form",
-    asyncTestDelay: 16,
-    validateDelay: 0,
-    validateTrigger: ["change"], //"blur",
-    labelPosition: "left",
-    labelAlign: "right",
-    clearErrorOnFocus: true,
-    inline: false,
-};
-
-export interface IFormProps {
     children?: ((instance: Form) => React.ReactNode) | React.ReactNode;
     defaultFormValue?: FormValue;
     getDefaultFieldValue?: (name: string, formValue: FormValue) => any;
@@ -76,12 +56,27 @@ interface IFormState {
     formValue: FormValue;
 }
 
+const defaultProps: IFormProps = {
+    prefixCls: "nex-form",
+    className: "",
+    style: {},
+    //实验性质，有序可能移除
+    disableValidator: false,
+    validators: {},
+    path2obj: true,
+    component: "form",
+    asyncTestDelay: 16,
+    validateDelay: 0,
+    validateTrigger: ["change"], //"blur",
+    labelPosition: "left",
+    labelAlign: "right",
+    clearErrorOnFocus: true,
+    inline: false,
+};
+
 function noop() {}
 
-export class Form extends React.Component<
-    IFormProps & Partial<FormDefaultProps>,
-    IFormState
-> {
+export class Form extends React.Component<Partial<IFormProps>, IFormState> {
     static defaultProps = defaultProps;
 
     static getDerivedStateFromProps(
@@ -93,7 +88,7 @@ export class Form extends React.Component<
         };
     }
 
-    readonly props: IFormProps & FormDefaultProps;
+    readonly props: Readonly<IFormProps>;
 
     //异步校验加乐观锁
     fieldLocks: Record<string, any> = {};

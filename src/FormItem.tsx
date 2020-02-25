@@ -28,21 +28,11 @@ type CommonProps =
     | "controlStyle"
     | "requiredMessage";
 
-interface FormItemDefaultProps {
+interface IFormItemProps {
     prefixCls: string;
     showRequiredMark: boolean;
     name: string;
     validateDelay: number;
-}
-
-const defaultProps: FormItemDefaultProps = {
-    prefixCls: "nex-form-item",
-    showRequiredMark: false,
-    name: "",
-    validateDelay: 0,
-};
-
-interface FormItemProps {
     children?:
         | ((props: IFormItemProps, instance: FormItem) => React.ReactNode)
         | React.ReactNode; //PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
@@ -78,17 +68,21 @@ interface FormItemProps {
     onBlur?: (e: React.FocusEvent) => void;
 }
 
-type Props = FormItemProps & FormItemDefaultProps;
-export type IFormItemProps = FormItemProps & Partial<FormItemDefaultProps>;
+const defaultProps: IFormItemProps = {
+    prefixCls: "nex-form-item",
+    showRequiredMark: false,
+    name: "",
+    validateDelay: 0,
+};
 
 let fid = 1;
 
-export class FormItem extends React.Component<IFormItemProps> {
+export class FormItem extends React.Component<Partial<IFormItemProps>> {
     static contextType = FormContext;
 
     static defaultProps = defaultProps;
 
-    readonly props: Props;
+    readonly props: Readonly<IFormItemProps>;
 
     _initialValue?: any;
     context!: React.ContextType<typeof FormContext>;
@@ -257,7 +251,7 @@ export class FormItem extends React.Component<IFormItemProps> {
         }
     };
 
-    normalizeChildrenProps(): Props {
+    normalizeChildrenProps(): IFormItemProps {
         let { normalize, name, onChange, onFocus, onBlur } = this.props;
         const form = this.getForm();
 
@@ -316,7 +310,7 @@ export class FormItem extends React.Component<IFormItemProps> {
         return prop in formProps ? formProps[prop] : defaultValue;
     }
 
-    getProp<T extends CommonProps>(prop: T, defaultValue?: Props[T]) {
+    getProp<T extends CommonProps>(prop: T, defaultValue?: IFormItemProps[T]) {
         const form = this.getForm();
         const formProps = form.props;
         const props = this.props;
