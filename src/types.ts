@@ -19,3 +19,11 @@ export type Validator = (
     formValue: FormValue,
     triggerType: string
 ) => boolean | null | undefined | PromiseLike<any> | any;
+
+export type FormItemChildrenProps = {
+    value: any;
+    onChange: (value: any) => void;
+    onFocus: (e: React.FocusEvent) => void;
+    onBlur: (e: React.FocusEvent) => void;
+    [x: string]: any;
+};

@@ -1,10 +1,10 @@
-import React, { ReactElement } from "react";
+import React from "react";
 import classnames from "classnames";
 import set from "lodash/set";
 import get from "lodash/get";
 import isFunction from "lodash/isFunction";
 import FormContext from "./FormContext";
-import { FormItem } from "./FormItem";
+import { FormItem, IFormItemProps } from "./FormItem";
 import { isEmptyValue } from "./utils";
 
 import {
@@ -15,6 +15,7 @@ import {
     ValueChangeCallback,
     ValidationCallback,
     Validator,
+    FormItemChildrenProps,
 } from "./types";
 
 export interface IFormProps {
@@ -44,10 +45,15 @@ export interface IFormProps {
     labelClassName?: string;
     controlStyle?: React.CSSProperties;
     controlClassName?: string;
-    normalizeFieldValue?: () => any;
+    normalizeFieldValue?: (
+        name: string,
+        value: any,
+        prevValue: any,
+        formValue: FormValue
+    ) => any;
     onSubmit?: () => any;
     onChange?: (formValue: FormValue) => void;
-    getInputProps?: () => any;
+    getInputProps?: (formItem: FormItem) => Partial<FormItemChildrenProps>;
 }
 
 interface IFormState {
@@ -461,10 +467,10 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
 
     validateField(
         name: string,
-        callback: ValidationCallback,
+        cb: ValidationCallback | null,
         triggerType: TriggerType
     ) {
-        callback = typeof callback === "function" ? callback : noop;
+        const callback = cb || noop;
 
         const { asyncTestDelay } = this.props;
         const { formError, validatingFields } = this.state;

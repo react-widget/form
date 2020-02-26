@@ -3,6 +3,7 @@ import isFunction from "lodash/isFunction";
 import classnames from "classnames";
 import FormContext from "./FormContext";
 import FormItemContext from "./FormItemContext";
+import { IFormProps } from "./Form";
 
 import {
     FormValue,
@@ -11,6 +12,7 @@ import {
     ValueChangeCallback,
     ValidationCallback,
     Validator,
+    FormItemChildrenProps,
 } from "./types";
 
 type CommonProps =
@@ -28,13 +30,16 @@ type CommonProps =
     | "controlStyle"
     | "requiredMessage";
 
-interface IFormItemProps {
+export interface IFormItemProps {
     prefixCls: string;
     showRequiredMark: boolean;
     name: string;
     validateDelay: number;
     children?:
-        | ((props: IFormItemProps, instance: FormItem) => React.ReactNode)
+        | ((
+              props: FormItemChildrenProps,
+              instance: FormItem
+          ) => React.ReactNode)
         | React.ReactNode; //PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
 
     style?: React.CSSProperties;
@@ -54,7 +59,7 @@ interface IFormItemProps {
     required?: boolean;
     requiredMessage?: string;
     clearErrorOnFocus?: boolean;
-    normalize?: (value: any, prevValue: any, formValue: FormValue) => void;
+    normalize?: (value: any, prevValue: any, formValue: FormValue) => any;
     renderExtra?: (instance: FormItem) => React.ReactNode;
     validateTrigger?:
         | "blur"
@@ -175,7 +180,7 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
         return form.cleanError(name);
     }
 
-    setError(message) {
+    setError(message: any) {
         const form = this.getForm();
         const { name } = this.props;
 
@@ -189,7 +194,10 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
         return form.isFieldValidating(name);
     }
 
-    validate(callback, triggerType: TriggerType = "none") {
+    validate(
+        callback: ValidationCallback | null,
+        triggerType: TriggerType = "none"
+    ) {
         const form = this.getForm();
         const { name } = this.props;
 
@@ -203,14 +211,14 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
         return form.getValue(name);
     }
 
-    setValue(value, callback) {
+    setValue(value: any, callback: ValueChangeCallback) {
         const form = this.getForm();
         const { name } = this.props;
 
         form.setValue(name, value, callback);
     }
 
-    triggerValidate(triggerType) {
+    triggerValidate(triggerType: TriggerType) {
         const validateDelay = this.getValidateDelay();
 
         if (validateDelay > 0) {
@@ -233,7 +241,7 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
         });
     };
 
-    handleFocus = callback => {
+    handleFocus = (callback?: () => void) => {
         const clearErrorOnFocus = this.getProp("clearErrorOnFocus");
         callback && callback();
 
@@ -243,7 +251,7 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
         }
     };
 
-    handleBlur = callback => {
+    handleBlur = (callback?: () => void) => {
         callback && callback();
 
         if (this.hasValidateTrigger("blur")) {
@@ -251,13 +259,16 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
         }
     };
 
-    normalizeChildrenProps(): IFormItemProps {
+    normalizeChildrenProps(): FormItemChildrenProps {
         let { normalize, name, onChange, onFocus, onBlur } = this.props;
         const form = this.getForm();
 
-        const _normalize = this.getFormProp("normalizeFieldValue");
+        const _normalize = this.getFormProp(
+            "normalizeFieldValue",
+            (name: string, value: any) => value
+        );
 
-        if (_normalize && !normalize) {
+        if (!normalize) {
             normalize = _normalize.bind(null, name);
         }
 
@@ -296,16 +307,21 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
         };
     }
 
-    normalizeChildren(children) {
-        return React.cloneElement(
-            React.Children.only(children),
-            this.normalizeChildrenProps()
-        );
+    normalizeChildren(children: React.ReactNode) {
+        return !React.isValidElement(children)
+            ? children
+            : React.cloneElement(
+                  React.Children.only(children),
+                  this.normalizeChildrenProps()
+              );
     }
 
-    getFormProp(prop, defaultValue?) {
+    getFormProp<T extends keyof IFormProps>(
+        prop: T,
+        defaultValue: Required<IFormProps>[T]
+    ) {
         const form = this.getForm();
-        const formProps = form.props;
+        const formProps = form.props as Required<IFormProps>;
 
         return prop in formProps ? formProps[prop] : defaultValue;
     }
@@ -344,17 +360,16 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
         const inline = this.getProp("inline");
         const labelPosition = this.getProp("labelPosition");
         const labelAlign = this.getProp("labelAlign");
-        const _renderControlExtra = this.getFormProp("renderControlExtra");
+        const _renderControlExtra = this.getFormProp(
+            "renderControlExtra",
+            (_: any) => null
+        );
         const renderControlExtra = () => {
             if (renderExtra) {
                 return renderExtra(this);
             }
 
-            if (_renderControlExtra) {
-                return _renderControlExtra(this);
-            }
-
-            return null;
+            return _renderControlExtra(this);
         };
 
         const hasError = this.hasError();
