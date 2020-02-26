@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import { Form, FormItem, NativeInput, FormContext } from "../../src/index";
+import { Form, FormItem, NativeInput, FormContext } from "../../lib/index";
 
 function FormItemField({
     type = "text",
@@ -12,7 +12,7 @@ function FormItemField({
         <FormItem
             {...resetProps}
             style={{
-                marginBottom: 24
+                marginBottom: 24,
             }}
         >
             <NativeInput
@@ -30,8 +30,8 @@ export default class DEMO extends Component {
             username: "默认",
             password: "",
             password2: "",
-            email: ""
-        }
+            email: "",
+        },
     };
 
     reset = e => {
@@ -70,7 +70,7 @@ export default class DEMO extends Component {
                 style={{
                     position: "absolute",
                     color: "red",
-                    top: "100%"
+                    top: "100%",
                 }}
             >
                 {component.isValidating() ? "校验中..." : component.getError()}

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import { Form, FormItem, NativeInput } from "../../src/index";
+import { Form, FormItem, NativeInput } from "../../lib/index";
 
 function Input(props) {
     return (
@@ -10,7 +10,7 @@ function Input(props) {
             type="text"
             style={{
                 height: 32,
-                padding: "4px 7px"
+                padding: "4px 7px",
             }}
             component="input"
         />
@@ -22,9 +22,9 @@ export default class DEMO extends Component {
         formValue: {
             name: "",
             info: {
-                gender: "男"
-            }
-        }
+                gender: "男",
+            },
+        },
     };
 
     reset = e => {
@@ -33,9 +33,9 @@ export default class DEMO extends Component {
             formValue: {
                 name: "haha",
                 info: {
-                    gender: "男"
-                }
-            }
+                    gender: "男",
+                },
+            },
         });
 
         this.form.cleanErrors();
@@ -58,7 +58,7 @@ export default class DEMO extends Component {
             },
             name: function(value) {
                 return value === "" ? "不能为空" : true;
-            }
+            },
         };
     }
 
@@ -67,7 +67,7 @@ export default class DEMO extends Component {
             <div
                 style={{
                     color: "red",
-                    top: "100%"
+                    top: "100%",
                 }}
             >
                 {component.isValidating() ? "校验中..." : component.getError()}
