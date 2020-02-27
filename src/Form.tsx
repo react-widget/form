@@ -480,7 +480,7 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
         const lockId = ++this.fieldLocks[name];
 
         //是否异步检测
-        let asyncTimer: number | null = setTimeout(() => {
+        let asyncTimer: number | null = (setTimeout(() => {
             asyncTimer = null;
 
             if (lockId !== this.fieldLocks[name]) return;
@@ -495,7 +495,7 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
                     [name]: null,
                 },
             });
-        }, asyncTestDelay);
+        }, asyncTestDelay) as unknown) as number;
 
         this._validateField(
             name,
@@ -609,10 +609,10 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
 
                 let isAsyncValidate = false;
                 //检测是否异步校验
-                let asyncTimer: number | null = setTimeout(() => {
+                let asyncTimer: number | null = (setTimeout(() => {
                     isAsyncValidate = true;
                     asyncTimer = null;
-                }, asyncTestDelay);
+                }, asyncTestDelay) as unknown) as number;
 
                 this._validateField(
                     name,
@@ -636,12 +636,12 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
             });
 
             //如果校验方法中存在异步校验则先显示同步校验的信息及异步状态
-            asyncUpdateTimer = setTimeout(() => {
+            asyncUpdateTimer = (setTimeout(() => {
                 asyncUpdateTimer = null;
                 //如果不存在异步校验，hasRunComplete会为true
                 if (hasRunComplete) return;
                 updateFormState();
-            }, asyncTestDelay);
+            }, asyncTestDelay) as unknown) as number;
         } else {
             callback(null, formValue);
         }

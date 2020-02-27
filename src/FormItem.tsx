@@ -95,8 +95,11 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
     _fid: number = fid++;
     _validateTimer: number | null = null;
 
-    constructor(props: IFormItemProps) {
-        super(props);
+    constructor(
+        props: IFormItemProps,
+        context: React.ContextType<typeof FormContext>
+    ) {
+        super(props, context);
         const form = this.getForm();
 
         this._initialValue = this.getValue();
@@ -223,9 +226,9 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
 
         if (validateDelay > 0) {
             if (this._validateTimer) clearTimeout(this._validateTimer);
-            this._validateTimer = setTimeout(() => {
+            this._validateTimer = (setTimeout(() => {
                 this.validate(null, triggerType);
-            }, validateDelay);
+            }, validateDelay) as unknown) as number;
         } else {
             this.validate(null, triggerType);
         }

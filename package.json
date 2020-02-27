@@ -20,6 +20,7 @@
         "babel-preset-packez": "^0.4.2",
         "core-js": "^3.6.4",
         "jquery": "^3.4.1",
+        "packez": "^3.1.1",
         "transform-es": "^4.6.6",
         "typescript": "^3.7.5"
     },
