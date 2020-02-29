@@ -4,7 +4,7 @@ import set from "lodash/set";
 import get from "lodash/get";
 import isFunction from "lodash/isFunction";
 import FormContext from "./FormContext";
-import { FormItem, IFormItemProps } from "./FormItem";
+import { FormItem } from "./FormItem";
 import { isEmptyValue } from "./utils";
 
 import {
@@ -34,6 +34,7 @@ export interface IFormProps {
     clearErrorOnFocus: boolean;
     inline: boolean;
 
+    scrollIntoView?: (dom: HTMLDivElement) => void;
     children?: ((instance: Form) => React.ReactNode) | React.ReactNode;
     defaultFormValue?: FormValue;
     getDefaultFieldValue?: (name: string, formValue: FormValue) => any;
@@ -51,7 +52,7 @@ export interface IFormProps {
         prevValue: any,
         formValue: FormValue
     ) => any;
-    onSubmit?: () => any;
+    onSubmit?: (e: React.FormEvent) => void;
     onChange?: (formValue: FormValue) => void;
     getInputProps?: (formItem: FormItem) => Partial<FormItemChildrenProps>;
 }
@@ -100,6 +101,8 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
     fieldLocks: Record<string, any> = {};
     formLockId: number = 1;
 
+    _isFormValidating: boolean = false;
+
     fields: FormItem[] = [];
     _validateCb: ValueChangeCallback[] = [];
 
@@ -137,11 +140,12 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
         return initialFormValue;
     }
 
-    reset(cb) {
+    reset(cb?: ValueChangeCallback) {
         const initialFormValue = this.getInitialFormValue();
 
         this.fieldLocks = {};
         this.formLockId = 1;
+        this._isFormValidating = false;
         // eslint-disable-next-line
         this.state.validatingFields = {};
         // eslint-disable-next-line
@@ -159,8 +163,8 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
         this.setValues({}, cb);
     }
 
-    getInitialValue(name) {
-        let initialValue;
+    getInitialValue(name: string) {
+        let initialValue: any;
 
         this.fields.forEach(field => {
             if (field.props.name === name) {
@@ -171,7 +175,7 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
         return initialValue;
     }
 
-    resetField(name: string, cb) {
+    resetField(name: string, cb?: ValueChangeCallback) {
         this.cleanError(name);
 
         let initialValue = this.getInitialValue(name);
@@ -194,7 +198,7 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
         return this.state.formValue;
     }
 
-    setValues(obj = {}, cb) {
+    setValues(obj: FormValue = {}, cb?: ValueChangeCallback) {
         const { path2obj, onChange } = this.props;
         const formValue = this.state.formValue;
 
@@ -226,7 +230,7 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
         }
     }
 
-    setFormValue(formValue, cb: ValueChangeCallback) {
+    setFormValue(formValue: FormValue, cb?: ValueChangeCallback) {
         return this.setValues(formValue, cb);
     }
 
@@ -242,7 +246,7 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
             : value;
     }
 
-    setValue(name: string, value: any, cb: ValueChangeCallback) {
+    setValue(name: string, value: any, cb?: ValueChangeCallback) {
         const { path2obj, onChange } = this.props;
         const formValue = this.state.formValue;
 
@@ -275,7 +279,7 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
         return this.getValue(name);
     }
 
-    setFieldValue(name: string, value: any, cb: ValueChangeCallback) {
+    setFieldValue(name: string, value: any, cb?: ValueChangeCallback) {
         return this.setValue(name, value, cb);
     }
 
@@ -391,6 +395,8 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
     }
 
     isValidating() {
+        if (this._isFormValidating) return true;
+
         const validatingFields = this.state.validatingFields;
         return Object.keys(validatingFields).some(key => validatingFields[key]);
     }
@@ -467,13 +473,14 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
 
     validateField(
         name: string,
-        cb: ValidationCallback | null,
-        triggerType: TriggerType
+        cb?: ValidationCallback | null,
+        triggerType?: TriggerType
     ) {
         const callback = cb || noop;
-
         const { asyncTestDelay } = this.props;
         const { formError, validatingFields } = this.state;
+
+        if (this._isFormValidating) return;
 
         this.fieldLocks[name] = this.fieldLocks[name] || 1;
 
@@ -529,7 +536,7 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
         );
     }
 
-    validate(callback: ValidationCallback, triggerType: TriggerType) {
+    validate(callback: ValidationCallback) {
         callback = typeof callback === "function" ? callback : noop;
         const formError = {};
         let asyncUpdateTimer: number | null = null;
@@ -542,6 +549,8 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
         const validatingFields = {};
         const allErrors: ValidationError[] = [];
         let validCounter = 0;
+
+        this._isFormValidating = true;
 
         const updateFormState = () => {
             if (lockId !== this.formLockId) return;
@@ -576,6 +585,8 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
                     return;
                 }
 
+                this._isFormValidating = false;
+
                 this.setState(
                     {
                         formError,
@@ -597,10 +608,6 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
                 const name = field.props.name;
                 validCounter++;
                 validatingFields[name] = true;
-
-                // if (!(name in formError)) {
-                //     formError[name] = null;
-                // }
             });
 
             //开始进行字段校验
@@ -614,25 +621,21 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
                     asyncTimer = null;
                 }, asyncTestDelay) as unknown) as number;
 
-                this._validateField(
-                    name,
-                    errors => {
-                        validatingFields[name] = false;
+                this._validateField(name, errors => {
+                    validatingFields[name] = false;
 
-                        if (asyncTimer) {
-                            clearTimeout(asyncTimer);
-                            asyncTimer = null;
-                        }
+                    if (asyncTimer) {
+                        clearTimeout(asyncTimer);
+                        asyncTimer = null;
+                    }
 
-                        //异步校验完成后执行刷新动作
-                        if (isAsyncValidate) {
-                            updateFormState();
-                        }
+                    //异步校验完成后执行刷新动作
+                    if (isAsyncValidate) {
+                        updateFormState();
+                    }
 
-                        complete(errors, name);
-                    },
-                    triggerType
-                );
+                    complete(errors, name);
+                });
             });
 
             //如果校验方法中存在异步校验则先显示同步校验的信息及异步状态
@@ -647,8 +650,9 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
         }
     }
 
-    validateAndScroll(callback, triggerType) {
-        callback = typeof callback === "function" ? callback : noop;
+    validateAndScroll(cb?: ValidationCallback) {
+        const { scrollIntoView } = this.props;
+        const callback = typeof cb === "function" ? cb : noop;
 
         this.validate((errors, formValue, isAbort) => {
             if (errors) {
@@ -658,7 +662,11 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
                     const name = field.props.name;
                     if (this.hasError(name)) {
                         const dom = field.getDOM();
-                        if (dom && dom.scrollIntoView) {
+
+                        if (scrollIntoView) {
+                            scrollIntoView(dom);
+                            break;
+                        } else if (dom && dom.scrollIntoView) {
                             dom.scrollIntoView();
                             break;
                         }
@@ -667,7 +675,7 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
             }
 
             callback(errors, formValue, isAbort);
-        }, triggerType);
+        });
     }
 
     getFormContext(this: Form) {

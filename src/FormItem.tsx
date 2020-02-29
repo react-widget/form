@@ -8,7 +8,7 @@ import { IFormProps } from "./Form";
 import {
     FormValue,
     TriggerType,
-    ValidationError,
+    ValidateTrigger,
     ValueChangeCallback,
     ValidationCallback,
     Validator,
@@ -40,32 +40,28 @@ export interface IFormItemProps {
               props: FormItemChildrenProps,
               instance: FormItem
           ) => React.ReactNode)
-        | React.ReactNode; //PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
+        | React.ReactNode;
 
     style?: React.CSSProperties;
     className?: string;
     disableValidator?: boolean;
     label?: React.ReactNode;
-    labelFor?: string; //PropTypes.oneOfType([string PropTypes.number]),
-    labelWidth?: string | number; //PropTypes.oneOfType([string PropTypes.number]),
+    labelFor?: string;
+    labelWidth?: number;
     labelStyle?: React.CSSProperties;
     labelClassName?: string;
-    labelPosition?: "top" | "left"; //PropTypes.oneOf(["top", "left"]),
-    labelAlign?: "left" | "right"; //PropTypes.oneOf(["left", "right"]),
-    controlStyle?: {};
+    labelPosition?: "top" | "left";
+    labelAlign?: "left" | "right";
+    controlStyle?: React.CSSProperties;
     controlClassName?: string;
-    validator?: () => boolean; //PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
+    validator?: Validator | Validator[];
 
     required?: boolean;
     requiredMessage?: string;
     clearErrorOnFocus?: boolean;
     normalize?: (value: any, prevValue: any, formValue: FormValue) => any;
     renderExtra?: (instance: FormItem) => React.ReactNode;
-    validateTrigger?:
-        | "blur"
-        | "change"
-        | "none"
-        | ("blur" | "change" | "none")[]; // onBlur onChange
+    validateTrigger?: ValidateTrigger;
     inline?: boolean;
     renderControlExtra?: () => React.ReactNode;
     onChange?: (value: any) => void;
@@ -113,13 +109,6 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
     getInitialValue() {
         return this._initialValue;
     }
-
-    // getInitialValue() {
-    //     const { name } = this.props;
-    //     const form = this.getForm();
-
-    //     return form.getInitialValue(name);
-    // }
 
     saveDOM = (dom: HTMLDivElement) => {
         this._dom = dom;
@@ -198,7 +187,7 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
     }
 
     validate(
-        callback: ValidationCallback | null,
+        callback?: ValidationCallback | null,
         triggerType: TriggerType = "none"
     ) {
         const form = this.getForm();
@@ -214,7 +203,7 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
         return form.getValue(name);
     }
 
-    setValue(value: any, callback: ValueChangeCallback) {
+    setValue(value: any, callback?: ValueChangeCallback) {
         const form = this.getForm();
         const { name } = this.props;
 
@@ -234,7 +223,7 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
         }
     }
 
-    handleChange = (value, callback) => {
+    handleChange = (value: any, callback?: () => void) => {
         this.setValue(value, formValue => {
             callback && callback();
 

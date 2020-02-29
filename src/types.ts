@@ -11,7 +11,7 @@ export type ValueChangeCallback = (fromValue: FormValue) => void;
 export type ValidationCallback = (
     errors: ValidationError[] | null,
     value: any,
-    state?: boolean
+    isAbort?: boolean
 ) => void;
 
 export type Validator = (
