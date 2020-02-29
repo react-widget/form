@@ -67,7 +67,6 @@ const defaultProps: IFormProps = {
     prefixCls: "nex-form",
     className: "",
     style: {},
-    //实验性质，有序可能移除
     disableValidator: false,
     validators: {},
     path2obj: true,
@@ -106,7 +105,7 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
     fields: FormItem[] = [];
     _validateCb: ValueChangeCallback[] = [];
 
-    state = {
+    state: IFormState = {
         formError: {},
         validatingFields: {},
         formValue: this.props.defaultFormValue || {},
@@ -128,6 +127,17 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
 
             this.fields.splice(idx, 1);
         }
+    }
+
+    getFieldByName(name: string) {
+        const fields = this.fields;
+        for (let i = 0; i < fields.length; i++) {
+            if (name === fields[i].props.name) {
+                return fields[i];
+            }
+        }
+
+        return null;
     }
 
     getInitialFormValue() {
@@ -296,15 +306,46 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
         this._validateCb = [];
     }
 
+    isDisableValidator(name?: string) {
+        if (arguments.length) {
+            return this.isDisableValidatorField(name as string);
+        }
+
+        return this.props.disableValidator;
+    }
+
+    isDisableValidatorField(name: string) {
+        const field = this.getFieldByName(name);
+        if (!field) return true;
+
+        return field.getProp("disableValidator", false);
+    }
+
     hasError(name: string) {
+        if (this.isDisableValidatorField(name)) {
+            return false;
+        }
+
         const { formError } = this.state;
 
         return formError[name] != null; // null or undefined
     }
 
     getError(name: string) {
+        if (this.isDisableValidatorField(name)) {
+            return null;
+        }
+
         const { formError } = this.state;
         return formError[name];
+    }
+
+    getErrors() {
+        if (this.isDisableValidator()) {
+            return {};
+        }
+
+        return this.state.formError;
     }
 
     cleanError(name: string) {
@@ -323,6 +364,10 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
     }
 
     setError(name: string, message: any) {
+        if (this.isDisableValidatorField(name)) {
+            return;
+        }
+
         const { formError } = this.state;
         this.setState({
             formError: {
@@ -341,8 +386,10 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
     setErrors(errors: Record<string, any>) {
         const { formError } = this.state;
         this.setState({
-            ...formError,
-            ...errors,
+            formError: {
+                ...formError,
+                ...errors,
+            },
         });
     }
 
@@ -390,11 +437,16 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
     }
 
     isFieldValidating(name: string) {
+        if (this.isDisableValidatorField(name)) {
+            return false;
+        }
+
         const validatingFields = this.state.validatingFields;
         return !!validatingFields[name];
     }
 
     isValidating() {
+        if (this.props.disableValidator) return false;
         if (this._isFormValidating) return true;
 
         const validatingFields = this.state.validatingFields;
@@ -490,7 +542,12 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
         let asyncTimer: number | null = (setTimeout(() => {
             asyncTimer = null;
 
-            if (lockId !== this.fieldLocks[name]) return;
+            if (
+                lockId !== this.fieldLocks[name] ||
+                this.isDisableValidatorField(name)
+            ) {
+                return;
+            }
 
             this.setState({
                 validatingFields: {
@@ -511,7 +568,10 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
                     clearTimeout(asyncTimer);
                 }
 
-                if (lockId !== this.fieldLocks[name]) {
+                if (
+                    lockId !== this.fieldLocks[name] ||
+                    this.isDisableValidatorField(name)
+                ) {
                     callback(errors, value, true /* abort state */);
                     return;
                 }
@@ -553,7 +613,7 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
         this._isFormValidating = true;
 
         const updateFormState = () => {
-            if (lockId !== this.formLockId) return;
+            if (lockId !== this.formLockId || this.isDisableValidator()) return;
 
             this.setState({
                 formError,
@@ -564,7 +624,7 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
         const complete = (errors: ValidationError[] | null, name: string) => {
             validCounter--;
 
-            if (errors) {
+            if (errors && !this.isDisableValidatorField(name)) {
                 formError[name] = errors[0].message;
                 allErrors.push(...errors);
             }
@@ -576,7 +636,7 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
                     asyncUpdateTimer = null;
                 }
 
-                if (lockId !== this.formLockId) {
+                if (lockId !== this.formLockId || this.isDisableValidator()) {
                     callback(
                         allErrors.length ? allErrors : null,
                         formValue,

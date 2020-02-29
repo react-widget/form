@@ -64,7 +64,7 @@ export interface IFormItemProps {
     validateTrigger?: ValidateTrigger;
     inline?: boolean;
     renderControlExtra?: () => React.ReactNode;
-    onChange?: (value: any) => void;
+    onChange?: (value: any, e?: React.SyntheticEvent) => void;
     onFocus?: (e: React.FocusEvent) => void;
     onBlur?: (e: React.FocusEvent) => void;
 }
@@ -145,7 +145,7 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
         return "validateDelay" in props ? props.validateDelay : validateDelay;
     }
 
-    reset(cb) {
+    reset(cb?: ValueChangeCallback) {
         const form = this.getForm();
         const { name } = this.props;
         form.resetField(name, cb);
@@ -257,7 +257,7 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
 
         const _normalize = this.getFormProp(
             "normalizeFieldValue",
-            (name: string, value: any) => value
+            (_: string, value: any) => value
         );
 
         if (!normalize) {
@@ -271,7 +271,7 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
         return {
             value: this.getValue(),
             ...customProps,
-            onChange: value => {
+            onChange: (value, e?: React.SyntheticEvent) => {
                 const formValue = form.getFormValue();
                 const prevValue = this.getValue();
 
@@ -280,7 +280,7 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
                 }
 
                 this.handleChange(value, () => {
-                    onChange && onChange(value);
+                    onChange && onChange(value, e);
                     customProps.onChange && customProps.onChange(value);
                 });
             },
@@ -347,7 +347,6 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
             renderExtra,
             children,
         } = this.props;
-        //实验性质，有可能移除
         const disableValidator = this.getProp("disableValidator");
         const inline = this.getProp("inline");
         const labelPosition = this.getProp("labelPosition");

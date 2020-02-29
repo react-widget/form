@@ -84,6 +84,7 @@ export default class DEMO extends Component {
         return (
             <div>
                 <Form
+                    // disableValidator
                     labelWidth={80}
                     // validateTrigger={["change", "blur"]}
                     getDefaultFieldValue={() => ""}

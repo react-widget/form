@@ -22,7 +22,7 @@ export type Validator = (
 
 export type FormItemChildrenProps = {
     value: any;
-    onChange: (value: any) => void;
+    onChange: (value: any, e?: React.SyntheticEvent) => void;
     onFocus: (e: React.FocusEvent) => void;
     onBlur: (e: React.FocusEvent) => void;
     [x: string]: any;

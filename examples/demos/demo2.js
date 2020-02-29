@@ -109,53 +109,53 @@ export default class DEMO extends Component {
                                 </FormItem>
                                 <FormItem
                                     help="必填选项"
-                                    name="name"
+                                    name="name2"
                                     label="姓名"
                                     inline
                                 >
                                     <Input />
                                 </FormItem>
-                                <FormItem name="name" label="姓名" inline>
+                                <FormItem name="name3" label="姓名" inline>
                                     <Input size="small" />
                                 </FormItem>
                                 <FormItem
                                     labelWidth={100}
-                                    name="name"
+                                    name="name4"
                                     label="姓名"
                                 >
                                     <Input />
                                 </FormItem>
                                 <FormItem
-                                    name="name"
+                                    name="name5"
                                     labelWidth={100}
                                     label="姓名"
                                     inline
                                 >
                                     <Input />
                                 </FormItem>
-                                <FormItem name="name" label="姓名" inline>
+                                <FormItem name="name6" label="姓名" inline>
                                     <Input />
                                 </FormItem>
                                 <FormItem
-                                    name="name"
+                                    name="name7"
                                     labelPosition="top"
                                     label="姓名"
                                 >
                                     <Input />
                                 </FormItem>
                                 <FormItem
-                                    name="name"
+                                    name="name8"
                                     labelPosition="top"
                                     label="姓名"
                                     inline
                                 >
                                     <Input />
                                 </FormItem>
-                                <FormItem name="name" label="姓名">
+                                <FormItem name="name9" label="姓名">
                                     <NativeInput component="input" />
                                 </FormItem>
                                 <div>
-                                    {form.isFieldValidating("name")
+                                    {form.isFieldValidating("name9")
                                         ? "数据校验中..."
                                         : null}
                                 </div>
@@ -211,7 +211,7 @@ export default class DEMO extends Component {
                                                               reject(
                                                                   "校验失败"
                                                               ),
-                                                    1000
+                                                    2000
                                                 );
                                             }
                                         );
