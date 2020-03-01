@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import { Form, FormItem, NativeInput, FormContext } from "../../lib/index";
+import { Form, FormItem, NativeField, FormContext } from "../../lib/index";
 
 function FormItemField({
     type = "text",
@@ -15,7 +15,7 @@ function FormItemField({
                 marginBottom: 24,
             }}
         >
-            <NativeInput
+            <NativeField
                 component={component}
                 type={type}
                 children={children}

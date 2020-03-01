@@ -1,61 +1,56 @@
 <!DOCTYPE html>
 <html style="width:100%; height:100%; overflow: auto;">
+    <head>
+        <meta charset="utf-8" />
+        <title>Form</title>
+        <meta
+            name="viewport"
+            content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1"
+        />
+        <style type="text/css">
+            .demo {
+                width: 1100px;
+                height: 500px;
+                margin: 50px auto;
+                background: #fff;
+                font-size: 12px;
+                overflow: auto;
+            }
 
-<head>
-    <meta charset="utf-8">
-    <title>Layout</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1">
-    <style type="text/css">
-        .demo {
-            width: 1100px;
-            height: 500px;
-            margin: 50px auto;
-            background: #FFF;
-            font-size: 12px;
-            overflow: auto;
-        }
+            .rw-layout-content {
+                height: 200px;
+            }
 
-        .rw-layout-content {
-            height: 200px;
-        }
+            .rw-layout.rw-layout-has-sider {
+                text-align: center;
+                background: #3ba0e9;
+            }
 
-        .rw-layout.rw-layout-has-sider {
+            .rw-layout-sider {
+                width: 200px;
+                text-align: center;
+                background: #3ba0e9;
+                color: #fff;
+            }
 
+            .rw-layout-footer,
+            .rw-layout-header {
+                background: #7dbcea;
+                color: #fff;
+                height: 64px;
+                line-height: 64px;
+                text-align: center;
+            }
 
-            text-align: center;
-            background: #3ba0e9;
-        }
+            .rw-layout-content {
+                background: rgba(16, 142, 233, 1);
+                color: #fff;
+                text-align: center;
+            }
+        </style>
+    </head>
 
-        .rw-layout-sider {
-
-            width: 200px;
-            text-align: center;
-            background: #3ba0e9;
-            color: #fff;
-        }
-
-        .rw-layout-footer,
-        .rw-layout-header {
-
-            background: #7dbcea;
-            color: #fff;
-            height: 64px;
-            line-height: 64px;
-            text-align: center;
-        }
-
-        .rw-layout-content {
-
-            background: rgba(16, 142, 233, 1);
-            color: #fff;
-            text-align: center;
-        }
-    </style>
-</head>
-
-<body style="background:#F5F5F5">
-    <div class="demo" id="demo">
-    </div>
-</body>
-
+    <body style="background:#F5F5F5">
+        <div class="demo" id="demo"></div>
+    </body>
 </html>

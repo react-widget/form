@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 
-import { Form, FormItem, NativeInput } from "../../lib/index";
+import { Form, FormItem, NativeField } from "../../lib/index";
 
 function Input(props) {
     return (
-        <NativeInput
+        <NativeField
             {...props}
             className=""
             type="text"
@@ -152,7 +152,7 @@ export default class DEMO extends Component {
                                     <Input />
                                 </FormItem>
                                 <FormItem name="name9" label="姓名">
-                                    <NativeInput component="input" />
+                                    <NativeField component="input" />
                                 </FormItem>
                                 <div>
                                     {form.isFieldValidating("name9")
@@ -160,17 +160,17 @@ export default class DEMO extends Component {
                                         : null}
                                 </div>
                                 <FormItem name="info.gender" label="性别">
-                                    <NativeInput component="input" />
+                                    <NativeField component="input" />
                                 </FormItem>
                                 <FormItem
                                     name="info.age"
                                     label="年龄"
                                     normalize={v => parseInt(v) || ""}
                                 >
-                                    <NativeInput component="input" />
+                                    <NativeField component="input" />
                                 </FormItem>
                                 <FormItem name="info.address" label="地址">
-                                    <NativeInput component="input" />
+                                    <NativeField component="input" />
                                 </FormItem>
                                 <FormItem
                                     name="info.list[0]"
@@ -191,7 +191,7 @@ export default class DEMO extends Component {
                                         );
                                     }}
                                 >
-                                    <NativeInput component="input" />
+                                    <NativeField component="input" />
                                 </FormItem>
                                 <div>
                                     {form.isFieldValidating("info.list[0]")
@@ -217,7 +217,7 @@ export default class DEMO extends Component {
                                         );
                                     }}
                                 >
-                                    <NativeInput component="input" />
+                                    <NativeField component="input" />
                                 </FormItem>
                                 <div>
                                     {form.isFieldValidating("info.list[1]")
@@ -225,20 +225,20 @@ export default class DEMO extends Component {
                                         : null}
                                 </div>
                                 <FormItem name="info.country" label="国籍">
-                                    <NativeInput component="select">
+                                    <NativeField component="select">
                                         <option value="中国">中国</option>
                                         <option value="美国">美国</option>
                                         <option value="澳大利亚">
                                             澳大利亚
                                         </option>
-                                    </NativeInput>
+                                    </NativeField>
                                 </FormItem>
                                 <FormItem
                                     name="info.desc"
                                     label="备注"
                                     alignItems="top"
                                 >
-                                    <NativeInput component="textarea" />
+                                    <NativeField component="textarea" />
                                 </FormItem>
                                 {form.isValidating() ? "表单校验中..." : null}
                                 <pre>{JSON.stringify(formValue)}</pre>
