@@ -1,64 +1,66 @@
 {
-    "name": "react-widget-form",
-    "version": "2.0.0-alpha1",
-    "description": "",
-    "main": "lib/index.js",
-    "module": "esm/index.js",
-    "types": "lib/index.d.ts",
-    "dependencies": {
-        "@babel/runtime": "^7.8.4",
-        "classnames": "^2.2.6",
-        "lodash": "^4.17.15",
-        "prop-types": "^15.6.2",
-        "react": "^16.12.0",
-        "react-dom": "^16.12.0",
-        "warning": "^4.0.2"
-    },
-    "devDependencies": {
-        "@babel/core": "^7.8.4",
-        "@types/lodash": "^4.14.149",
-        "babel-preset-packez": "^0.4.2",
-        "core-js": "^3.6.4",
-        "jquery": "^3.4.1",
-        "packez": "^3.1.1",
-        "transform-es": "^4.6.6",
-        "typescript": "^3.7.5"
-    },
-    "files": [
-        "esm",
-        "lib",
-        "*.md"
-    ],
-    "scripts": {
-        "docs": "packez build ./examples/index.js -d docs -w -c",
-        "start": "tsc -w",
-        "cjs": "transform-es src -d lib -c -t cjs",
-        "esm": "transform-es src -d esm -c -t esm",
-        "demo": "packez server ./examples/index.js -d dist -w -c",
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "packez build ./src/index.js -c",
-        "server": "packez server ./src/index.js -c",
-        "analyzer": "packez analyzer ./src/index.js -c"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/react-widget/form.git"
-    },
-    "keywords": [
-        "react-widget",
-        "form",
-        "react"
-    ],
-    "author": "nobo.zhou@foxmail.com",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/react-widget/form/issues"
-    },
-    "homepage": "https://github.com/react-widget/form#readme",
-    "browserslist": [
-        ">0.25%",
-        "not dead",
-        "not ie <= 11",
-        "not op_mini all"
-    ]
+	"name": "react-widget-form",
+	"version": "2.0.0-alpha1",
+	"description": "",
+	"main": "cjs/index.js",
+	"module": "esm/index.js",
+	"types": "lib/index.d.ts",
+	"dependencies": {
+		"@babel/runtime": "^7.8.4",
+		"classnames": "^2.2.6",
+		"lodash": "^4.17.15",
+		"prop-types": "^15.6.2",
+		"react": "^16.12.0",
+		"react-dom": "^16.12.0",
+		"warning": "^4.0.2"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.8.4",
+		"@types/lodash": "^4.14.149",
+		"babel-preset-packez": "^0.4.2",
+		"core-js": "^3.6.4",
+		"gulp-sass": "^4.0.2",
+		"jquery": "^3.4.1",
+		"npm-run-all": "^4.1.5",
+		"packez": "^3.1.1",
+		"transform-es": "^5.0.0",
+		"typescript": "^3.7.5"
+	},
+	"files": [
+		"cjs",
+		"esm",
+		"lib",
+		"*.md"
+	],
+	"scripts": {
+		"docs": "packez build ./examples/index.js -d docs -c -w",
+		"start": "tsc -w",
+		"cjs": "transform-es src -d cjs -c -t cjs",
+		"esm": "transform-es src -d esm -c -t esm",
+		"tsc": "tsc",
+		"demo": "packez server ./examples/index.js -d dist -w -c",
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "run-s tsc cjs esm"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/react-widget/form.git"
+	},
+	"keywords": [
+		"react-widget",
+		"form",
+		"react"
+	],
+	"author": "nobo.zhou@foxmail.com",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/react-widget/form/issues"
+	},
+	"homepage": "https://github.com/react-widget/form#readme",
+	"browserslist": [
+		">0.25%",
+		"not dead",
+		"not ie <= 11",
+		"not op_mini all"
+	]
 }
