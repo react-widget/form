@@ -432,7 +432,7 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
 		return Object.keys(validatingFields).some(key => validatingFields[key]);
 	}
 
-	_validateField(name: string, callback: ValidationCallback, triggerType = "none") {
+	_validateField(name: string, callback: ValidationCallback, triggerType: TriggerType = "none") {
 		callback = typeof callback === "function" ? callback : noop;
 		const { formValue } = this.state;
 		const value = this.getValue(name);

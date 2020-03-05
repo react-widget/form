@@ -1,9 +1,9 @@
 const _ = require("lodash");
 
 module.exports = function({ method, program, ...defaults }) {
-    const opts = {
-        tsCheck: true,
-    };
+	const opts = {
+		tsCheck: false,
+	};
 
-    return _.defaultsDeep(opts, defaults);
+	return _.defaultsDeep(opts, defaults);
 };

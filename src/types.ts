@@ -9,21 +9,21 @@ export type ValidationError = { name: string; message: any };
 export type ValueChangeCallback = (fromValue: FormValue) => void;
 
 export type ValidationCallback = (
-    errors: ValidationError[] | null,
-    value: any,
-    isAbort?: boolean
+	errors: ValidationError[] | null,
+	value: any,
+	isAbort?: boolean
 ) => void;
 
-export type Validator = (
-    value: any,
-    formValue: FormValue,
-    triggerType: string
-) => boolean | null | undefined | PromiseLike<any> | any;
+export type Validator<T = boolean | null | undefined | PromiseLike<any> | any> = (
+	value: any,
+	formValue: FormValue,
+	triggerType: TriggerType
+) => T;
 
 export type FormItemChildrenProps = {
-    value: any;
-    onChange: (value: any, e?: React.SyntheticEvent) => void;
-    onFocus: (e: React.FocusEvent) => void;
-    onBlur: (e: React.FocusEvent) => void;
-    [x: string]: any;
+	value: any;
+	onChange: (value: any, e?: React.SyntheticEvent) => void;
+	onFocus: (e: React.FocusEvent) => void;
+	onBlur: (e: React.FocusEvent) => void;
+	[x: string]: any;
 };
