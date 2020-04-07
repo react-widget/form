@@ -18,6 +18,12 @@ import {
 	FormItemChildrenProps,
 } from "./types";
 
+export type ComponentProps = {
+	style: React.CSSProperties;
+	className: string;
+	onSubmit: (e: React.FormEvent) => void;
+};
+
 export interface IFormProps {
 	prefixCls: string;
 	className: string;
@@ -97,11 +103,17 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
 	fields: FormItem[] = [];
 	_validateCb: ValueChangeCallback[] = [];
 
-	state: IFormState = {
-		formError: {},
-		validatingFields: {},
-		formValue: this.props.defaultFormValue || {},
-	};
+	state: IFormState;
+
+	constructor(props: IFormProps, context?: any) {
+		super(props, context);
+
+		this.state = {
+			formError: {},
+			validatingFields: {},
+			formValue: props.defaultFormValue || {},
+		};
+	}
 
 	addField(field: FormItem) {
 		this.fields.push(field);
