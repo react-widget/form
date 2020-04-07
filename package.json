@@ -16,10 +16,17 @@
 	},
 	"devDependencies": {
 		"@babel/core": "^7.8.4",
+		"@types/enzyme": "^3.10.5",
+		"@types/enzyme-adapter-react-16": "^1.0.6",
+		"@types/jest": "^25.2.1",
 		"@types/lodash": "^4.14.149",
-		"babel-preset-packez": "^0.4.2",
+		"@types/react": "^16.9.32",
+		"babel-preset-packez": "^1.0.0",
 		"core-js": "^3.6.4",
+		"enzyme": "^3.11.0",
+		"enzyme-adapter-react-16": "^1.15.2",
 		"gulp-sass": "^4.0.2",
+		"jest": "^25.2.7",
 		"jquery": "^3.4.1",
 		"npm-run-all": "^4.1.5",
 		"packez": "^4.1.2",
@@ -39,7 +46,7 @@
 		"esm": "transform-es src -d esm -c -t esm",
 		"tsc": "tsc",
 		"demo": "packez server ./examples/index.js -d dist -w -c",
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "jest",
 		"build": "run-s tsc cjs esm docs"
 	},
 	"repository": {
