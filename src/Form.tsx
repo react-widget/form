@@ -24,7 +24,7 @@ export type ComponentProps = {
 	onSubmit: (e: React.FormEvent) => void;
 };
 
-export interface IFormProps {
+export interface FormProps {
 	prefixCls: string;
 	className: string;
 	style: React.CSSProperties;
@@ -58,14 +58,14 @@ export interface IFormProps {
 	getInputProps?: (formItem: FormItem) => Partial<FormItemChildrenProps>;
 }
 
-interface IFormState {
+interface FormState {
 	formError: Record<string, any>;
 	validatingFields: Record<string, boolean>;
 	formValue: FormValue;
 }
 
-const defaultProps: IFormProps = {
-	prefixCls: "nex-form",
+const defaultProps: FormProps = {
+	prefixCls: "rw-form",
 	className: "",
 	style: {},
 	disableValidator: false,
@@ -83,16 +83,16 @@ const defaultProps: IFormProps = {
 
 function noop() {}
 
-export class Form extends React.Component<Partial<IFormProps>, IFormState> {
+export class Form extends React.Component<FormProps, FormState> {
 	static defaultProps = defaultProps;
 
-	static getDerivedStateFromProps(nextProps: IFormProps, prevState: IFormState) {
+	static getDerivedStateFromProps(nextProps: FormProps, prevState: FormState) {
 		return {
 			formValue: nextProps.formValue || prevState.formValue,
 		};
 	}
 
-	readonly props: Readonly<IFormProps>;
+	readonly props: Readonly<FormProps>;
 
 	//异步校验加乐观锁
 	fieldLocks: Record<string, any> = {};
@@ -103,9 +103,9 @@ export class Form extends React.Component<Partial<IFormProps>, IFormState> {
 	fields: FormItem[] = [];
 	_validateCb: ValueChangeCallback[] = [];
 
-	state: IFormState;
+	state: FormState;
 
-	constructor(props: IFormProps, context?: any) {
+	constructor(props: FormProps, context?: any) {
 		super(props, context);
 
 		this.state = {

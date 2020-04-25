@@ -3,7 +3,7 @@ import isFunction from "lodash/isFunction";
 import classnames from "classnames";
 import FormContext, { IFormContext } from "./FormContext";
 import FormItemContext from "./FormItemContext";
-import { IFormProps } from "./Form";
+import { FormProps } from "./Form";
 
 import {
 	FormValue,
@@ -30,8 +30,7 @@ type CommonProps =
 	| "controlStyle"
 	| "requiredMessage";
 
-export interface IFormItemProps {
-	prefixCls: string;
+export interface FormItemProps {
 	showRequiredMark: boolean;
 	name: string;
 	validateDelay: number;
@@ -66,8 +65,7 @@ export interface IFormItemProps {
 	onBlur?: (e: React.FocusEvent) => void;
 }
 
-const defaultProps: IFormItemProps = {
-	prefixCls: "nex-form-item",
+const defaultProps: FormItemProps = {
 	showRequiredMark: false,
 	name: "",
 	validateDelay: 0,
@@ -75,12 +73,12 @@ const defaultProps: IFormItemProps = {
 
 let fid = 1;
 
-export class FormItem extends React.Component<Partial<IFormItemProps>> {
+export class FormItem extends React.Component<FormItemProps> {
 	static contextType = FormContext;
 
 	static defaultProps = defaultProps;
 
-	readonly props: Readonly<IFormItemProps>;
+	readonly props: Readonly<FormItemProps>;
 
 	_initialValue?: any;
 	context: IFormContext;
@@ -88,7 +86,7 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
 	_fid: number = fid++;
 	_validateTimer: number | null = null;
 
-	constructor(props: IFormItemProps, context?: any) {
+	constructor(props: FormItemProps, context?: any) {
 		super(props, context);
 		const form = this.getForm();
 
@@ -296,14 +294,14 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
 			: React.cloneElement(React.Children.only(children), this.normalizeChildrenProps());
 	}
 
-	getFormProp<T extends keyof IFormProps>(prop: T, defaultValue: Required<IFormProps>[T]) {
+	getFormProp<T extends keyof FormProps>(prop: T, defaultValue: Required<FormProps>[T]) {
 		const form = this.getForm();
-		const formProps = form.props as Required<IFormProps>;
+		const formProps = form.props as Required<FormProps>;
 
 		return prop in formProps ? formProps[prop] : defaultValue;
 	}
 
-	getProp<T extends CommonProps>(prop: T, defaultValue?: IFormItemProps[T]) {
+	getProp<T extends CommonProps>(prop: T, defaultValue?: FormItemProps[T]) {
 		const form = this.getForm();
 		const formProps = form.props;
 		const props = this.props;
@@ -315,6 +313,11 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
 		return { formItem: this };
 	}
 
+	getPrefixCls() {
+		const form = this.getForm();
+		return form.props.prefixCls;
+	}
+
 	render() {
 		const {
 			name,
@@ -323,11 +326,13 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
 			showRequiredMark,
 			required,
 			className,
-			prefixCls,
 			style,
 			renderExtra,
 			children,
 		} = this.props;
+
+		const prefixCls = this.getPrefixCls() + "-item";
+
 		const disableValidator = this.getProp("disableValidator");
 		const inline = this.getProp("inline");
 		const labelPosition = this.getProp("labelPosition");
@@ -351,6 +356,7 @@ export class FormItem extends React.Component<Partial<IFormItemProps>> {
 		return (
 			<FormItemContext.Provider value={this.getFormItemContext()}>
 				<div
+					data-name={name}
 					style={style}
 					ref={this.saveDOM}
 					className={classnames(prefixCls, {

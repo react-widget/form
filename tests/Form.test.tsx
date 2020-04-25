@@ -7,11 +7,11 @@ configure({ adapter: new Adapter() });
 
 test("Form with className", () => {
 	const wrapper = mount(<Form className="form-test"></Form>);
-	expect(wrapper.html()).toEqual(`<form class="nex-form form-test"></form>`);
+	expect(wrapper.html()).toEqual(`<form class="rw-form form-test"></form>`);
 });
 test("Form with component -1", () => {
 	const wrapper = mount(<Form component="div"></Form>);
-	expect(wrapper.html()).toEqual(`<div class="nex-form"></div>`);
+	expect(wrapper.html()).toEqual(`<div class="rw-form"></div>`);
 });
 test("Form with component -2", () => {
 	function FormComponent(props) {
@@ -22,7 +22,7 @@ test("Form with component -2", () => {
 		);
 	}
 	const wrapper = mount(<Form component={FormComponent}></Form>);
-	expect(wrapper.html()).toEqual(`<div><div class=\"nex-form\"></div></div>`);
+	expect(wrapper.html()).toEqual(`<div><div class=\"rw-form\"></div></div>`);
 });
 test("Form with style", () => {
 	const wrapper = mount(
@@ -32,5 +32,5 @@ test("Form with style", () => {
 			}}
 		></Form>
 	);
-	expect(wrapper.html()).toEqual(`<form style="font-size: 12px;" class="nex-form"></form>`);
+	expect(wrapper.html()).toEqual(`<form style="font-size: 12px;" class="rw-form"></form>`);
 });

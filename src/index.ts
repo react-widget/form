@@ -8,12 +8,12 @@ import useFormItem from "./useFormItem";
 
 type BaseFormType = typeof BaseForm;
 interface Form extends BaseFormType {
-    Item: typeof FormItem;
-    useForm: typeof useForm;
-    useFormItem: typeof useFormItem;
-    Context: typeof FormContext;
-    ItemContext: typeof FormItemContext;
-    NativeField: typeof NativeField;
+	Item: typeof FormItem;
+	useForm: typeof useForm;
+	useFormItem: typeof useFormItem;
+	Context: typeof FormContext;
+	ItemContext: typeof FormItemContext;
+	NativeField: typeof NativeField;
 }
 
 const Form: Form = BaseForm as Form;
@@ -25,14 +25,16 @@ Form.useFormItem = useFormItem;
 Form.ItemContext = FormItemContext;
 Form.NativeField = NativeField;
 
+export const version = "%VERSION%";
+
 export {
-    BaseForm as Form,
-    FormItem,
-    NativeField,
-    FormContext,
-    FormItemContext,
-    useForm,
-    useFormItem,
+	BaseForm as Form,
+	FormItem,
+	NativeField,
+	FormContext,
+	FormItemContext,
+	useForm,
+	useFormItem,
 };
 
 export default Form;
