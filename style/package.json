@@ -1,0 +1,6 @@
+{
+	"name": "react-widget-form/style",
+	"private": true,
+	"main": "../cjs/style/index.js",
+	"module": "../esm/style/index.js"
+}

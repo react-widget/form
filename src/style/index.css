@@ -1,0 +1,58 @@
+.rw-form-item {
+	display: flex;
+}
+
+.rw-form-item-inline {
+	display: inline-flex;
+}
+
+.rw-form-item-label {
+	text-align: right;
+	flex: none;
+}
+
+.rw-form-item-label-left {
+	text-align: left;
+}
+
+.rw-form-item-top {
+	display: block;
+}
+
+.rw-form-item-top.rw-form-item-inline {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.rw-form-item-top .rw-form-item-label {
+	text-align: left;
+	display: block;
+}
+
+.rw-form-item-label {
+	text-align: right;
+	flex: none;
+}
+
+.rw-form-item-label {
+	text-align: right;
+	flex: none;
+}
+
+.rw-form-item-label {
+	text-align: right;
+	flex: none;
+}
+
+.rw-form-item-control {
+	position: relative;
+	flex: 1;
+}
+
+.rw-form-item.is-required .rw-form-item-label:before {
+	content: "*";
+	display: inline-block;
+	margin-right: 4px;
+	font-family: SimSun;
+	color: red;
+}

@@ -1,6 +1,6 @@
 import React from "react";
 
-export interface NativeFieldProps {
+export interface NativeFieldProps extends Omit<React.HTMLAttributes<any>, "onChange"> {
 	component?: React.ElementType<any>;
 	value?: any;
 	inputRef?: (ref: React.ReactInstance) => void;

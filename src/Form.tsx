@@ -7,7 +7,7 @@ import FormContext from "./FormContext";
 import { FormItem } from "./FormItem";
 import { isEmptyValue } from "./utils";
 
-import {
+import type {
 	FormValue,
 	TriggerType,
 	ValidateTrigger,
@@ -25,21 +25,20 @@ export type ComponentProps = {
 };
 
 export interface FormProps {
-	prefixCls: string;
-	className: string;
-	style: React.CSSProperties;
-	disableValidator: boolean;
-	validators: Record<string, Validator | Validator[]>;
-	path2obj: boolean;
-	component: React.ElementType;
-	asyncTestDelay: number;
-	validateDelay: number;
-	validateTrigger: ValidateTrigger;
-	labelPosition: "top" | "left";
-	labelAlign: "left" | "right";
-	clearErrorOnFocus: boolean;
-	inline: boolean;
-
+	prefixCls?: string;
+	className?: string;
+	style?: React.CSSProperties;
+	disableValidator?: boolean;
+	validators?: Record<string, Validator | Validator[]>;
+	path2obj?: boolean;
+	component?: React.ElementType;
+	asyncTestDelay?: number;
+	validateDelay?: number;
+	validateTrigger?: ValidateTrigger;
+	labelPosition?: "top" | "left";
+	labelAlign?: "left" | "right";
+	clearErrorOnFocus?: boolean;
+	inline?: boolean;
 	scrollIntoView?: (dom: HTMLDivElement) => void;
 	children?: ((instance: Form) => React.ReactNode) | React.ReactNode;
 	defaultFormValue?: FormValue;
@@ -58,33 +57,29 @@ export interface FormProps {
 	getInputProps?: (formItem: FormItem) => Partial<FormItemChildrenProps>;
 }
 
-interface FormState {
+export interface FormState {
 	formError: Record<string, any>;
 	validatingFields: Record<string, boolean>;
 	formValue: FormValue;
 }
 
-const defaultProps: FormProps = {
-	prefixCls: "rw-form",
-	className: "",
-	style: {},
-	disableValidator: false,
-	validators: {},
-	path2obj: true,
-	component: "form",
-	asyncTestDelay: 16,
-	validateDelay: 0,
-	validateTrigger: ["change"], //"blur",
-	labelPosition: "left",
-	labelAlign: "right",
-	clearErrorOnFocus: true,
-	inline: false,
-};
-
 function noop() {}
 
 export class Form extends React.Component<FormProps, FormState> {
-	static defaultProps = defaultProps;
+	static defaultProps: FormProps = {
+		prefixCls: "rw-form",
+		disableValidator: false,
+		validators: {},
+		path2obj: true,
+		component: "form",
+		asyncTestDelay: 16,
+		validateDelay: 0,
+		validateTrigger: ["change"], //"blur",
+		labelPosition: "left",
+		labelAlign: "right",
+		clearErrorOnFocus: true,
+		inline: false,
+	};
 
 	static getDerivedStateFromProps(nextProps: FormProps, prevState: FormState) {
 		return {
@@ -92,10 +87,8 @@ export class Form extends React.Component<FormProps, FormState> {
 		};
 	}
 
-	readonly props: Readonly<FormProps>;
-
 	//异步校验加乐观锁
-	fieldLocks: Record<string, any> = {};
+	fieldLocks: Record<string, any> = Object.create(null);
 	formLockId: number = 1;
 
 	_isFormValidating: boolean = false;
@@ -103,14 +96,12 @@ export class Form extends React.Component<FormProps, FormState> {
 	fields: FormItem[] = [];
 	_validateCb: ValueChangeCallback[] = [];
 
-	state: FormState;
-
 	constructor(props: FormProps, context?: any) {
 		super(props, context);
 
 		this.state = {
-			formError: {},
-			validatingFields: {},
+			formError: Object.create(null),
+			validatingFields: Object.create(null),
 			formValue: props.defaultFormValue || {},
 		};
 	}
@@ -123,8 +114,7 @@ export class Form extends React.Component<FormProps, FormState> {
 		var idx = this.fields.indexOf(field);
 		if (idx !== -1) {
 			const name = field.props.name;
-
-			// eslint-disable-next-line
+			// 清空验证信息
 			this.state.formError[name] = null;
 
 			this.fields.splice(idx, 1);
@@ -155,18 +145,18 @@ export class Form extends React.Component<FormProps, FormState> {
 	reset(cb?: ValueChangeCallback) {
 		const initialFormValue = this.getInitialFormValue();
 
-		this.fieldLocks = {};
+		this.fieldLocks = Object.create(null);
 		this.formLockId = 1;
 		this._isFormValidating = false;
-		// eslint-disable-next-line
-		this.state.validatingFields = {};
-		// eslint-disable-next-line
-		this.state.formValue = initialFormValue;
-		// eslint-disable-next-line
-		this.state.formError = {};
+		// @ts-ignore
+		this.state.validatingFields = Object.create(null);
+		// @ts-ignore
+		// this.state.formValue = initialFormValue;
+		// @ts-ignore
+		this.state.formError = Object.create(null);
 		// this.cleanErrors();
 
-		this.setValues({}, cb);
+		this.setValues(initialFormValue, cb);
 	}
 
 	getInitialValue(name: string) {
@@ -208,7 +198,7 @@ export class Form extends React.Component<FormProps, FormState> {
 		const { path2obj, onChange } = this.props;
 		const formValue = this.state.formValue;
 
-		const isControlled = "formValue" in this.props;
+		const isControlled = this.props.formValue !== undefined;
 
 		const nextFormValue = formValue;
 
@@ -241,8 +231,7 @@ export class Form extends React.Component<FormProps, FormState> {
 	}
 
 	getValue(name: string) {
-		const { getDefaultFieldValue } = this.props;
-		const path2obj = this.props.path2obj;
+		const { getDefaultFieldValue, path2obj } = this.props;
 		const formValue = this.state.formValue;
 
 		const value = path2obj ? get(formValue, name) : formValue[name];
@@ -253,32 +242,12 @@ export class Form extends React.Component<FormProps, FormState> {
 	}
 
 	setValue(name: string, value: any, cb?: ValueChangeCallback) {
-		const { path2obj, onChange } = this.props;
-		const formValue = this.state.formValue;
-
-		const isControlled = "formValue" in this.props;
-
-		const nextFormValue = formValue;
-
-		if (path2obj) {
-			set(nextFormValue, name, value);
-		} else {
-			nextFormValue[name] = value;
-		}
-
-		if (!isControlled) {
-			this.setState({
-				formValue: nextFormValue,
-			});
-		}
-
-		if (onChange) {
-			onChange(nextFormValue);
-		}
-
-		if (cb) {
-			this._validateCb.push(cb);
-		}
+		this.setValues(
+			{
+				[name]: value,
+			},
+			cb
+		);
 	}
 
 	getFieldValue(name: string) {
@@ -375,7 +344,7 @@ export class Form extends React.Component<FormProps, FormState> {
 
 	cleanErrors() {
 		this.setState({
-			formError: {},
+			formError: Object.create(null),
 		});
 	}
 
@@ -402,9 +371,8 @@ export class Form extends React.Component<FormProps, FormState> {
 				if (fieldProps.required) {
 					fieldValidators.unshift(value => {
 						if (isEmptyValue(value)) {
-							return field.getProp("requiredMessage", `${name} check fail`);
+							return field.getProp("requiredMessage", `${name} is required`);
 						}
-
 						return true;
 					});
 				}
@@ -418,7 +386,7 @@ export class Form extends React.Component<FormProps, FormState> {
 				}
 			});
 
-		const validator = this.props.validators[name];
+		const validator = this.props.validators?.[name];
 
 		if (validator) {
 			fieldValidators.push(...(Array.isArray(validator) ? validator : [validator]));
@@ -441,7 +409,9 @@ export class Form extends React.Component<FormProps, FormState> {
 		if (this._isFormValidating) return true;
 
 		const validatingFields = this.state.validatingFields;
-		return Object.keys(validatingFields).some(key => validatingFields[key]);
+		return Object.keys(validatingFields).some(
+			key => !this.isDisableValidatorField(key) && validatingFields[key]
+		);
 	}
 
 	_validateField(name: string, callback: ValidationCallback, triggerType: TriggerType = "none") {
@@ -466,7 +436,7 @@ export class Form extends React.Component<FormProps, FormState> {
 					errors = [errors];
 				}
 
-				errors = errors.map(error => {
+				errors = errors.map((error: any) => {
 					let message = error;
 
 					if (error instanceof Error) {
@@ -488,7 +458,7 @@ export class Form extends React.Component<FormProps, FormState> {
 			const validator = validators.shift();
 
 			if (!validator) {
-				return; //check finish
+				return;
 			}
 
 			// 校验方法返回 true undefined null 代表校验成功，校验失败则直接返回失败信息
@@ -498,6 +468,7 @@ export class Form extends React.Component<FormProps, FormState> {
 			} else if (ret === false) {
 				cb(`${name} check fail`);
 			} else if (ret && ret.then) {
+				// promise
 				ret.then(
 					() => cb(),
 					(e: any) => cb(e)
@@ -580,10 +551,10 @@ export class Form extends React.Component<FormProps, FormState> {
 		let hasRunComplete = false;
 		const { asyncTestDelay } = this.props;
 		const { formValue } = this.state;
-		this.fieldLocks = {}; //validate优先级高于validateField
+		this.fieldLocks = Object.create(null); //validate优先级高于validateField
 		const lockId = ++this.formLockId;
 		const fields = this.fields;
-		const validatingFields = {};
+		const validatingFields = Object.create(null);
 		const allErrors: ValidationError[] = [];
 		let validCounter = 0;
 
@@ -721,14 +692,9 @@ export class Form extends React.Component<FormProps, FormState> {
 	};
 
 	render() {
-		const {
-			prefixCls,
-			style,
-			className,
-			onSubmit,
-			component: Component,
-			children,
-		} = this.props;
+		const { prefixCls, style, className, onSubmit, component, children } = this.props;
+
+		const Component = component!;
 
 		return (
 			<FormContext.Provider value={this.getFormContext()}>

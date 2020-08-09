@@ -5,7 +5,7 @@ import FormContext, { IFormContext } from "./FormContext";
 import FormItemContext from "./FormItemContext";
 import { FormProps } from "./Form";
 
-import {
+import type {
 	FormValue,
 	TriggerType,
 	ValidateTrigger,
@@ -31,9 +31,9 @@ type CommonProps =
 	| "requiredMessage";
 
 export interface FormItemProps {
-	showRequiredMark: boolean;
+	showRequiredMark?: boolean;
 	name: string;
-	validateDelay: number;
+	validateDelay?: number;
 	children?:
 		| ((props: FormItemChildrenProps, instance: FormItem) => React.ReactNode)
 		| React.ReactNode;
@@ -65,20 +65,16 @@ export interface FormItemProps {
 	onBlur?: (e: React.FocusEvent) => void;
 }
 
-const defaultProps: FormItemProps = {
-	showRequiredMark: false,
-	name: "",
-	validateDelay: 0,
-};
-
 let fid = 1;
 
 export class FormItem extends React.Component<FormItemProps> {
 	static contextType = FormContext;
 
-	static defaultProps = defaultProps;
-
-	readonly props: Readonly<FormItemProps>;
+	static defaultProps: FormItemProps = {
+		showRequiredMark: false,
+		name: "",
+		validateDelay: 0,
+	};
 
 	_initialValue?: any;
 	context: IFormContext;
@@ -134,7 +130,7 @@ export class FormItem extends React.Component<FormItemProps> {
 		const { validateDelay } = form.props;
 		const props = this.props;
 
-		return "validateDelay" in props ? props.validateDelay : validateDelay;
+		return "validateDelay" in props ? props.validateDelay! : validateDelay!;
 	}
 
 	reset(cb?: ValueChangeCallback) {
@@ -256,7 +252,7 @@ export class FormItem extends React.Component<FormItemProps> {
 		const getInputProps = this.getFormProp("getInputProps", () => ({}));
 
 		const customProps = getInputProps(this);
-		//valueTrigger 	收集子节点的值的时机，暂不开发...
+		// TODO: valueTrigger 	收集子节点的值的时机
 		return {
 			value: this.getValue(),
 			...customProps,

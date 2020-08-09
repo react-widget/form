@@ -160,7 +160,7 @@ function Input(props){
 ### NativeInput
 
 ```ts
-component: React.ElementType;
+component?: React.ElementType;
 onChange?: (value: any) => void;
 inputRef?: (dom: any) => void;
 [others: string]: any;
@@ -265,51 +265,64 @@ export default function NativeInput(props) {
 
 ## 基础样式
 
-```scss
-$form-item-cls: nex-form-item;
+```css
+.rw-form-item {
+	display: flex;
+}
 
-.#{$form-item-cls} {
-    display: flex;
+.rw-form-item-inline {
+	display: inline-flex;
+}
 
-    &-inline {
-        display: inline-flex;
-    }
+.rw-form-item-label {
+	text-align: right;
+	flex: none;
+}
 
-    &-label {
-        text-align: right;
-        flex: none;
-    }
+.rw-form-item-label-left {
+	text-align: left;
+}
 
-    &-label-left {
-        text-align: left;
-    }
+.rw-form-item-top {
+	display: block;
+}
 
-    &-top {
-        display: block;
-    }
+.rw-form-item-top.rw-form-item-inline {
+	display: inline-block;
+	vertical-align: top;
+}
 
-    &-top.#{$form-item-cls}-inline {
-        display: inline-block;
-        vertical-align: top;
-    }
+.rw-form-item-top .rw-form-item-label {
+	text-align: left;
+	display: block;
+}
 
-    &-top &-label {
-        text-align: left;
-        display: block;
-    }
+.rw-form-item-label {
+	text-align: right;
+	flex: none;
+}
 
-    &-control {
-        position: relative;
-        flex: 1;
-    }
+.rw-form-item-label {
+	text-align: right;
+	flex: none;
+}
 
-    &.is-required &-label:before {
-        content: "*";
-        display: inline-block;
-        margin-right: 4px;
-        font-family: SimSun;
-        color: red;
-    }
+.rw-form-item-label {
+	text-align: right;
+	flex: none;
+}
+
+.rw-form-item-control {
+	position: relative;
+	flex: 1;
+}
+
+.rw-form-item.is-required .rw-form-item-label:before {
+	content: "*";
+	display: inline-block;
+	margin-right: 4px;
+	font-family: SimSun;
+	color: red;
 }
 
 
